@@ -1,0 +1,219 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.common.mapper.VoMapper">
+
+    <!-- ProductVO에 있는 변수는 따로 지정하지 않아도 자동으로 값이 세팅된다. (단, property는 같아야 한다.) -->
+    <resultMap id="productVOMap" type="ProductVO">
+        <association property="baseVO" javaType="BaseVO">
+            <result property="prdAutoPrcsNo" column="prdAutoPrcsNo"></result>
+            <result property="advrtStmt" column="advrtStmt"></result>
+            <result property="orgnTypCd" column="orgnTypCd"></result>
+            <result property="orgnNm" column="orgnNm"></result>
+            <result property="selPrdClfCd" column="selPrdClfCd"></result>
+            <result property="selBgnDy" column="selBgnDy"></result>
+            <result property="selEndDy" column="selEndDy"></result>
+            <result property="selMnbdClfCd" column="selMnbdClfCd"></result>
+            <result property="selMthdCd" column="selMthdCd"></result>
+            <result property="prdCompTypCd" column="prdCompTypCd"></result>
+            <result property="selStatCd" column="selStatCd"></result>
+            <result property="dlvCnAreaCd" column="dlvCnAreaCd"></result>
+            <result property="dlvWyCd" column="dlvWyCd"></result>
+            <result property="dlvCstInstBasiCd" column="dlvCstInstBasiCd"></result>
+            <result property="dlvCst" column="dlvCst"></result>
+            <result property="dlvCstPayTypCd" column="dlvCstPayTypCd"></result>
+            <result property="rtngdDlvCst" column="rtngdDlvCst"></result>
+            <result property="exchDlvCst" column="exchDlvCst"></result>
+            <result property="bndlDlvCnYn" column="bndlDlvCnYn"></result>
+            <result property="todayDlvCnYn" column="todayDlvCnYn"></result>
+            <result property="appmtDyDlvCnYn" column="appmtDyDlvCnYn"></result>
+            <result property="sndPlnTrm" column="sndPlnTrm"></result>
+            <result property="rcptIsuCnYn" column="rcptIsuCnYn"></result>
+            <result property="prdTypCd" column="prdTypCd"></result>
+            <result property="minorSelCnYn" column="minorSelCnYn"></result>
+            <result property="aprvNessYn" column="aprvNessYn"></result>
+            <result property="mnfcDy" column="mnfcDy"></result>
+            <result property="eftvDy" column="eftvDy"></result>
+            <result property="prdStatCd" column="prdStatCd"></result>
+            <result property="suplDtyfrPrdClfCd" column="suplDtyfrPrdClfCd"></result>
+            <result property="sellerPrdCd" column="sellerPrdCd"></result>
+            <result property="unDlvCnYn" column="unDlvCnYn"></result>
+            <result property="wirelssPrdNm" column="wirelssPrdNm"></result>
+            <result property="wirelssPrdDtlDesc" column="wirelssPrdDtlDesc"></result>
+            <result property="bagrnSelPrdYn" column="bagrnSelPrdYn"></result>
+            <result property="createIp" column="createIp"></result>
+            <result property="updateIp" column="updateIp"></result>
+            <result property="sellerPcId" column="sellerPcId"></result>
+            <result property="prcCmpExpYn" column="prcCmpExpYn"></result>
+            <result property="avgDlvDy" column="avgDlvDy"></result>
+            <result property="totSelQty" column="totSelQty"></result>
+            <result property="abrdBrandYn" column="abrdBrandYn"></result>
+            <result property="abrdBuyPlace" column="abrdBuyPlace"></result>
+            <result property="dispCtgr1NoDe" column="dispCtgr1NoDe"></result>
+            <result property="dispCtgr2NoDe" column="dispCtgr2NoDe"></result>
+            <result property="dispCtgr3NoDe" column="dispCtgr3NoDe"></result>
+            <result property="dispCtgr4NoDe" column="dispCtgr4NoDe"></result>
+            <result property="displayYn" column="displayYn"></result>
+            <result property="createCd" column="createCd"></result>
+            <result property="chinaSaleYn" column="chinaSaleYn"></result>
+            <result property="chinaSelPrc" column="chinaSelPrc"></result>
+            <result property="selLimitTypCd" column="selLimitTypCd"></result>
+            <result property="selLimitQty" column="selLimitQty"></result>
+            <result property="lowPrcCompExYn" column="lowPrcCompExYn"></result>
+            <result property="ctgrPntPreExYn" column="ctgrPntPreExYn"></result>
+            <result property="mstrPrdMatchClfCd" column="mstrPrdMatchClfCd"></result>
+            <result property="orgnTypDtlsCd" column="orgnTypDtlsCd"></result>
+            <result property="orgnDifferentYn" column="orgnDifferentYn"></result>
+            <result property="orderCmltOutLink" column="orderCmltOutLink"></result>
+            <result property="cupnExCd" column="cupnExCd"></result>
+            <result property="mypageOutLink" column="mypageOutLink"></result>
+            <result property="dlvCstInfoCd" column="dlvCstInfoCd"></result>
+            <result property="sellerAgencyCd" column="sellerAgencyCd"></result>
+            <result property="mobile1wonYn" column="mobile1wonYn"></result>
+            <result property="bcktExYn" column="bcktExYn"></result>
+            <result property="prdFrDlvBasiAmt" column="prdFrDlvBasiAmt"></result>
+            <result property="reviewDispYn" column="reviewDispYn"></result>
+            <result property="ordCnStepCd" column="ordCnStepCd"></result>
+            <result property="selMinLimitTypCd" column="selMinLimitTypCd"></result>
+            <result property="selMinLimitQty" column="selMinLimitQty"></result>
+            <result property="abrdSizetableDispYn" column="abrdSizetableDispYn"></result>
+            <result property="visitDlvYn" column="visitDlvYn"></result>
+            <result property="bsnDealClf" column="bsnDealClf"></result>
+            <result property="dlvClf" column="dlvClf"></result>
+            <result property="abrdCnDlvCst" column="abrdCnDlvCst"></result>
+            <result property="abrdInCd" column="abrdInCd"></result>
+            <result property="prdWght" column="prdWght"></result>
+            <result property="jejuDlvCst" column="jejuDlvCst"></result>
+            <result property="islandDlvCst" column="islandDlvCst"></result>
+            <result property="reviewOptDispYn" column="reviewOptDispYn"></result>
+            <result property="hideYn" column="hideYn"></result>
+            <result property="bookAddCd" column="bookAddCd"></result>
+            <result property="fdPrdNm" column="fdPrdNm"></result>
+            <result property="minorSelCnBoYn" column="minorSelCnBoYn"></result>
+            <result property="forAbrdBuyClf" column="forAbrdBuyClf"></result>
+            <result property="rmaterialTypCd" column="rmaterialTypCd"></result>
+            <result property="useMon" column="useMon"></result>
+            <result property="hsCode" column="hsCode"></result>
+            <result property="omPrdYn" column="omPrdYn"></result>
+            <result property="svcAreaCd" column="svcAreaCd"></result>
+            <result property="rtngdDlvCd" column="rtngdDlvCd"></result>
+            <result property="templateYn" column="templateYn"></result>
+            <result property="eftvEndDy" column="eftvEndDy"></result>
+            <result property="townLmtClfCd" column="townLmtClfCd"></result>
+            <result property="shopNo" column="shopNo"></result>
+            <result property="gblDlvYn" column="gblDlvYn"></result>
+            <result property="gblHsCodeNo" column="gblHsCodeNo"></result>
+            <result property="gblHsCode" column="gblHsCode"></result>
+            <result property="ntNo" column="ntNo"></result>
+            <result property="prdNmEng" column="prdNmEng"></result>
+            <result property="engDispYn" column="engDispYn"></result>
+            <result property="infoTypeCtgrNo" column="infoTypeCtgrNo"></result>
+            <result property="partnerCupnExYn" column="partnerCupnExYn"></result>
+            <result property="lpCupnExYn" column="lpCupnExYn"></result>
+            <result property="optTypCd" column="optTypCd"></result>
+            <result property="rfndTypCd" column="rfndTypCd"></result>
+            <result property="selLimitTerm" column="selLimitTerm"></result>
+            <result property="setTypCd" column="setTypCd"></result>
+            <result property="issueCupnExptCd" column="issueCupnExptCd"></result>
+            <result property="stdPrdNm" column="stdPrdNm"></result>
+            <result property="mktPrdNm" column="mktPrdNm"></result>
+            <result property="stdPrdYn" column="stdPrdYn"></result>
+            <result property="stdOptGrpNo" column="stdOptGrpNo"></result>
+            <result property="employeeNo" column="employeeNo"></result>
+            <result property="employee" column="employee"></result>
+            <result property="certTypCd" column="certTypCd"></result>
+            <result property="prdInfoType" column="prdInfoType"></result>
+            <result property="templatePrdNo" column="templatePrdNo"></result>
+            <result property="reRegPrdNo" column="reRegPrdNo"></result>
+            <result property="selTermDy" column="selTermDy"></result>
+            <result property="itemInfo" column="itemInfo"></result>
+            <result property="tourSidoSelectInfo" column="tourSidoSelectInfo"></result>
+            <result property="sigunguSelectInfoID" column="sigunguSelectInfoID"></result>
+            <result property="certDownYn" column="certDownYn"></result>
+            <result property="townSellerCertType" column="townSellerCertType"></result>
+            <result property="frPrdNo" column="frPrdNo"></result>
+            <result property="mstrPrdNo" column="mstrPrdNo"></result>
+            <result property="allBranchUseYn" column="allBranchUseYn"></result>
+            <result property="townSelLmtDy" column="townSelLmtDy"></result>
+            <result property="pdEventCnt" column="pdEventCnt"></result>
+            <result property="evtConfirmCnt" column="evtConfirmCnt"></result>
+            <result property="modelNo" column="modelNo"></result>
+            <result property="stdBaseDt" column="stdBaseDt"></result>
+            <result property="brandNm" column="brandNm"></result>
+            <result property="modelNm" column="modelNm"></result>
+            <result property="statChgRsn" column="statChgRsn"></result>
+            <result property="stdPrdYn" column="stdPrdYn"></result>
+        </association>
+        <association property="optionVO" javaType="OptionVO">
+            <result property="optTypCd" column="optTypCd"></result>
+            <result property="mrgnPolicyCd" column="mrgnPolicyCd"></result>
+            <result property="mrgnRt" column="mrgnRt"></result>
+            <result property="puchPrc" column="puchPrc"></result>
+            <result property="mrgnAmt" column="mrgnAmt"></result>
+            <result property="prdStckQty" column="prdStckQty"></result>
+        </association>
+        <association property="priceVO" javaType="PriceVO">
+            <result property="cstmAplPrc" column="cstmAplPrc"></result>
+            <result property="selPrc" column="selPrc"></result>
+            <result property="maktPrc" column="maktPrc"></result>
+        </association>
+        <association property="prdOthersVO" javaType="PrdOthersVO">
+            <result property="buyDsblDyCd" column="buyDsblDyCd"></result>
+        </association>
+        <association property="memberVO" javaType="MemberVO">
+            <result property="memID" column="memId"></result>
+            <result property="memNM" column="memNm"></result>
+            <result property="memEmail" column="memEmail"></result>
+            <result property="memTypCD" column="memTypCd"></result>
+        </association>
+        <association property="categoryVO" javaType="CategoryVO">
+            <result property="dispCtgrNo" column="dispCtgrNo"></result>
+            <result property="offerDispLmtYn" column="offerDispLmtYn"></result>
+            <result property="mobileYn" column="mobileYn"></result>
+            <result property="dispCtgrPrdTypCd" column="dispCtgrPrdTypCd"></result>
+            <result property="bookClfCd" column="bookClfCd"></result>
+            <result property="aprvCrtfYn" column="aprvCrtfYn"></result>
+        </association>
+        <association property="productDescVO" javaType="ProductDescVO">
+            <result property="prdDescContClob" column="prdDescContClob"></result>
+            <result property="splitedCnt" column="splitedCnt"></result>
+            <result property="splitedUrl" column="splitedUrl"></result>
+            <result property="prdDtlTypCd" column="prdDtlTypCd"></result>
+        </association>
+    </resultMap>
+
+    <resultMap id="eventPrdInfoResult" type="ProductEvtVO">
+        <association property="EventPricePegVO" javaType="EventPricePegVO">
+            <result property="aprvStatCd"	column="APRV_STAT_CD"/>
+            <result property="prdAddStatCd" column="PRD_ADD_STAT_CD"/>
+            <result property="eventBgnDt" 	column="EVENT_BGN_DT"/>
+        </association>
+        <association property="EventRqstPrdInfoVO" javaType="EventRqstPrdInfoVO">
+            <result property="eventNo" 	column="RQST_EVENT_NO"/>
+        </association>
+        <association property="EventOrgPrdInfoVO" javaType="EventOrgPrdInfoVO">
+            <result property="eventNo" 	column="ORG_EVENT_NO"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="sharedStockListResult" type="ProductStockVO">
+        <association property="stockSetInfoVO" javaType="ProductStockSetInfoVO">
+            <result property="mstPrdNo" column="MST_PRD_NO"/>
+            <result property="compPrdNo" column="COMP_PRD_NO" />
+            <result property="compStckNo" column="COMP_STCK_NO" />
+            <result property="avgUntprc" column="AVG_UNTPRC"/>
+            <result property="setDscRt" column="SET_DSC_RT"/>
+            <result property="setUnitQty" column="SET_UNIT_QTY"/>
+            <result property="stckQty" column="STCK_QTY"/>
+            <result property="addedSelPrc" column="COMP_ADDED_SEL_PRC"/>
+            <result property="prdNm" column="PRD_NM"/>
+            <result property="optionMixNm" column="OPTION_MIX_NM"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="standardOptionItemInfoResult" type="StandardOptionItemVO">
+        <association property="stdOptGrpMappVO" javaType="StandardOptionGroupMappingVO">
+            <result property="stdOptGrpNo" column="STD_OPT_GRP_NO"/>
+        </association>
+    </resultMap>
+</mapper>

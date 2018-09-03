@@ -1,0 +1,698 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.ctgrattr.mapper.CtgrAttrMapper">
+
+
+
+    <select id="getServiceKeyAttributeListByDispCtgNo" resultType="CtgrAttrVO" parameterType="HashMap">
+        SELECT /* getServiceKeyAttributeListByDispCtgNo (ctgrAttrMapper.xml) */
+        A.ATTR_NO as prdAttrNo,
+        NVL(a.HGRNK_ATTR_NO,0) hgrnkAttrNo,
+        A.ATTR_CD as prdAttrValueCd,
+        A.MSTR_PRD_KEY_ATTR_YN as keyAttrYn,
+        A.ATTR_ENT_WY_CD as attrEntWyCd,
+        A.ATTR_UNIT_CD as prdAttrUnitCd,
+        A.PLNO_SLCT_CN_YN as plnoSlctCnYn,
+        A.ATTR_VALUE_IMG_APL_YN as attrValImgAplYn,
+        B.PRD_ATTR_VALUE_NM as prdAttrValueNm,
+        NVL(B.ATTR_TYPE, '') AS attrType,
+        NVL(C.DISP_CTGR_KIND_CD, '01') AS dispCtgrKindCd,
+        NVL(A.SELLER_PRD_KEY_ATTR_YN, 'N') AS sellerPrdKeyAttrYn
+        FROM pd_ctgr_attr a,
+        pd_prd_attr_value_cd b,
+        dp_disp_ctgr c
+        WHERE a.attr_cd = b.prd_attr_value_cd
+        AND a.disp_ctgr_no = c.disp_ctgr_no
+        AND a.SELLER_PRD_KEY_ATTR_YN = 'Y'
+        AND b.use_yn = 'Y'
+        and a.use_yn = 'Y'
+        AND a.DISP_CTGR_NO IN (SELECT case when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr4_no and use_yn = 'Y'
+        and a.disp_ctgr4_no is not null and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr4_no
+        when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr3_no and use_yn = 'Y'
+        and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr3_no
+        when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr2_no and use_yn = 'Y'
+        and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr2_no
+        else a.disp_ctgr1_no end disp_ctgr_no
+        FROM dp_disp_ctgr_list a
+        WHERE a.DISP_CTGR_NO IN (#{dispCtgrNo},#{infoTypeCtgrNo}
+
+        ))
+        ORDER BY disp_ctgr_kind_cd DESC, a.disp_prrt_rnk
+    </select>
+
+    <select id="getAttributeValueByOnePrdAttrValueCd"
+            resultType="CtgrAttrValueVO"
+            parameterType="HashMap">
+        SELECT /* getAttributeValueByOnePrdAttrValueCd (ctgrAttrMapper.xml) */
+        prd_attr_value_cd, prd_attr_value_nm
+        FROM pd_prd_attr_comp
+        WHERE obj_prd_no = #{objPrdNo}
+        AND obj_clf_cd = #{valueObjClfCd}
+        AND prd_attr_cd = #{prdAttrCd}
+    </select>
+
+    <select id="getServiceKeyAttributeListByDispCtgNoPrdSecondForTour"
+            resultType="CtgrAttrVO"
+            parameterType="HashMap">
+        SELECT /* getServiceKeyAttributeListByDispCtgNoPrdSecondForTour (ctgrAttrMapper.xml)*/
+        C.PRD_ATTR_NO as prdAttrNo,
+        C.hgrnk_attr_no as hgrnkAttrNo,
+        C.prd_attr_value_cd as prdAttrValueCd,
+        C.key_attr_yn as keyAttrYn,
+        C.attr_ent_wy_cd as attrEntWyCd,
+        C.prd_attr_unit_cd as prdAttrUnitCd,
+        C.plno_slct_cn_yn as plnoSlctCnYn,
+        C.attr_val_img_apl_yn as attrValImgAplYn,
+        C.prd_attr_value_nm as prdAttrValueNm,
+        C.prd_attr_value_comp_value_nm as prdAttrValueCompValueNm,
+        C.disp_ctgr_no as dispCtgrNo,
+        C.disp_prrt_rnk as dispPrrtRnk,
+        C.disp_ctgr_kind_cd as dispCtgrKindCd,
+        C.disp_ctgr_typ_cd as dispCtgrTypCd,
+        C.attr_type as attrType,
+        C.attr_desc as attrDesc,
+        C.svc_typ_cd as svcTypCd,
+        C.exp_wy_cd as expWyCd,
+        C.hgrnk_attr_no_value as hgrnkAttrNoValue,
+        C.hgrnk_attr_no_value_cd as hgrnkAttrNoValueCd,
+        (select /*+ INDEX(A IX1_PD_CTGR_ATTR_VALUE) */ HGRNK_ATTR_VALUE_NO from pd_ctgr_attr_value A where attr_no = c.HGRNK_ATTR_NO_VALUE and attr_value_cd = c.prd_attr_value_comp_value_cd) AS hgrnkAttrValueNo
+        FROM (
+        SELECT /* ctgrAttribute.getServiceKeyAttributeListByDispCtgNoPrdSecondForTour */a.ATTR_NO prd_attr_no,
+        nvl(a.hgrnk_attr_no, 0) hgrnk_attr_no,
+        a.ATTR_CD prd_attr_value_cd,
+        a.MSTR_PRD_KEY_ATTR_YN key_attr_yn,
+        a.attr_ent_wy_cd,
+        a.ATTR_UNIT_CD prd_attr_unit_cd,
+        a.plno_slct_cn_yn,
+        a.ATTR_VALUE_IMG_APL_YN attr_val_img_apl_yn,
+        b.prd_attr_value_nm,
+        NVL((SELECT /*+ INDEX(X PK_PD_PRD_ATTR_COMP) */ LISTAGG (x.prd_attr_value_nm, '∏') WITHIN GROUP (ORDER BY x.prd_attr_value_nm) FROM pd_prd_attr_comp x WHERE  x.obj_prd_no = #{objPrdNo} AND x.obj_clf_cd = #{valueObjClfCd} AND x.prd_attr_cd = a.attr_cd),
+        (SELECT /*+ INDEX(Y PK_PD_PRD_ATTR_COMP_TXT) */ LISTAGG (y.prd_attr_value_nm, '∏') WITHIN GROUP (ORDER BY y.prd_attr_value_nm) FROM pd_prd_attr_comp_txt y WHERE y.obj_prd_no = #{objPrdNo} AND y.obj_clf_cd = #{valueObjClfCd}  AND y.prd_attr_cd = a.attr_cd))
+        AS prd_attr_value_comp_value_nm,
+        (SELECT /*+ INDEX(X PK_PD_PRD_ATTR_COMP) */prd_attr_value_cd
+        FROM pd_prd_attr_comp x
+        WHERE x.obj_prd_no = #{objPrdNo}
+        AND x.obj_clf_cd = '01'
+        AND x.prd_attr_cd = a.attr_cd and rownum =1) AS prd_attr_value_comp_value_cd,
+        a.disp_ctgr_no,
+        a.disp_prrt_rnk,
+        c.disp_ctgr_kind_cd,
+        c.disp_ctgr_typ_cd,
+        nvl(b.attr_type, '') AS attr_type,
+        replace(nvl(a.attr_desc, b.attr_desc), chr(13)||chr(10), '\r\n') AS attr_desc,
+        a.svc_typ_cd,
+        a.exp_wy_cd,
+        NVL((select /*+ INDEX(D IX4_PD_CTGR_ATTR) */ attr_no from pd_ctgr_attr d where d.hgrnk_attr_no > 0 start with d.attr_no = a.attr_no connect by prior d.attr_no = d.hgrnk_attr_no),0) AS hgrnk_attr_no_value,
+        NVL((select /*+ INDEX(D IX4_PD_CTGR_ATTR) */ ATTR_CD from pd_ctgr_attr d where d.hgrnk_attr_no > 0 start with d.attr_no = a.attr_no connect by prior d.attr_no = d.hgrnk_attr_no),'') AS hgrnk_attr_no_value_cd
+        FROM pd_ctgr_attr a,
+        pd_prd_attr_value_cd b,
+        dp_disp_ctgr c
+        WHERE a.attr_cd = b.prd_attr_value_cd
+        AND a.disp_ctgr_no = c.disp_ctgr_no
+        <choose>
+            <when test="sellerPrdKeyAttrYn==null or sellerPrdKeyAttrYn =='' ">
+                AND a.SELLER_PRD_KEY_ATTR_YN = 'Y'
+            </when>
+            <otherwise>
+                AND a.SELLER_PRD_KEY_ATTR_YN = #{sellerPrdKeyAttrYn}
+            </otherwise>
+        </choose>
+
+        AND a.use_yn = 'Y'
+        AND b.use_yn = 'Y'
+        AND a.svc_typ_cd = #{svcTypCd}
+        <if test="onlyIncludeAttrCd != null and onlyIncludeAttrCd.size > 0">
+            and a.attr_cd in
+            <foreach collection = "onlyIncludeAttrCd"  item="item" index="index" open="(" close=")" separator=",">
+                #{item, jdbcType=VARCHAR}
+            </foreach>
+
+        </if>
+
+
+        AND a.disp_ctgr_no IN (SELECT case when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr4_no and use_yn = 'Y'
+        and a.disp_ctgr4_no is not null and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr4_no
+        when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr3_no and use_yn = 'Y'
+        and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr3_no
+        when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr2_no and use_yn = 'Y'
+        and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr2_no
+        else a.disp_ctgr1_no end disp_ctgr_no
+        FROM dp_disp_ctgr_list a
+        WHERE a.DISP_CTGR_NO IN (#{dispCtgrNo}, #{infoTypeCtgrNo})
+
+        )
+        ORDER BY disp_ctgr_kind_cd DESC, a.disp_prrt_rnk
+        ) C
+    </select>
+
+    <select id="getAttributeValueByOneAttributeNo"
+            resultType="CtgrAttrValueVO"
+            parameterType="HashMap">
+
+        SELECT /* getAttributeValueByOneAttributeNo  (ctgrAttrMapper.xml)*/
+        <choose>
+            <when test='synonymIncludeSearchYn !="Y"'>
+                <choose>
+                    <when test=" prdAttrValueNm == null or prdAttrValueNm =='' ">
+                        /*+ leading(a b) index(a IX4_PD_CTGR_ATTR_VALUE) use_nl(a b) */
+
+                    </when>
+                    <otherwise>
+                        /*+ leading(b a) index(a IX4_PD_CTGR_ATTR_VALUE) use_nl(b a) */
+                    </otherwise>
+                </choose>
+            </when>
+            <otherwise>
+                /*+ LEADING(B A) USE_NL(A) INDEX(A IX5_PD_CTGR_ATTR_VALUE) */
+            </otherwise>
+        </choose>
+
+
+        a.attr_no as prd_attr_no,
+        a.HGRNK_ATTR_VALUE_NO as hgrnk_attr_val_no,
+        a.attr_value_no as prd_attr_value_no,
+        a.attr_value_cd as prd_attr_value_cd,
+        b.prd_attr_value_nm,
+        NVL(b.REP_ATTR_VALUE_YN, 'N') AS REP_ATTR_VALUE_YN
+        FROM pd_ctgr_attr_value a, pd_prd_attr_value_cd b
+        WHERE a.attr_value_cd = b.prd_attr_value_cd
+        AND a.attr_no = #{prdAttrNo}
+        <choose>
+            <when test="hgrnkAttrValNo == null or hgrnkAttrValNo =='' ">
+                AND a.HGRNK_ATTR_VALUE_NO = 0
+            </when>
+            <otherwise>
+                AND a.HGRNK_ATTR_VALUE_NO = #{hgrnkAttrValNo}
+            </otherwise>
+        </choose>
+
+        AND a.use_yn = 'Y'
+        AND b.use_yn = 'Y'
+        <choose>
+            <when test='synonymIncludeSearchYn=="Y"'>
+                AND b.CM_CD_YN = 'Y'
+                AND b.attr_value_clf_cd = '02'
+                <choose>
+                    <when test="prdAttrValueNm == null or prdAttrValueNm =='' ">
+                        and 1 = 2
+                    </when>
+                    <otherwise>
+                        and  UPPER (b.prd_attr_value_nm) LIKE UPPER(#{prdAttrValueNm}||'%')
+                    </otherwise>
+                </choose>
+                UNION
+                SELECT /*+ LEADING(C B A) USE_NL(B A) INDEX(C IX2_PD_PRD_ATTR_VAL_SYN) INDEX(B PK_PD_PRD_ATTR_VALUE_CD) */
+                a.attr_no as prd_attr_no,
+                a.HGRNK_ATTR_VALUE_NO as hgrnk_attr_val_no,
+                a.attr_value_no as prd_attr_value_no,
+                a.attr_value_cd as prd_attr_value_cd,
+                b.prd_attr_value_nm,
+                NVL(b.REP_ATTR_VALUE_YN, 'N') AS REP_ATTR_VALUE_YN
+                FROM pd_ctgr_attr_value a, pd_prd_attr_value_cd b, pd_prd_attr_val_syn c
+                WHERE a.attr_value_cd = b.prd_attr_value_cd
+                AND b.prd_attr_value_cd = c.prd_attr_value_cd
+                AND upper(c.syn_nm) LIKE upper(#{prdAttrValueNm}||'%')
+                AND a.attr_no = #{prdAttrNo}
+                AND a.HGRNK_ATTR_VALUE_NO = 0
+                AND a.use_yn = 'Y'
+                AND b.use_yn = 'Y'
+                AND b.attr_value_clf_cd = '02'
+                AND b.CM_CD_YN = 'Y'
+
+            </when>
+            <otherwise>
+                <choose>
+                    <when test="prdAttrValueNm ==null or prdAttrValueNm ==''">
+                        and b.cm_cd_yn = 'Y'
+                    </when>
+                    <otherwise>
+                        and b.prd_attr_value_nm = #{prdAttrValueNm}
+                    </otherwise>
+                </choose>
+
+            </otherwise>
+        </choose>
+        ORDER BY
+        <if test='synonymIncludeSearchYn=="Y"'> REP_ATTR_VALUE_YN DESC, </if>
+        <choose>
+            <when test="tourYN != 'Y'">
+                prd_attr_value_nm
+            </when>
+            <otherwise>
+                disp_prrt_rnk
+            </otherwise>
+        </choose>
+
+
+
+    </select>
+
+    <select id="getServiceKeyAttributeListByDispCtgNoPrdSecond"
+            resultType="CtgrAttrVO"
+            parameterType="HashMap">
+        SELECT /* getServiceKeyAttributeListByDispCtgNoPrdSecond (ctgrAttrMapper.xml)*/
+        x.prd_attr_no as prdAttrNo,
+        x.hgrnk_attr_no as hgrnkAttrNo,
+        x.prd_attr_value_cd as prdAttrValueCd,
+        x.key_attr_yn as keyAttrYn,
+        x.attr_ent_wy_cd as attrEntWyCd,
+        x.prd_attr_unit_cd as prdAttrUnitCd,
+        x.plno_slct_cn_yn as plnoSlctCnYn,
+        x.attr_val_img_apl_yn as attrValImgAplYn,
+        x.prd_attr_value_nm as prdAttrValueNm,
+        x.prd_attr_value_comp_value_nm as prdAttrValueCompValueNm,
+        x.prd_attr_value_comp_value_cd as prdAttrValueCompValueCd,
+        x.disp_ctgr_no as dispCtgrNo,
+        x.disp_prrt_rnk as dispPrrtRnk,
+        x.disp_ctgr_kind_cd as dispCtgrKindCd,
+        x.disp_ctgr_typ_cd as dispCtgrTypCd,
+        x.attr_type as attrType,
+        x.attr_desc as attrDesc,
+        (SELECT cm_cd_yn FROM pd_prd_attr_value_cd WHERE prd_attr_value_cd = x.prd_attr_value_comp_value_cd) AS cmCdYn
+        FROM
+        (
+        SELECT /* ctgrAttribute.getServiceKeyAttributeListByDispCtgNoPrdSecond */
+        a.ATTR_NO prd_attr_no,
+        nvl(a.hgrnk_attr_no, 0) hgrnk_attr_no,
+        a.ATTR_CD prd_attr_value_cd,
+        a.MSTR_PRD_KEY_ATTR_YN key_attr_yn,
+        a.attr_ent_wy_cd,
+        a.ATTR_UNIT_CD prd_attr_unit_cd,
+        a.plno_slct_cn_yn,
+        a.ATTR_VALUE_IMG_APL_YN attr_val_img_apl_yn,
+        b.prd_attr_value_nm,
+        NVL((SELECT /*+ INDEX(X PK_PD_PRD_ATTR_COMP) */ nvl(x.prd_attr_value_nm, '') FROM pd_prd_attr_comp x WHERE  x.obj_prd_no = #{objPrdNo} AND x.obj_clf_cd = #{valueObjClfCd} AND x.prd_attr_cd = a.attr_cd AND rownum = 1),
+        (SELECT /*+ INDEX(Y PK_PD_PRD_ATTR_COMP_TXT) */ nvl(y.prd_attr_value_nm, '') FROM pd_prd_attr_comp_txt y WHERE y.obj_prd_no = #{objPrdNo} AND y.obj_clf_cd = #{valueObjClfCd}  AND y.prd_attr_cd = a.attr_cd AND rownum = 1))
+        AS prd_attr_value_comp_value_nm /*prd_attr_value_comp_value_nm*/,
+        NVL((SELECT /*+ INDEX(X PK_PD_PRD_ATTR_COMP) */ nvl(x.prd_attr_value_cd, '') FROM pd_prd_attr_comp x WHERE  x.obj_prd_no = #{objPrdNo} AND x.obj_clf_cd = #{valueObjClfCd} AND x.prd_attr_cd = a.attr_cd AND rownum = 1),'0') AS prd_attr_value_comp_value_cd,
+        a.disp_ctgr_no,
+        a.disp_prrt_rnk,
+        c.disp_ctgr_kind_cd,
+        c.disp_ctgr_typ_cd,
+        nvl(b.attr_type, '01') AS attr_type,
+        nvl(a.attr_desc, b.attr_desc) AS attr_desc
+        FROM pd_ctgr_attr a,
+        pd_prd_attr_value_cd b,
+        dp_disp_ctgr c
+        WHERE a.attr_cd = b.prd_attr_value_cd
+        AND a.disp_ctgr_no = c.disp_ctgr_no
+        AND a.SELLER_PRD_KEY_ATTR_YN = 'Y'
+        AND a.use_yn = 'Y'
+        AND b.use_yn = 'Y'
+        <if test="onlyIncludeAttrCd != null and onlyIncludeAttrCd.size() > 0">
+            and a.attr_cd in
+            <foreach collection = "onlyIncludeAttrCd"  item="item" index="index" open="(" close=")" separator=",">
+                #{item, jdbcType=VARCHAR}
+            </foreach>
+        </if>
+
+        AND a.disp_ctgr_no IN (SELECT case when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr4_no and use_yn = 'Y'
+        and a.disp_ctgr4_no is not null and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr4_no
+        when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr3_no and use_yn = 'Y'
+        and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr3_no
+        when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr2_no and use_yn = 'Y'
+        and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr2_no
+        else a.disp_ctgr1_no end disp_ctgr_no
+        FROM dp_disp_ctgr_list a
+        WHERE a.DISP_CTGR_NO IN (#{dispCtgrNo},#{infoTypeCtgrNo}
+        ))
+        ORDER BY disp_ctgr_kind_cd DESC, a.disp_prrt_rnk
+        )x
+    </select>
+
+
+    <delete id="serviceDeletePrdAttrValueCompAll" parameterType="HashMap">
+        DELETE /* serviceDeletePrdAttrValueCompAll (ctgrAttrMapper.xml) */
+        FROM pd_prd_attr_comp
+        WHERE obj_prd_no = #{objPrdNo}
+        AND obj_clf_cd = #{valueObjClfCd}
+        AND prd_attr_cd NOT IN ('2547285', '11256539')
+        AND prd_attr_cd NOT IN (SELECT attr_cd
+        FROM pd_ctgr_attr
+        WHERE disp_ctgr_no IN (SELECT case when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr4_no and use_yn = 'Y'
+        and a.disp_ctgr4_no is not null and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr4_no
+        when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr3_no and use_yn = 'Y'
+        and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr3_no
+        when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr2_no and use_yn = 'Y'
+        and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr2_no
+        else a.disp_ctgr1_no end disp_ctgr_no
+        FROM dp_disp_ctgr_list a
+        WHERE a.DISP_CTGR_NO = (select gnrl_ctgr_no from dp_gnrl_disp where prd_no = #{objPrdNo})
+        )
+        AND SELLER_PRD_KEY_ATTR_YN = #{keyAttrYn}
+        <if test="infoTypeCtgrNo != 0" >
+            MINUS SELECT attr_cd FROM pd_ctgr_attr WHERE disp_ctgr_no = #{infoTypeCtgrNo}
+        </if>
+        )
+    </delete>
+
+
+
+    <delete id="serviceDeletePrdAttrValueComp" parameterType="HashMap">
+        DELETE /* serviceDeletePrdAttrValueComp (ctgrAttrMapper.xml) */
+        FROM pd_prd_attr_comp
+        WHERE obj_prd_no = #{objPrdNo}
+        AND obj_clf_cd = #{valueObjClfCd}
+        AND prd_attr_cd NOT IN ('2547285', '11256539')
+        AND prd_attr_cd IN (SELECT attr_cd
+        FROM pd_ctgr_attr
+        WHERE disp_ctgr_no IN (SELECT case when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr4_no and use_yn = 'Y'
+        and a.disp_ctgr4_no is not null and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr4_no
+        when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr3_no and use_yn = 'Y'
+        and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr3_no
+        when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr2_no and use_yn = 'Y'
+        and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr2_no
+        else a.disp_ctgr1_no end disp_ctgr_no
+        FROM dp_disp_ctgr_list a
+        WHERE a.DISP_CTGR_NO IN (#{dispCtgrNo},#{infoTypeCtgrNo}))
+        <if test="newPrdAttrCdList != null and newPrdAttrCdList.size() > 0" >
+            and attr_cd IN
+            <foreach collection = "newPrdAttrCdList"  item="item" index="index" open="(" close=")" separator=",">
+                #{item, jdbcType=VARCHAR}
+            </foreach>
+        </if>
+        AND SELLER_PRD_KEY_ATTR_YN = #{keyAttrYn})
+    </delete>
+
+    <!--  상품 속성값 모니터링 상세 > (비필수)속성값 연결 해제  -->
+    <delete id="deletePrdAttrValue" parameterType="HashMap">
+        DELETE /* ctgrAttribute.deletePrdAttrValue */ pd_prd_attr_comp
+        WHERE obj_clf_cd = '01'
+        AND obj_prd_no = #{objPrdNo}
+        <if test="prdAttrCd !=null and prdAttrCd !='' ">
+            AND prd_attr_cd = #{prdAttrCd}
+        </if>
+        <if test="prdAttrValueCd !=null and prdAttrValueCd != ''">
+            AND prd_attr_value_cd = #{prdAttrValueCd}
+        </if>
+
+
+    </delete>
+
+
+    <select id="getAttributeAndValueCodeNewSeq" resultType="String">
+        SELECT SEQ_PD_PRD_ATTR_VALUE_CD.NEXTVAL SEQ FROM DUAL
+    </select>
+
+    <update id="insertAttributeAndValueCode" parameterType="PdPrdAttrValueCd">
+        INSERT /* ctgrAttribute.insertAttributeAndValueCode */
+        INTO PD_PRD_ATTR_VALUE_CD
+        (PRD_ATTR_VALUE_CD, PRD_ATTR_VALUE_NM, PRD_ATTR_VALUE_ENG_NM, ATTR_VALUE_CLF_CD, PRD_ATTR_ATTR_REG_SRC_CD, USE_YN,
+        CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO, CM_CD_YN, IMG_URL, ATTR_TYPE, ATTR_DESC, REP_ATTR_VALUE_YN)
+        SELECT #{prdAttrValueCd}, #{prdAttrValueNm}, #{prdAttrValueEngNm}, #{attrValueClfCd}, #{prdAttrAttrRegSrcCd}, #{useYn},
+        sysdate, #{createNo}, sysdate, #{updateNo}, #{cmCdYn}, #{imgUrl}, #{attrType}, #{attrDesc}, DECODE(#{repAttrValueYn}, 'Y', 'Y', '')
+        FROM dual
+        WHERE not exists(select /*+ index(a IX5_PD_PRD_ATTR_VALUE_CD)*/ 1
+        from PD_PRD_ATTR_VALUE_CD a
+        where UPPER(PRD_ATTR_VALUE_NM) = UPPER(#{prdAttrValueNm})
+        and use_yn = 'Y'
+        and ATTR_VALUE_CLF_CD = #{attrValueClfCd}
+        and rownum = 1)
+    </update>
+
+
+    <select id="getCodeByAttributeAndValueNm3" resultType="CtgrAttrValueVO" parameterType="HashMap">
+        SELECT /* ctgrAttribute.getCodeByAttributeAndValueNm3 */
+        PRD_ATTR_VALUE_CD, PRD_ATTR_VALUE_NM
+        FROM
+        (
+        SELECT /*+ INDEX_DESC(A IX5_PD_PRD_ATTR_VALUE_CD) */
+        A.PRD_ATTR_VALUE_CD, A.PRD_ATTR_VALUE_NM
+        FROM PD_PRD_ATTR_VALUE_CD A
+        WHERE A.ATTR_VALUE_CLF_CD = #{attrValueClfCd}
+        AND UPPER(A.PRD_ATTR_VALUE_NM) = UPPER(#{prdAttrValueNm})
+        AND A.USE_YN='Y'
+        UNION ALL
+        SELECT /*+ LEADING(A B) USE_NL(B) INDEX(A IX2_PD_PRD_ATTR_VAL_SYN) INDEX(B IX2_PD_PRD_ATTR_VALUE_CD) */
+        B.PRD_ATTR_VALUE_CD, B.PRD_ATTR_VALUE_NM
+        FROM PD_PRD_ATTR_VAL_SYN A, PD_PRD_ATTR_VALUE_CD B
+        WHERE A.PRD_ATTR_VALUE_CD = B.PRD_ATTR_VALUE_CD
+        AND B.ATTR_VALUE_CLF_CD = #{attrValueClfCd}
+        AND UPPER(A.SYN_NM) = UPPER(#{prdAttrValueNm})
+        AND B.USE_YN='Y'
+        )
+        where rownum = 1
+    </select>
+
+    <select id="getCodeByAttributeAndValueNm2" resultType="CtgrAttrValueVO" parameterType="HashMap">
+        select /* ctgrAttribute.getCodeByAttributeAndValueNm2 */
+        c.prd_attr_value_cd, c.prd_attr_value_nm
+        from pd_ctgr_attr a
+        , pd_ctgr_attr_value b
+        , (SELECT
+        prd_attr_value_cd, prd_attr_value_nm
+        FROM
+        (
+        SELECT /*+ LEADING(a b) USE_NL(b) INDEX(a IX2_PD_PRD_ATTR_VAL_SYN) INDEX(b IX2_PD_PRD_ATTR_VALUE_CD) */
+        b.prd_attr_value_cd, b.prd_attr_value_nm
+        FROM pd_prd_attr_val_syn a, pd_prd_attr_value_cd b
+        WHERE a.prd_attr_value_cd = b.prd_attr_value_cd
+        and b.attr_value_clf_cd = '02'
+        and UPPER(a.syn_nm) = UPPER(#{prdAttrValueNm})
+        and b.use_yn='Y'
+        and b.CM_CD_YN = 'Y'
+        UNION ALL
+        SELECT /*+ index(a IX5_PD_PRD_ATTR_VALUE_CD)*/
+        prd_attr_value_cd, prd_attr_value_nm
+        FROM pd_prd_attr_value_cd a
+        WHERE attr_value_clf_cd = '02'
+        and UPPER(prd_attr_value_nm) = UPPER(#{prdAttrValueNm})
+        and use_yn='Y'
+        and CM_CD_YN = 'Y'
+        )
+        where rownum = 1
+        ) c
+        where a.attr_no = b.attr_no
+        and b.attr_value_cd = c.prd_attr_value_cd
+        and a.attr_cd = #{prdAttrCd}
+        and a.disp_ctgr_no IN (SELECT case when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr4_no and use_yn = 'Y'
+        and a.disp_ctgr4_no is not null and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr4_no
+        when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr3_no and use_yn = 'Y'
+        and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr3_no
+        when (select /*+ INDEX(PD_CTGR_ATTR IX2_PD_CTGR_ATTR) */ count(*) from pd_ctgr_attr where disp_ctgr_no = a.disp_ctgr2_no and use_yn = 'Y'
+        and rownum <![CDATA[<=]]> 1) > 0 then a.disp_ctgr2_no
+        else a.disp_ctgr1_no end disp_ctgr_no
+        FROM dp_disp_ctgr_list a
+        WHERE a.DISP_CTGR_NO IN (#{dispCtgrNo},#{infoTypeCtgrNo}
+        ))
+        and rownum = 1
+    </select>
+
+
+    <select id="getCommonAttributeInfoByNo" resultType="CtgrAttrValueVO" parameterType="long">
+        SELECT /*  ctgrAttrMapper.xml(CommonAttributeInfoByNo) */
+        A.DISP_CTGR_NO as dispCtgrNo,
+        A.ATTR_CD prdAttrValueCd,
+        (SELECT B.PRD_ATTR_VALUE_NM FROM PD_PRD_ATTR_VALUE_CD
+        WHERE PRD_ATTR_VALUE_CD= A.ATTR_CD) AS prdAttrValueNm,
+        A.HGRNK_ATTR_NO as hgrnkAttrValNo,
+        (SELECT C.PRD_ATTR_VALUE_NM
+        FROM  PD_PRD_ATTR_VALUE_CD C
+        WHERE C.PRD_ATTR_VALUE_CD IN
+        (SELECT B.ATTR_CD
+        FROM  PD_CTGR_ATTR B
+        WHERE B.ATTR_NO = A.HGRNK_ATTR_NO )
+        ) AS HgrnkAttrValNm,
+        A.ATTR_ENT_WY_CD as attrEntWyCd
+        from PD_CTGR_ATTR A, PD_PRD_ATTR_VALUE_CD B
+        WHERE
+        A.ATTR_CD = B.PRD_ATTR_VALUE_CD
+        AND ATTR_NO = #{prdAttrNo}
+    </select>
+
+    <update id="insertAttributeValueCompHist" parameterType="PdPrdAttrComp">
+        INSERT
+        INTO PD_PRD_ATTR_COMP_HIST
+        (OBJ_PRD_NO, HIST_APL_DT, PRD_ATTR_CD, PRD_ATTR_VALUE_CD, OBJ_CLF_CD, PRD_ATTR_VALUE_NM,
+        CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO)
+
+        SELECT #{objPrdNo}, sysdate, #{prdAttrCd}, #{prdAttrValueCd}, #{objClfCd},
+        (SELECT /*+ INDEX(A IX2_PD_PRD_ATTR_VALUE_CD) */ A.prd_attr_value_nm
+        FROM pd_prd_attr_value_cd A
+        where A.prd_attr_value_cd = #{prdAttrValueCd}
+        and A.ATTR_VALUE_CLF_CD = '02'),
+        sysdate, #{createNo}, sysdate, #{updateNo}
+        FROM DUAL
+        WHERE NOT EXISTS (
+        SELECT  1
+        FROM PD_PRD_ATTR_COMP_HIST A
+        WHERE A.OBJ_PRD_NO = #{objPrdNo}
+        AND A.HIST_APL_DT = SYSDATE
+        AND A.PRD_ATTR_CD = #{prdAttrCd}
+        AND A.PRD_ATTR_VALUE_CD = #{prdAttrValueCd}
+        AND A.OBJ_CLF_CD = #{objClfCd}
+        )
+
+
+    </update>
+
+    <update id="insertAttributeValueComp" parameterType="PdPrdAttrComp">
+        MERGE /* insertAttributeValueComp (ctgrAttrMapper.xml) */
+        /*+ INDEX(A PK_PD_PRD_ATTR_COMP) */
+        INTO PD_PRD_ATTR_COMP A
+        USING (
+        SELECT #{objPrdNo} AS OBJ_PRD_NO, #{prdAttrCd} AS PRD_ATTR_CD, #{prdAttrValueCd} AS PRD_ATTR_VALUE_CD
+        , #{objClfCd} AS OBJ_CLF_CD
+        , (SELECT prd_attr_value_nm
+        FROM pd_prd_attr_value_cd
+        where prd_attr_value_cd = #{prdAttrValueCd}
+        and ATTR_VALUE_CLF_CD = '02') AS PRD_ATTR_VALUE_NM
+        , #{createNo} AS CREATE_NO
+        , #{updateNo} AS UPDATE_NO
+        FROM DUAL
+        ) TMP ON (A.OBJ_PRD_NO = TMP.OBJ_PRD_NO AND A.PRD_ATTR_CD = TMP.PRD_ATTR_CD AND A.PRD_ATTR_VALUE_CD = TMP.PRD_ATTR_VALUE_CD AND A.OBJ_CLF_CD = TMP.OBJ_CLF_CD)
+        WHEN NOT MATCHED THEN
+        INSERT (
+        OBJ_PRD_NO, PRD_ATTR_CD, PRD_ATTR_VALUE_CD, OBJ_CLF_CD, PRD_ATTR_VALUE_NM,
+        CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO
+        ) VALUES (
+        TMP.OBJ_PRD_NO, TMP.PRD_ATTR_CD, TMP.PRD_ATTR_VALUE_CD, TMP.OBJ_CLF_CD, TMP.PRD_ATTR_VALUE_NM,
+        SYSDATE, TMP.CREATE_NO, SYSDATE, TMP.UPDATE_NO
+        )
+    </update>
+
+
+    <!-- 기타속성값 키 생성 -->
+    <select id="getAttributeValueEtcNewSeq" resultType="String">
+        SELECT /* ctgrAttribute.AttributeValueEtc.getNewSeq 김성준 2010.02.03 */ SEQ_PD_CTGR_ATTR_VALUE_ETC.NEXTVAL SEQ FROM DUAL
+    </select>
+
+    <!-- 기타 속성값 등록 -->
+    <update id="insertAttributeValueEtc" parameterType="PdCtgrAttrValueEtc">
+        INSERT /* ctgrAttribute.insertAttributeValueEtc 김성준 2010.02.03 */
+        INTO PD_CTGR_ATTR_VALUE_ETC
+        (ATTR_VALUE_ETC_NO, ATTR_VALUE_ETC_NM, DISP_CTGR_NO, ATTR_CD,
+        SELLER_NO, SELLER_ID, E_MAIL_SEND_YN, ATTR_VALUE_CD, STAT_CD,
+        CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO)
+        select #{attrValueEtcNo}, #{attrValueEtcNm}, #{dispCtgrNo}, #{attrCd},
+        #{createNo}, (SELECT MEM_ID FROM MB_MEM WHERE MEM_NO = #{createNo}), 'N', #{attrValueCd}, '01',
+        sysdate, #{createNo}, sysdate, #{updateNo}
+        from dual
+        where not exists(select /*+ index(a IX3_PD_CTGR_ATTR_VALUE_ETC)*/ 1 from PD_CTGR_ATTR_VALUE_ETC a
+        where ATTR_VALUE_CD = #{attrValueCd}
+        and DISP_CTGR_NO = #{dispCtgrNo}
+        and ATTR_CD = #{attrCd}
+        and SELLER_NO = #{createNo})
+    </update>
+
+
+    <insert id="insertAttributeValueCompTxt" parameterType="PdPrdAttrCompTxt">
+        INSERT /* insertAttributeValueCompTxtHist (CtgrAttrMapper.xml)  */
+        INTO PD_PRD_ATTR_COMP_TXT
+        (OBJ_PRD_NO, PRD_ATTR_CD, OBJ_CLF_CD, PRD_ATTR_VALUE_NM,
+        CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO)
+        <choose>
+            <when test="prdAttrCd !=null and prdAttrCd!=''">
+                VALUES
+                (#{objPrdNo}, #{prdAttrCd}, #{objClfCd}, #{prdAttrValueNm}, sysdate, #{createNo}, sysdate, #{updateNo})
+            </when>
+            <otherwise>
+                select #{objPrdNo}, prd_attr_value_cd attr_cd, #{objClfCd}, #{prdAttrValueNm}, sysdate, #{createNo}, sysdate, #{updateNo}
+                from pd_prd_attr_value_cd
+                where prd_attr_value_cd in  (
+                select ATTR_CD
+                from pd_ctgr_attr
+                where attr_no = #{prdAttrNo} )
+            </otherwise>
+        </choose>
+
+    </insert>
+
+
+
+
+    <insert id="insertAttributeValueCompTxtHist" parameterType="PdPrdAttrCompTxt">
+        INSERT /* insertAttributeValueCompTxtHist */
+        INTO PD_PRD_ATTR_COMP_TXT_HIST
+        (OBJ_PRD_NO, HIST_APL_DT, PRD_ATTR_CD, OBJ_CLF_CD, PRD_ATTR_VALUE_NM,
+        CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO)
+        <choose>
+            <when test="prdAttrCd !=null and prdAttrCd!=''">
+                VALUES
+                (#{objPrdNo}, sysdate, #{prdAttrCd}, #{objClfCd}, #{prdAttrValueNm}, sysdate, #{createNo}, sysdate, #{updateNo})
+            </when>
+            <otherwise>
+                select #{objPrdNo}, prd_attr_value_cd attr_cd, #{objClfCd}, #{prdAttrValueNm}, sysdate, #{createNo}, sysdate, #{updateNo}
+                from pd_prd_attr_value_cd
+                where prd_attr_value_cd in  (
+                select ATTR_CD
+                from pd_ctgr_attr
+                where attr_no = #{prdAttrNo} )
+            </otherwise>
+        </choose>
+
+    </insert>
+    <select id="getPrdBrandInfo" resultType="CtgrAttrVO"  parameterType="long">
+        SELECT
+          OBJ_PRD_NO AS objPrdNo,
+          PRD_ATTR_CD AS prdAttrValueCd,
+          PRD_ATTR_VALUE_CD AS prdAttrValueCompValueCd,
+          PRD_ATTR_VALUE_NM AS prdAttrValueCompValueNm
+        FROM PD_PRD_ATTR_COMP
+        WHERE OBJ_PRD_NO = #{prdNo}
+          AND PRD_ATTR_CD = '11821'
+
+
+
+    </select>
+
+    <select id="getAttributeValueByAttributeNoList" resultType="CtgrAttrVO" parameterType="long">
+        SELECT /* attributeDAOMap.product.getAttributeValueByAttributeNoList */
+        *
+        FROM
+        (
+        SELECT /*+ index(a FK2_PD_PRD_ATTR_VALUE) index(b IX2_PD_PRD_ATTR_VALUE_CD) use_nl(a b) */
+        A.PRD_ATTR_NO as prdAttrNo,
+        a.hgrnk_attr_val_no as hgrnkAttrValNo,
+        (SELECT F.PRD_ATTR_VALUE_NM FROM PD_PRD_ATTR_VALUE E, PD_PRD_ATTR_VALUE_CD F
+        WHERE   E.PRD_ATTR_VALUE_CD = F.PRD_ATTR_VALUE_CD
+        AND E.PRD_ATTR_VALUE_NO =a.hgrnk_attr_val_no
+        AND E.PRD_ATTR_NO = (SELECT HGRNK_ATTR_NO
+        FROM PD_PRD_ATTR
+        WHERE PRD_ATTR_NO = #{prdAttrNo})
+        )  hgrnk_attr_val_NM as hgrnkAttrValNm,
+        A.PRD_ATTR_VALUE_NO as prdAttrValueNo,
+        A.PRD_ATTR_VALUE_CD as prdAttrValueCd,
+        B.PRD_ATTR_VALUE_NM as prdAttrValueNm
+        FROM PD_PRD_ATTR_VALUE A, PD_PRD_ATTR_VALUE_CD B
+        WHERE A.PRD_ATTR_VALUE_CD = B.PRD_ATTR_VALUE_CD
+        AND A.PRD_ATTR_NO = #{prdAttrNo}
+        AND b.cm_cd_yn='Y'
+        AND b.use_yn='Y'
+        AND A.USE_YN='Y'
+        AND A.PRD_ATTR_NO > 0
+        AND A.PRD_ATTR_NO NOT IN
+        (5324,4105,3051,3164,5194,3196,3584,1485,5773,4124,3600,5677,3517,3112,3816,4426,3081,1226,5327,
+        4095,3123,3150,4813,3710,3810,5947,3138,3096,5163,6031,1036,1739,3437,3614,1057,3717,5741,5732,
+        3537,3724,3923,3555,5013,3181,5242,4114,2265,5736,1243,3065,4499,5120,4569)
+        UNION ALL
+        SELECT /*+ index(a (PRD_ATTR_NO)) index_ffs(b IX6_PD_PRD_ATTR_VALUE_CD) use_hash(a b) */
+        A.PRD_ATTR_NO,
+        a.hgrnk_attr_val_no,
+        (SELECT F.PRD_ATTR_VALUE_NM FROM PD_PRD_ATTR_VALUE E, PD_PRD_ATTR_VALUE_CD F
+        WHERE   E.PRD_ATTR_VALUE_CD = F.PRD_ATTR_VALUE_CD
+        AND E.PRD_ATTR_VALUE_NO =a.hgrnk_attr_val_no
+        AND E.PRD_ATTR_NO = (SELECT HGRNK_ATTR_NO
+        FROM PD_PRD_ATTR
+        WHERE PRD_ATTR_NO = #{prdAttrNo})
+        )  hgrnk_attr_val_NM,
+        A.PRD_ATTR_VALUE_NO,
+        A.PRD_ATTR_VALUE_CD,
+        B.PRD_ATTR_VALUE_NM
+        FROM PD_PRD_ATTR_VALUE A, PD_PRD_ATTR_VALUE_CD B
+        WHERE A.PRD_ATTR_VALUE_CD = B.PRD_ATTR_VALUE_CD
+        AND A.PRD_ATTR_NO = #{prdAttrNo}
+        AND b.cm_cd_yn='Y'
+        AND b.use_yn='Y'
+        AND A.USE_YN='Y'
+        AND A.PRD_ATTR_NO > 0
+        AND A.PRD_ATTR_NO IN
+        (5324,4105,3051,3164,5194,3196,3584,1485,5773,4124,3600,5677,3517,3112,3816,4426,3081,1226,5327,
+        4095,3123,3150,4813,3710,3810,5947,3138,3096,5163,6031,1036,1739,3437,3614,1057,3717,5741,5732,
+        3537,3724,3923,3555,5013,3181,5242,4114,2265,5736,1243,3065,4499,5120,4569)
+        ) a
+        ORDER BY a.PRD_ATTR_VALUE_NM
+    </select>
+
+</mapper>

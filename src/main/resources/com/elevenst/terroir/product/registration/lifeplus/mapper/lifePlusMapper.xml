@@ -1,0 +1,604 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.lifeplus.mapper.LifePlusMapper">
+
+    <select id="getPdSvcCanPlcySeq" parameterType="PdSvcCanPlcy" resultType="long">
+        SELECT /* lifePlusMapper.getPdSvcCanPlcySeq */
+            SVC_CAN_PLCY_SEQ
+        FROM
+            PD_SVC_CAN_PLCY
+        WHERE
+            SELLER_MEM_NO = #{sellerMemNo}
+        AND SVC_CAN_PLCY_CLF_CD = #{svcCanPlcyClfCd}
+        AND SVC_CAN_PLCY_OBJ_NO = #{svcCanPlcyObjNo}
+    </select>
+
+    <select id="getPdSvcCanRgnList" parameterType="long" resultType="PdSvcCanRgnVO">
+        SELECT /* lifePlusMapper.getPdSvcCanRgnList */
+            RGN_ADDR_CD AS rgnAddrCd
+            ,RGN_CLF_CD AS rgnClfCd
+            ,SIDO_NM AS sidoNm
+            ,SIGUNGU_NM AS siGunGuNm
+            ,UEUPMYON_NM AS ueupMyonNm
+            ,UEUPMYON_CD AS lawDongCd
+            ,DECODE(SIDO_NM, '서울특별시', '001', RGN_CLF_CD) PRRT
+        FROM PD_SVC_CAN_RGN
+        WHERE SVC_CAN_PLCY_SEQ = #{svcCanPlcySeq}
+        ORDER BY PRRT , RGN_CLF_CD , SIDO_NM , SIGUNGU_NM , UEUPMYON_NM
+    </select>
+
+    <insert id="insertPdSvcCanPlcy" parameterType="PdSvcCanPlcy">
+        <selectKey keyProperty="svcCanPlcySeq" resultType="long" order="BEFORE">
+            SELECT SEQ_PD_SVC_CAN_PLCY.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT
+        INTO PD_SVC_CAN_PLCY
+        (
+        SVC_CAN_PLCY_SEQ,
+        SELLER_MEM_NO,
+        SVC_CAN_PLCY_CLF_CD,
+        SVC_CAN_PLCY_OBJ_NO,
+        RGN_ADDR_CD_LIST,
+        CREATE_DT,
+        CREATE_NO,
+        UPDATE_DT,
+        UPDATE_NO
+        ) VALUES (
+        #{svcCanPlcySeq},
+        #{sellerMemNo},
+        #{svcCanPlcyClfCd},
+        #{svcCanPlcyObjNo},
+        #{rgnAddrCdList},
+        SYSDATE,
+        #{createNo},
+        SYSDATE,
+        #{updateNo}
+        )
+        /* lifePlusMapper.insertPdSvcCanPlcy */
+    </insert>
+
+    <update id="updatePdSvcCanPlcy" parameterType="PdSvcCanPlcy">
+        UPDATE
+        PD_SVC_CAN_PLCY
+        SET
+        RGN_ADDR_CD_LIST = #{rgnAddrCdList},
+        UPDATE_DT = SYSDATE,
+        UPDATE_NO = #{updateNo}
+        WHERE
+        SVC_CAN_PLCY_SEQ = #{svcCanPlcySeq}
+        /* lifePlusMapper.updatePdSvcCanPlcy */
+    </update>
+
+    <delete id="deletePdSvcCanRgn" parameterType="long">
+        DELETE
+        FROM
+        PD_SVC_CAN_RGN
+        WHERE
+        SVC_CAN_PLCY_SEQ = #{svcCanPlcySeq}
+        /* lifePlusMapper.deletePdSvcCanRgn */
+    </delete>
+
+    <insert id="insertPdSvcCanRgn" parameterType="PdSvcCanRgn">
+        <selectKey keyProperty="svcCanRgnSeq" resultType="long" order="BEFORE">
+            SELECT SEQ_PD_SVC_CAN_RGN.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT
+        INTO PD_SVC_CAN_RGN
+        (
+        SVC_CAN_RGN_SEQ,
+        SVC_CAN_PLCY_SEQ,
+        RGN_CLF_CD,
+        RGN_ADDR_CD,
+        SIDO_NM,
+        SIGUNGU_NM,
+        UEUPMYON_NM,
+        UEUPMYON_CD,
+        CREATE_DT,
+        CREATE_NO,
+        UPDATE_DT,
+        UPDATE_NO
+        ) VALUES (
+        #{svcCanRgnSeq},
+        #{svcCanPlcySeq},
+        #{rgnClfCd},
+        #{rgnAddrCd},
+        #{sidoNm},
+        #{sigunguNm},
+        #{ueupmyonNm},
+        #{ueupmyonCd},
+        SYSDATE,
+        #{createNo},
+        SYSDATE,
+        #{updateNo}
+        )
+        /* lifePlusMapper.insertPdSvcCanRgn */
+    </insert>
+
+
+
+
+
+    <!-- 상품예약일정정보목록 조회 -->
+    <select id="getPrdRsvSchdlInfoList" resultType="PdRsvSchdlInfoVO" parameterType="PdRsvSchdlInfoVO">
+        SELECT
+        PRD_NO ,
+        CASE WHEN TO_CHAR(BGN_DT, 'YYYYMMDD') ='19800101' THEN '-'
+        WHEN FLOOR(TO_NUMBER(BGN_DT-TO_DATE(TO_CHAR(SYSDATE+1-TO_CHAR(SYSDATE,'D'),'YYYYMMDD')))/7) = 0 THEN '금주'
+        ELSE TO_CHAR(FLOOR(TO_NUMBER(BGN_DT-TO_DATE(TO_CHAR(SYSDATE+1-TO_CHAR(SYSDATE,'D'),'YYYYMMDD')))/7)) END AS WEEKNM,
+        TO_CHAR(BGN_DT, 'YYYYMMDD') AS BGN_DT ,
+        TO_CHAR(END_DT, 'YYYYMMDD') AS END_DT ,
+        NVL(DTL_DESC, '') AS DTL_DESC,
+        TO_CHAR(UPDATE_DT, 'YYYYMMDD') AS UPDATE_DT
+        FROM PD_RSV_SCHDL_INFO
+        WHERE 1=1
+        <if test="prdNo != null and prdNo > 0">
+            AND PRD_NO = #{prdNo}
+        </if>
+        AND ( BGN_DT >= TRUNC(SYSDATE) + 1 - TO_CHAR(SYSDATE, 'D') OR BGN_DT = TO_DATE('19800101', 'YYYYMMDD'))
+        ORDER BY BGN_DT ASC
+        /* lifePlusMapper.getPrdRsvSchdlInfoList */
+    </select>
+
+    <!-- 상품예약제한수량목록 조회 -->
+    <select id="getPrdRsvLmtQtyList" resultType="PdRsvSchdlInfoVO" parameterType="PdRsvSchdlInfoVO">
+        SELECT
+        PRLQ.PRD_NO ,
+        TO_CHAR(PRLQ.BGN_DT, 'YYYYMMDD') AS BGN_DT ,
+        PRLQ.WKDY_CD ,
+        (SELECT SCD.CD_VAL2 FROM SY_CO_DETAIL SCD WHERE SCD.GRP_CD = 'LC049' AND  SCD.DTLS_CD = PRLQ.WKDY_CD) AS WKDY_NM ,
+        PRLQ.HHMM ,
+        PRLQ.RSV_LMT_QTY
+        FROM PD_RSV_LMT_QTY PRLQ
+        WHERE 1=1
+        AND PRLQ.PRD_NO = #{prdNo}
+        <if test="bgnDt != null and bgnDt != ''">
+            AND TO_CHAR(PRLQ.BGN_DT, 'YYYYMMDD') = #{bgnDt}
+        </if>
+        ORDER BY PRLQ.BGN_DT ASC, PRLQ.WKDY_CD ASC, PRLQ.HHMM ASC
+        /* lifePlusMapper.getPrdRsvLmtQtyList */
+    </select>
+
+    <!-- 공휴일 목록 조회 -->
+    <select id="getHolidayList" resultType="HashMap">
+        SELECT
+        SOLAR_DY,
+        YR,
+        MON,
+        DD
+        FROM SY_OFF_DY
+        WHERE 1=1
+        AND SOLAR_DY >= TO_CHAR(SYSDATE + 1 - TO_CHAR(SYSDATE, 'D'), 'YYYYMMDD')
+        AND HLDY_YN = 'Y'
+        AND HLDT_DESC IS NOT NULL
+        /* lifePlusMapper.getHolidayList */
+    </select>
+
+    <!-- 영업시간 조회 -->
+    <select id="getPdStrSaleTimeList" resultType="HashMap" parameterType="HashMap">
+        SELECT
+        STR_NO ,
+        SALE_BGN_HM ,
+        SALE_END_HM ,
+        WOFF_WKDY_LIST ,
+        PHLDY_WOFF_YN ,
+        RSV_DISAB_CNDT_CD ,
+        RSV_DISAB_HH_CD ,
+        SALE_END_ORD_CAN_YN ,
+        SALE_END_ORD_CAN_HH_CD ,
+        RSV_CAN_WK
+        FROM PD_STR_SALE_TIME
+        WHERE 1=1
+        AND STR_NO = #{strNo}
+        /* lifePlusMapper.getPdStrSaleTimeList */
+    </select>
+
+    <!-- 영업시간 휴무일 조회 -->
+    <select id="getPdStrWoffList" resultType="HashMap" parameterType="HashMap">
+        SELECT
+        TO_CHAR(WOFF_DT, 'YYYYMMDD') AS SOLAR_DY,
+        TO_CHAR(WOFF_DT, 'YYYY') AS YR,
+        TO_CHAR(WOFF_DT, 'MM') AS MON,
+        TO_CHAR(WOFF_DT, 'DD') AS DD
+        FROM PD_STR_WOFF
+        WHERE 1=1
+        AND STR_NO = #{strNo}
+        AND WOFF_DT >= TRUNC(SYSDATE) + 1 -  TO_CHAR(SYSDATE, 'D')
+        /* lifePlusMapper.getPdStrWoffList */
+    </select>
+
+    <!-- 상품예약일정정보 등록 -->
+    <insert id="insertProductRsvSchedule" parameterType="PdRsvSchdlInfo">
+        INSERT INTO
+        PD_RSV_SCHDL_INFO
+        ( PRD_NO , BGN_DT , END_DT , DTL_DESC , CREATE_DT , CREATE_NO , UPDATE_DT , UPDATE_NO )
+        VALUES
+        ( #{prdNo}, #{bgnDt}, #{endDt}, #{dtlDesc}, SYSDATE, #{createNo}, SYSDATE, #{updateNo} )
+        /* lifePlusMapper.insertProductRsvSchedule */
+    </insert>
+
+    <!-- 상품예약제한수량 등록 -->
+    <insert id="insertProductRsvLmtQty" parameterType="PdRsvLmtQty">
+        INSERT INTO
+        PD_RSV_LMT_QTY
+        ( PRD_NO , BGN_DT , WKDY_CD , HHMM , RSV_LMT_QTY , CREATE_DT , CREATE_NO , UPDATE_DT , UPDATE_NO)
+        VALUES
+        ( #{prdNo}, #{bgnDt}, #{wkdyCd}, #{hhmm}, #{rsvLmtQty}, SYSDATE, #{createNo}, SYSDATE, #{updateNo} )
+        /* lifePlusMapper.insertProductRsvLmtQty */
+    </insert>
+
+    <!-- 상품예약일정정보 삭제 -->
+    <delete id="deleteProductRsvScheduleList" parameterType="PdRsvSchdlInfo">
+        DELETE
+        PD_RSV_SCHDL_INFO
+        WHERE 1=1
+        <if test="prdNo != null and prdNo > 0">
+            AND PRD_NO = #{prdNo}
+        </if>
+        /* lifePlusMapper.deleteProductRsvScheduleList */
+    </delete>
+
+    <!-- 상품예약제한수량 삭제 -->
+    <delete id="deleteProductRsvLmtQtyList" parameterType="PdRsvLmtQty">
+        DELETE
+        PD_RSV_LMT_QTY
+        WHERE 1=1
+        <if test="prdNo != null and prdNo > 0">
+            AND PRD_NO = #{prdNo}
+        </if>
+        <if test="bgnDt != null and bgnDt != ''">
+            AND BGN_DT = #{bgnDt}
+        </if>
+        <if test="wkdyCd != null and wkdyCd != ''">
+            AND WKDY_CD = #{wkdyCd}
+        </if>
+        /* lifePlusMapper.deleteProductRsvLmtQtyList */
+    </delete>
+
+    <!-- 상품예약제한수량목록 조회 ResultMap -->
+    <select id="getPrdRsvLmtQty" resultType="PdRsvLmtQty" parameterType="PdRsvLmtQty">
+        SELECT
+        PRLQ.PRD_NO AS prdNo,
+        TO_CHAR(PRLQ.BGN_DT, 'YYYYMMDD') AS bgnDt,
+        PRLQ.WKDY_CD AS wkdyCd,
+        PRLQ.HHMM AS hhmm,
+        PRLQ.RSV_LMT_QTY AS rsvLmtQty
+        FROM PD_RSV_LMT_QTY PRLQ
+        WHERE 1=1
+        AND PRLQ.PRD_NO = #{prdNo}
+        AND PRLQ.BGN_DT Between to_date(#{bgnDt} || '000000', 'YYYYMMDDHH24MISS') and to_date(#{bgnDt} || '235959', 'YYYYMMDDHH24MISS')
+        AND PRLQ.WKDY_CD = #{wkdyCd}
+        AND PRLQ.HHMM = #{hhmm}
+        /* lifePlusMapper.getPrdRsvLmtQty */
+    </select>
+
+    <!-- 시간재고 수량 업데이트 -->
+    <update id="updateProductRsvLmtQty" parameterType="PdRsvLmtQty">
+        UPDATE PD_RSV_LMT_QTY PRLQ SET
+        RSV_LMT_QTY = RSV_LMT_QTY - #{rsvLmtQty}
+        WHERE 1=1
+        AND PRLQ.PRD_NO = #{prdNo}
+        AND PRLQ.BGN_DT Between to_date(#{bgnDt} || '000000', 'YYYYMMDDHH24MISS') and to_date(#{bgnDt} || '235959', 'YYYYMMDDHH24MISS')
+        AND PRLQ.WKDY_CD = #{wkdyCd}
+        AND PRLQ.HHMM = #{hhmm}
+        /* lifePlusMapper.updateProductRsvLmtQty */
+    </update>
+
+    <!-- 주문 번호 업데이트 -->
+    <update id="updateOrdRsv" parameterType="HashMap">
+        UPDATE TR_ORD_RSV
+        SET ORD_NO = #{ordNo}
+        WHERE RSV_NO = #{rsvNo}
+        /* lifePlusMapper.updateOrdRsv */
+    </update>
+
+    <update id="updateRsvTmtr" parameterType="TrOrdRsvTmtr">
+        update tr_ord_rsv_tmtr
+        set update_dt = sysdate
+        , update_no = #{updateNo}
+        <if test="rsvCnfrmDt != null and rsvCnfrmDt != ''">
+            , rsv_cnfrm_dt = to_date(#{rsvCnfrmDt},'YYYY/MM/DD HH24:MI:SS')
+        </if>
+        <if test="ptnrEmpNo != null and ptnrEmpNo > 0">
+            , chgr_nm =  (select ptnr_emp_nm from pd_ptnr_emp_info where ptnr_emp_no = #{ptnrEmpNo})
+            , ptnr_emp_no = #{ptnrEmpNo}
+        </if>
+        where rsv_no = #{rsvNo}
+        and rsv_tmtr = #{rsvTmtr}
+        /* lifePlusMapper.updateRsvTmtr */
+    </update>
+
+    <update id="updateRsvDlv" parameterType="TrOrdRsvDlv">
+        update tr_ord_rsv_dlv
+        set update_dt = sysdate
+        , update_no = #{updateNo}
+        <if test="rsvDlvCnfrmDt != null and rsvDlvCnfrmDt != ''">
+            , rsv_dlv_cnfrm_dt = to_date(#{rsvDlvCnfrmDt},'YYYY/MM/DD HH24:MI:SS')
+        </if>
+        <if test="dlvPtnrEmpNo != null and dlvPtnrEmpNo != ''">
+            , dlv_chgr_nm =  (select ptnr_emp_nm from pd_ptnr_emp_info where ptnr_emp_no = #{dlvPtnrEmpNo})
+            , dlv_ptnr_emp_no = #{dlvPtnrEmpNo}
+        </if>
+        where rsv_no = #{rsvNo}
+        and rsv_tmtr = #{rsvTmtr}
+        /* lifePlusMapper.updateRsvDlv */
+    </update>
+
+    <update id="updateRsvPrdCont" parameterType="TrOrdRsv">
+        update tr_ord_rsv
+        set prd_add_info_cont = #{prdAddInfoCont}
+        , update_dt = sysdate
+        , update_no = #{updateNo}
+        where rsv_no = #{rsvNo}
+        /* lifePlusMapper.updateRsvPrdCont */
+    </update>
+
+    <update id="updateRsvTmtrStat" parameterType="TrOrdRsvTmtr">
+        update tr_ord_rsv_tmtr
+        set update_dt = sysdate
+        , update_no = #{updateNo}
+        <if test="rsvStatCd != null and rsvStatCd != ''">
+            , rsv_stat_cd = #{rsvStatCd}
+        </if>
+        <if test="rsvCnfrmDt != null and rsvCnfrmDt != ''">
+            , rsv_cnfrm_dt = to_date(#{rsvCnfrmDt},'YYYY/MM/DD HH24:MI:SS')
+        </if>
+        <if test="ptnrEmpNo != null and ptnrEmpNo > 0">
+            , chgr_nm =  (select ptnr_emp_nm from pd_ptnr_emp_info where ptnr_emp_no = #{ptnrEmpNo})
+            , ptnr_emp_no = #{ptnrEmpNo}
+        </if>
+        where rsv_no = #{rsvNo}
+        and rsv_tmtr = #{rsvTmtr}
+        /* lifePlusMapper.updateRsvTmtrStat */
+    </update>
+
+    <update id="updateRsvDlvStat" parameterType="TrOrdRsvDlv">
+        update tr_ord_rsv_dlv
+        set update_dt = sysdate
+        ,update_no = #{updateNo}
+        <if test="rsvDlvStatCd != null and rsvDlvStatCd != ''">
+            ,rsv_dlv_stat_cd = #{rsvDlvStatCd}
+        </if>
+        <if test="rsvDlvCnfrmDt != null and rsvDlvCnfrmDt != ''">
+            ,rsv_dlv_cnfrm_dt = to_date(#{rsvDlvCnfrmDt},'YYYY/MM/DD HH24:MI:SS')
+        </if>
+        <if test="dlvPtnrEmpNo != null and dlvPtnrEmpNo != ''">
+            , dlv_chgr_nm =  (select ptnr_emp_nm from pd_ptnr_emp_info where ptnr_emp_no = #{dlvPtnrEmpNo})
+            , dlv_ptnr_emp_no = #{dlvPtnrEmpNo}
+        </if>
+        where rsv_no = #{rsvNo}
+        and rsv_tmtr = #{rsvTmtr}
+        /* lifePlusMapper.updateRsvDlvStat */
+    </update>
+
+    <!-- 영업시간 목록 조회 -->
+    <select id="getBsnsHrMgtMaster" resultType="BsnsHrMgtMasterVO">
+        SELECT
+        STR_NO AS strNo,
+        SALE_BGN_HM AS saleBgnHm,
+        SALE_END_HM AS saleEndHm,
+        NVL(WOFF_WKDY_LIST,'') AS woffWkdyList,
+        PHLDY_WOFF_YN AS phldyWoffYn,
+        NVL(RSV_CAN_WK,0) AS rsvCanWk,
+        NVL(RSV_DISAB_CNDT_CD,'') AS rsvDisabCndtCd,
+        NVL(RSV_DISAB_HH_CD,'') AS rsvDisabHhCd,
+        NVL(SALE_END_ORD_CAN_YN,'') AS saleEndOrdCanYn,
+        NVL(SALE_END_ORD_CAN_HH_CD,'') AS saleEndOrdCanHhCd
+        FROM
+        PD_STR_SALE_TIME
+        WHERE STR_NO = #{strNo}
+        /* lifePlusMapper.getBsnsHrMgtMaster */
+    </select>
+
+    <!-- 영업시간 예외 목록 조회 -->
+    <select id="getBsnsHrMgtDetailExct" resultType="BsnsHrMgtDetailExctVO">
+        SELECT
+        STR_NO AS strNo,
+        WKDY_CD AS wkdyCd,
+        EXCT_BGN_HM AS exctBgnHm,
+        EXCT_END_HM AS exctEndHm
+        FROM
+        PD_STR_SALE_EXCT_TIME
+        WHERE STR_NO = #{strNo}
+        /* lifePlusMapper.getBsnsHrMgtDetailExct */
+    </select>
+
+    <!-- 영업시간 휴무 목록 조회 -->
+    <select id="getBsnsHrMgtDetailWoff" resultType="BsnsHrMgtDetailWoffVO">
+        SELECT
+        STR_NO AS strNo,
+        TO_CHAR(WOFF_DT, 'YYYY/MM/DD') AS woffDt
+        FROM
+        PD_STR_WOFF
+        WHERE STR_NO = #{strNo}
+        /* lifePlusMapper.getBsnsHrMgtDetailWoff */
+    </select>
+
+    <!-- 영업시간 등록 -->
+    <insert id="insertBsnsHrMgtMaster" parameterType="BsnsHrMgtMasterVO">
+        INSERT
+        INTO PD_STR_SALE_TIME
+        (
+        STR_NO,
+        SALE_BGN_HM,
+        SALE_END_HM,
+        WOFF_WKDY_LIST,
+        PHLDY_WOFF_YN,
+        RSV_CAN_WK,
+        RSV_DISAB_CNDT_CD,
+        RSV_DISAB_HH_CD,
+        SALE_END_ORD_CAN_YN,
+        SALE_END_ORD_CAN_HH_CD,
+        CREATE_DT,
+        CREATE_NO,
+        UPDATE_DT,
+        UPDATE_NO
+        ) VALUES (
+        #{strNo},
+        #{saleBgnHm},
+        #{saleEndHm},
+        #{woffWkdyList},
+        #{phldyWoffYn},
+        #{rsvCanWk},
+        #{rsvDisabCndtCd},
+        #{rsvDisabHhCd},
+        #{saleEndOrdCanYn},
+        #{saleEndOrdCanHhCd},
+        SYSDATE,
+        #{createNo},
+        SYSDATE,
+        #{updateNo}
+        )
+        /* lifePlusMapper.insertBsnsHrMgtMaster */
+    </insert>
+
+    <!-- 휴무 요일 재고 삭제 -->
+    <delete id="deleteRsvLmtQtyCountForDay" parameterType="BsnsHrMgtMasterVO">
+        DELETE
+        FROM PD_RSV_LMT_QTY
+        WHERE PRD_NO IN (SELECT /*+ INDEX(C IX1_PD_TOWN_SHOP_BRANCH_COMP) */ PRD_NO
+        FROM PD_TOWN_SHOP_BRANCH_COMP C
+        WHERE SHOP_NO = #{shopNo}
+        AND SHOP_BRANCH_NO = #{strNo})
+        <if test="woffWkdyArr != null and woffWkdyArr.length > 0">
+            <foreach item="woffWkdy" collection="woffWkdyArr" open="AND WKDY_CD IN (" close=")" separator=",">
+                #{woffWkdy}
+            </foreach>
+        </if>
+        /* lifePlusMapper.deleteRsvLmtQtyCountForDay */
+    </delete>
+
+    <!-- 공휴일 재고 삭제 -->
+    <delete id="deleteRsvLmtQtyCountForHoliDay" parameterType="BsnsHrMgtMasterVO">
+        DELETE
+        FROM PD_RSV_LMT_QTY QTY
+        WHERE PRD_NO IN (SELECT /*+ INDEX(C IX1_PD_TOWN_SHOP_BRANCH_COMP) */ PRD_NO
+        FROM PD_TOWN_SHOP_BRANCH_COMP C
+        WHERE SHOP_NO = #{shopNo}
+        AND SHOP_BRANCH_NO = #{strNo})
+        AND (QTY.BGN_DT, QTY.WKDY_CD) IN (SELECT /*+ HASH_SJ (O) */ NEXT_DAY(TO_DATE(SOLAR_DY,'YYYYMMDD') - 7, 1) AS BGN_DT
+        ,WEEKDY AS WKDY_CD
+        FROM SY_OFF_DY O
+        WHERE HLDY_YN = 'Y'
+        AND WEEKDY NOT IN ('1','7')
+        AND SOLAR_DY > TO_CHAR(SYSDATE, 'YYYYMMDD'))
+        /* lifeplusMapper.deleteRsvLmtQtyCountForHoliDay */
+    </delete>
+
+    <!-- 영업시간 예외 등록 -->
+    <insert id="insertBsnsHrMgtDetailExct" parameterType="BsnsHrMgtDetailExctVO">
+        INSERT
+        INTO PD_STR_SALE_EXCT_TIME
+        (
+        STR_NO,
+        WKDY_CD,
+        EXCT_BGN_HM,
+        EXCT_END_HM,
+        CREATE_DT,
+        CREATE_NO,
+        UPDATE_DT,
+        UPDATE_NO
+        ) VALUES (
+        #{strNo},
+        #{wkdyCd},
+        #{exctBgnHm},
+        #{exctEndHm},
+        SYSDATE,
+        #{createNo},
+        SYSDATE,
+        #{updateNo}
+        )
+        /* lifeplusMapper.insertBsnsHrMgtDetailExct */
+    </insert>
+
+    <!-- 영업시간 휴무 등록 -->
+    <insert id="insertBsnsHrMgtDetailWoff" parameterType="BsnsHrMgtDetailWoffVO">
+        INSERT
+        INTO PD_STR_WOFF
+        (
+        STR_NO,
+        WOFF_DT,
+        CREATE_DT,
+        CREATE_NO,
+        UPDATE_DT,
+        UPDATE_NO
+        ) VALUES (
+        #{strNo},
+        #{woffDt},
+        SYSDATE,
+        #{createNo},
+        SYSDATE,
+        #{updateNo}
+        )
+        /* lifeplusMapper.insertBsnsHrMgtDetailWoff */
+    </insert>
+
+    <!-- 휴무 지정일 재고 삭제 -->
+    <delete id="deleteRsvLmtQtyCountForDate" parameterType="BsnsHrMgtDetailWoffVO">
+        DELETE
+        FROM PD_RSV_LMT_QTY
+        WHERE PRD_NO IN (SELECT /*+ INDEX(C IX1_PD_TOWN_SHOP_BRANCH_COMP) */ PRD_NO
+        FROM PD_TOWN_SHOP_BRANCH_COMP C
+        WHERE SHOP_NO = #{shopNo}
+        AND SHOP_BRANCH_NO = #{strNo})
+        AND BGN_DT = NEXT_DAY(TO_DATE(#{woffDt},'YYYY/MM/DD') - 7, 1)
+        AND WKDY_CD = TO_NUMBER(TO_CHAR(TO_DATE(#{woffDt},'YYYY/MM/DD'), 'D'))
+        /* lifeplusMapper.deleteRsvLmtQtyCountForDate */
+    </delete>
+
+    <!-- 영업시간 수정 -->
+    <update id="modBsnsHrMgtMaster" parameterType="BsnsHrMgtMasterVO">
+        MERGE INTO  PD_STR_SALE_TIME B
+        USING (SELECT #{strNo} AS STR_NO FROM DUAL) A
+        ON (A.STR_NO = B.STR_NO)
+        WHEN MATCHED THEN
+        UPDATE SET
+        B.SALE_BGN_HM = #{saleBgnHm}
+        ,B.SALE_END_HM = #{saleEndHm}
+        ,B.WOFF_WKDY_LIST = #{woffWkdyList}
+        ,B.PHLDY_WOFF_YN = #{phldyWoffYn}
+        ,B.RSV_CAN_WK = #{rsvCanWk}
+        ,B.RSV_DISAB_CNDT_CD = #{rsvDisabCndtCd}
+        ,B.RSV_DISAB_HH_CD = #{rsvDisabHhCd}
+        ,B.SALE_END_ORD_CAN_YN = #{saleEndOrdCanYn}
+        ,B.SALE_END_ORD_CAN_HH_CD = #{saleEndOrdCanHhCd}
+        ,B.UPDATE_DT = SYSDATE
+        ,B.UPDATE_NO = #{updateNo}
+        WHEN NOT MATCHED THEN
+        INSERT (B.STR_NO, B.SALE_BGN_HM, B.SALE_END_HM, B.WOFF_WKDY_LIST, B.PHLDY_WOFF_YN, B.RSV_CAN_WK, B.RSV_DISAB_CNDT_CD, B.RSV_DISAB_HH_CD, B.SALE_END_ORD_CAN_YN, B.SALE_END_ORD_CAN_HH_CD, B.CREATE_DT, B.CREATE_NO, B.UPDATE_DT, B.UPDATE_NO)
+        VALUES (#{strNo},#{saleBgnHm},#{saleEndHm},#{woffWkdyList},#{phldyWoffYn},#{rsvCanWk},#{rsvDisabCndtCd},#{rsvDisabHhCd},#{saleEndOrdCanYn},#{saleEndOrdCanHhCd},SYSDATE,#{createNo},SYSDATE,#{updateNo})
+        /* lifePlusMapper.modBsnsHrMgtMaster */
+    </update>
+
+    <!-- 영업시간 예외 삭제 -->
+    <delete id="deleteBsnsHrMgtDetailExct" parameterType="long">
+        DELETE
+        FROM
+        PD_STR_SALE_EXCT_TIME
+        WHERE
+        STR_NO = #{strNo}
+        /* lifePlusMapper.deleteBsnsHrMgtDetailExct */
+    </delete>
+
+    <!-- 영업시간 휴무 삭제 -->
+    <delete id="deleteBsnsHrMgtDetailWoff" parameterType="long">
+        DELETE
+        FROM
+        PD_STR_WOFF
+        WHERE
+        STR_NO = #{strNo}
+        /* lifePlusMapper.deleteBsnsHrMgtDetailWoff */
+    </delete>
+
+
+    <select id="selectRgnAddrCd" parameterType="PdSvcCanRgnVO" resultType="String">
+        SELECT /* lifePlusMapper.xml selectRgnAddrCd */
+            RGN_ADDR_CD AS rgnAddrCd
+        FROM SY_RGN_ADDR
+        WHERE RGN_CLF_CD = #{rgnClfCd}
+        AND SIDO_NM = #{sidoNm}
+        <if test="sigunguNm != '' and sigunguNm != null">
+            AND SIGUNGU_NM = #{sigunguNm}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,157 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.common.mapper.CommonMapper">
+
+    <cache eviction="FIFO" flushInterval="3600000" size="512" readOnly="true"/>
+
+    <select id="getRealTimeProperties" parameterType="java.util.Map" resultType="java.lang.String" useCache="false">
+        SELECT /* getRealTimeProperties */
+        value
+        FROM sy_properties
+        WHERE key like #{KEY}
+    </select>
+
+    <select id="get1hourTimeProperties" parameterType="java.util.Map" resultType="java.lang.String">
+        SELECT /* get1hourTimeProperties */
+        value
+        FROM sy_properties
+        WHERE key like #{KEY}
+    </select>
+
+    <select id="get1hourTimePropertyList" parameterType="java.util.Map" resultType="java.util.HashMap">
+        SELECT /* get1hourTimePropertyList */
+        KEY, VALUE
+        FROM SY_PROPERTIES
+        where key in
+        <foreach item="item" collection="KEY" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getValidAppListMap" resultType="hashmap" parameterType="java.util.Map" useCache="false">
+
+        SELECT
+			APP_ID,
+			GRP_ID,
+			APP_NM,
+			USE_YN,
+			BGN_DT,
+			END_DT
+		FROM
+			SY_APP_MNG
+        WHERE 1=1
+        <foreach item="item" index="index" collection="syAppList" open="AND APP_ID IN  (" close=")" separator=",">
+            #{item, jdbcType=VARCHAR}
+        </foreach>
+        <![CDATA[
+        AND USE_YN IN ( 'Y', 'T' )
+        AND BGN_DT <= SYSDATE
+        AND END_DT > SYSDATE
+        ]]>
+    </select>
+
+    <select id="getValidAppId" parameterType="com.elevenst.common.vo.SyAppMngVO" resultType="com.elevenst.common.vo.SyAppMngVO">
+        SELECT
+            APP_ID AS appId,
+            GRP_ID AS grpId,
+            APP_NM AS appNm,
+            USE_YN AS useYN,
+            BGN_DT AS bgnDt,
+            END_DT AS endDt
+        FROM
+            SY_APP_MNG
+        WHERE 1=1
+        AND APP_ID = #{appId}
+        <![CDATA[
+        AND USE_YN IN ( 'Y', 'T' )
+        AND BGN_DT <= SYSDATE
+        AND END_DT > SYSDATE
+        ]]>
+    </select>
+
+    <select id="getValidAppMap" resultType="HashMap" parameterType="com.elevenst.common.vo.SyAppMngVO" useCache="false">
+        SELECT
+        APP_ID,
+        GRP_ID,
+        APP_NM,
+        USE_YN,
+        BGN_DT,
+        END_DT
+        FROM
+        SY_APP_MNG
+        WHERE 1=1
+        <if test="validAppListStr != null and validAppListStr.size > 0">
+            <foreach item="appId" index="index" open="AND app_id IN (" close=")" separator="," collection="validAppListStr">
+                #{appId}
+            </foreach>
+        </if>
+        <![CDATA[
+        AND USE_YN IN ( 'Y', 'T' )
+        AND BGN_DT <= SYSDATE
+        AND END_DT > SYSDATE
+        ]]>
+    </select>
+
+    <select id="getCodeDetail" parameterType="SyCoDetailVO" resultType="SyCoDetailVO">
+        SELECT /* commonMapper.xml getCodeDetail */
+            GRP_CD AS grpCd
+            ,DTLS_CD AS dtlsCd
+            ,DTLS_COM_NM AS dtlsComNm
+            ,DTLS_COM_ENG_NM AS dtlsComEngNm
+            ,CD_VAL1 AS cdVal1
+            ,CD_VAL2 AS cdVal2
+            ,CD_VAL3 AS cdVal3
+            ,USE_YN AS useYn
+            ,PARENT_CD AS parentCd
+        FROM SY_CO_DETAIL CODE
+        WHERE GRP_CD = #{grpCd}
+        <if test="parentCd != null and parentCd != ''">
+        AND PARENT_CD = #{parentCd}
+        </if>
+        <if test = "dtlsCd != null and dtlsCd !=''">
+        AND DTLS_CD = #{dtlsCd}
+        </if>
+        AND USE_YN = 'Y'
+        ORDER BY PRRT_RNK, DTLS_CD,PARENT_CD
+    </select>
+
+    <select id="getCodeDetailName" parameterType="SyCoDetailVO" resultType="SyCoDetailVO">
+        SELECT
+        b.grp_cd as grpCd,
+        b.dtls_cd as dylsCd,
+        b.dtls_com_nm as dtlsComNm,
+        b.cd_val1 as cdVal1,
+        b.cd_val2 as cdVal2,
+        b.cd_val3 as cdVal3,
+        b.PRRT_RNK as prrtRnk,
+        b.use_yn as useYn,
+        b.PARENT_CD as parentCd,
+        B.DTLS_COM_ENG_NM as dtlsComEngNm,
+        B.CD_VAL1_ENG as cdVal1Eng,
+        B.DTLS_CD_DESC as dtlsCdDesc
+        FROM sy_co_master a, sy_co_detail b
+        WHERE A.grp_cd = #{grpCd}
+        AND A.USE_YN = 'Y'
+        <if test = "dtlsCd != null and dtlsCd !=''">
+            AND B.DTLS_CD = #{dtlsCd}
+        </if>
+        AND B.grp_cd = A.grp_cd
+        ORDER BY B.PRRT_RNK
+    </select>
+
+    <select id="getHelpPopCont" resultType="HelpPopVO" parameterType="String">
+        SELECT title as title , cont as cont , hefilename as hefilename	FROM sy_help_memo WHERE display_yn = 'Y' and code = #{code}
+    </select>
+
+    <select id="getHelpPopContList" resultType="HelpPopVO" parameterType="List">
+        SELECT title as title ,code as code, cont as cont , hefilename as hefilename
+        FROM sy_help_memo
+        WHERE display_yn = 'Y'
+        AND code IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

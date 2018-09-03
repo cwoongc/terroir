@@ -1,0 +1,142 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.product.mapper.RentalMapper">
+
+
+    <update id="updatePdRntlPrd" parameterType="PdRntlPrd">
+        <![CDATA[
+		UPDATE PD_RNTL_PRD SET
+		/*product.updatePdRntlPrd*/
+			FREE_INST_YN = #{freeInstYn},
+			CO_CARD_BNFT = #{coCardBnft},
+			INST_CST_DESC = #{instCstDesc},
+			FRGFT_DESC = #{frgftDesc},
+			ETC_INFO = #{etcInfo},
+			USE_YN = #{useYn},
+			UPDATE_DT = SYSDATE,
+			UPDATE_NO = #{updateNo}
+		WHERE PRD_NO= #{prdNo}
+	]]>
+    </update>
+
+    <update id="insertRntlPrdHist"  parameterType="long">
+		INSERT INTO /*insertRntlPrdHist*/ PD_RNTL_PRD_HIST (
+			PRD_NO,
+			HIST_DT,
+			CST_TERM_CD,
+			FREE_INST_YN,
+			CO_CARD_BNFT,
+			INST_CST_DESC,
+			FRGFT_DESC,
+			ETC_INFO,
+			USE_YN,
+			MIN_RNTL_CST,
+			MAX_RNTL_CST,
+			CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO
+		)
+		select
+			PRD_NO,
+			SYSDATE,
+			CST_TERM_CD,
+			FREE_INST_YN,
+			CO_CARD_BNFT,
+			INST_CST_DESC,
+			FRGFT_DESC,
+			ETC_INFO,
+			USE_YN,
+			MIN_RNTL_CST,
+			MAX_RNTL_CST,
+			SYSDATE, CREATE_NO, SYSDATE, UPDATE_NO
+		from PD_RNTL_PRD
+		where PRD_NO = #{prdNo}
+    </update>
+
+    <insert id="insertRntlPrd" parameterType="PdRntlPrd">
+
+        INSERT INTO PD_RNTL_PRD (
+		/*RentalMapper.insertRntlPrd*/
+			PRD_NO,
+			CST_TERM_CD,
+			FREE_INST_YN,
+			CO_CARD_BNFT,
+			INST_CST_DESC,
+			FRGFT_DESC,
+			ETC_INFO,
+			USE_YN,
+			MIN_RNTL_CST,
+			MAX_RNTL_CST,
+			CREATE_DT,
+			CREATE_NO,
+			UPDATE_DT,
+			UPDATE_NO
+		)VALUES(
+			#{prdNo},
+			#{cstTermCd},
+			#{freeInstYn},
+			#{coCardBnft},
+			#{instCstDesc},
+			#{frgftDesc},
+			#{etcInfo},
+			#{useYn},
+			(SELECT /*+ INDEX(STK IX_PD_STOCK_01) */ NVL(MIN(RNTL_CST),0)
+		             FROM PD_STOCK STK
+		             WHERE STK.PRD_NO = #{prdNo}) ,
+			(SELECT /*+ INDEX(STK IX_PD_STOCK_01) */ NVL(MAX(RNTL_CST),0)
+		             FROM PD_STOCK STK
+		             WHERE STK.PRD_NO = #{prdNo} ) ,
+			SYSDATE, #{createNo}, SYSDATE, #{updateNo}
+		)
+    </insert>
+
+	<update id="updateRntlPrd" parameterType="ProductVO">
+		UPDATE PD_RNTL_PRD SET
+		/* product.updateCstTermCd */
+		<if test="cstTermCd!=null and cstTermCd !=''">
+			CST_TERM_CD = #{cstTermCd},
+		</if>
+		<if test="freeInstYn!=null and freeInstYn !=''">
+			FREE_INST_YN = #{freeInstYn},
+		</if>
+		<if test="coCardBnft!=null and coCardBnft !=''">
+			CO_CARD_BNFT = #{coCardBnft},
+		</if>
+		<if test="instCstDesc!=null and instCstDesc !=''">
+			INST_CST_DESC = #{instCstDesc},
+		</if>
+		<if test="frgftDesc!=null and frgftDesc !=''">
+			FRGFT_DESC = #{frgftDesc},
+		</if>
+		<if test="etcInfo!=null and etcInfo !=''">
+			ETC_INFO = #{etcInfo},
+		</if>
+		UPDATE_DT = SYSDATE,
+		UPDATE_NO = #{updateNo},
+
+		MIN_RNTL_CST = (SELECT /*+ INDEX(STK IX_PD_STOCK_01) */ NVL(MIN(RNTL_CST),0)
+		FROM PD_STOCK STK
+		WHERE STK.PRD_NO = #{prdNo} ) ,
+		MAX_RNTL_CST= (SELECT /*+ INDEX(STK IX_PD_STOCK_01) */ NVL(MAX(RNTL_CST),0)
+		FROM PD_STOCK STK
+		WHERE STK.PRD_NO = #{prdNo} )
+		WHERE PRD_NO= #{prdNo}
+	</update>
+
+	<update id="updateRntlCstUnt" parameterType="PdRntlPrd">
+		UPDATE PD_RNTL_PRD SET
+
+			CST_TERM_CD = #{cstTermCd},
+
+		UPDATE_DT = SYSDATE,
+		UPDATE_NO = #{updateNo},
+
+		MIN_RNTL_CST = (SELECT /*+ INDEX(STK IX_PD_STOCK_01) */ NVL(MIN(RNTL_CST),0)
+		FROM PD_STOCK STK
+		WHERE STK.PRD_NO = #{prdNo} ) ,
+		MAX_RNTL_CST= (SELECT /*+ INDEX(STK IX_PD_STOCK_01) */ NVL(MAX(RNTL_CST),0)
+		FROM PD_STOCK STK
+		WHERE STK.PRD_NO = #{prdNo} )
+		WHERE PRD_NO= #{prdNo}
+	</update>
+
+</mapper>

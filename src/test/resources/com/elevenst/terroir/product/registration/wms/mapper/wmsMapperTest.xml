@@ -1,0 +1,59 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.wms.mapper.WmsMapperTest">
+    <update id="updateEmployeeNo" parameterType="PdPrdWmsInfo">
+        UPDATE PD_PRD_WMS_INFO SET /* WmsMapper.xml : updateEmployeeNo : 담당MD 개별 수정  */
+        EMP_NO = #{empNo},
+        UPDATE_NO = #{updateNo},
+        UPDATE_DT = sysdate
+        WHERE
+        PRD_NO = #{prdNo}
+    </update>
+
+    <update id="insertPdPrdWmsInfoHist" parameterType="PdPrdWmsInfo">
+    INSERT INTO PD_PRD_WMS_INFO_HIST (PRD_NO,HIST_APL_DT,SSNL_PRD_YN,FRIG_TYP_CD,INCM_ALLW_TRM_RT,EXPR_TRM_CHK_YN,EXPR_TRM_CLF_CD,EXPR_TRM_UNT,EXPR_TRM_VAL,RTN_TW_YN,SEL_UNT,EMP_NO,CREATE_NO,CREATE_DT,UPDATE_NO,UPDATE_DT,WMS_PRD_NM,REP_PTNR_MEM_NO,ONE_PACK_YN,WHIN_SFLIFE_RESID_DCNT,WHOUT_SFLIFE_RESID_DCNT,SFLIFE_WARN_DCNT,SEASON_CLF_CD,STCK_ATTR_REG_YN,DST_PRD_CLF_CD)
+    SELECT PRD_NO,SYSDATE AS HIST_APL_DT,SSNL_PRD_YN,FRIG_TYP_CD,INCM_ALLW_TRM_RT,EXPR_TRM_CHK_YN,EXPR_TRM_CLF_CD,EXPR_TRM_UNT,EXPR_TRM_VAL,RTN_TW_YN,SEL_UNT,EMP_NO,CREATE_NO,CREATE_DT,UPDATE_NO,UPDATE_DT,WMS_PRD_NM,REP_PTNR_MEM_NO,ONE_PACK_YN,WHIN_SFLIFE_RESID_DCNT,WHOUT_SFLIFE_RESID_DCNT,SFLIFE_WARN_DCNT,SEASON_CLF_CD,STCK_ATTR_REG_YN,DST_PRD_CLF_CD FROM PD_PRD_WMS_INFO WHERE PRD_NO = #{prdNo}
+    </update>
+
+    <update id="insertBasisStockAttribute" parameterType="PdPrdWmsInfo">
+        INSERT /* wmsMapper.xml : insertBasisStockAttribute */ INTO PD_PRD_WMS_INFO
+        (PRD_NO,
+        EMP_NO,
+        REP_PTNR_MEM_NO,
+        CREATE_NO,
+        CREATE_DT,
+        UPDATE_NO,
+        UPDATE_DT
+        ) VALUES (
+        #{prdNo},
+        #{empNo},
+        #{repPtnrMemNo},
+        #{createNo},
+        SYSDATE,
+        #{updateNo},
+        SYSDATE
+        )
+    </update>
+
+    <select id="getPdPrdWmsInfoTEST" resultType ="PdPrdWmsInfo" parameterType="long">
+        select  PRD_NO as prdNo,
+        EMP_NO as empNo,
+        REP_PTNR_MEM_NO as repPtnrMemNo,
+        CREATE_NO as createNo,
+        CREATE_DT as createDt,
+        UPDATE_NO as updateNo,
+        UPDATE_DT as updateDt
+        From    PD_PRD_WMS_INFO
+        where   PRD_NO = #{prdNo}
+    </select>
+
+    <delete id="deletePdPrdWmsInfoTEST" parameterType="long">
+       delete from PD_PRD_WMS_INFO where prd_no = #{prdNo}
+    </delete>
+
+    <delete id="deletePdPrdWmsInfoHistTEST" parameterType="long">
+        delete from PD_PRD_WMS_INFO_HIST where prd_no = #{prdNo}
+    </delete>
+
+</mapper>

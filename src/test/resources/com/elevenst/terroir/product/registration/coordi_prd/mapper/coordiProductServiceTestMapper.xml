@@ -1,0 +1,72 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.coordi_prd.mapper.CoordiProductServiceTestMapper">
+
+
+    <insert id="insertCoordiProduct" parameterType="PdPrdCoordi">
+        INSERT /* CoordiProductServiceTestMapper.insertCoordiProduct */ INTO PD_PRD_COORDI
+				(
+				    PRD_NO
+				    ,COORDI_PRD_NO
+				    ,CREATE_DT
+				    ,CREATE_NO
+				)
+				VALUES
+				(
+				    #{prdNo}
+				    ,#{coordiPrdNo}
+				    ,SYSDATE
+				    ,#{createNo}
+				)
+
+    </insert>
+
+	<delete id="deleteCoordiProduct" parameterType="long">
+		DELETE  /*CoordiProductServiceTestMapper.deleteCoordiProduct */ FROM PD_PRD_COORDI
+		WHERE PRD_NO = #{prdNo}
+	</delete>
+
+
+
+	<select id="getCoordiPrdNoList" parameterType="long" resultType="long">
+		SELECT /* CoordiProductServiceTestMapper.getMyCoordiProductList */
+		COORDI_PRD_NO
+		FROM PD_PRD_COORDI
+		WHERE PRD_NO = #{prdNo}
+	</select>
+
+
+
+	<select id="getDisplayCoordiProductList" parameterType="long" resultType="DisplayCoordiProductVO">
+		SELECT  /* CoordiProductServiceTestMapper.getDisplayCoordiProductList */
+		DLP.PRD_NO  /*전시상품 번호*/
+		,DLP.PRD_NM  /*전시상품 명*/
+		,DLP.SEL_PRC  /*전시상품 판매가*/
+		,DLP.FINAL_DSC_PRC  /* 전시상품 최종구매가능가 */
+		,DLP.DLV_CUPN_CD  /* 전시상품 배송쿠폰코드 */
+		,DLP.IMG_URL_02   /* 상품이미지URL02(170 *1 170 */
+		,CASE
+		WHEN DLP.SEL_PRC = DLP.FINAL_DSC_PRC THEN 'N' /* 전시상품 판매가 최종구매가능가 상이 여부 */
+		ELSE 'Y'
+		END as dscYn
+		FROM    DP_LIVE_PRD DLP
+		,PD_PRD_COORDI CRD
+		WHERE  DLP.PRD_NO = CRD.COORDI_PRD_NO
+		AND    CRD.PRD_NO = #{prdNo}
+	</select>
+
+
+	<select id="getCoordiProductList" parameterType="long" resultType="PdPrdCoordi">
+		SELECT /* CoordiProductServiceTestMapper.getCoordiProductList */
+		PRD_NO
+		,COORDI_PRD_NO
+		,CREATE_DT
+		,CREATE_NO
+		FROM PD_PRD_COORDI
+		WHERE PRD_NO = #{prdNo}
+	</select>
+
+
+
+</mapper>

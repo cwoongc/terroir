@@ -1,0 +1,85 @@
+package com.elevenst.terroir.product.registration.product.entity;
+
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
+
+@Data
+public class PdPrdTour implements Serializable {
+    private static final long serialVersionUID = 7988266865887788457L;
+
+    private long prdNo;
+    private long maxSelPrc;
+    private String drcStlYn;
+    private String iframeAcssYn;
+    private String svcAreaCd;
+    private String cnFeeAplYn;
+    private String directStlYn;
+    private String hotelCountry;
+    private String hotelCity;
+    private String hotelBaseAddr;
+    private String hotelDtlsAddr;
+    private String hotelAddrTypCd;
+    private String hotelMailNo;
+    private String hotelBuildMngNo;
+    private String hotelTlphnNo;
+    private long hotelFloor;
+    private long hotelRoomCnt;
+    private String checkInTime;
+    private String checkOutTime;
+    private String hotelPrdType;
+    private String hotelGrade;
+    private String mapPosY;
+    private String mapPosX;
+    private String prdPrmtFlag;
+    private String tourPrdType;
+    private String tourNationType;
+    private String tourNightDays;
+    private String dprtCity;
+    private String dprtCountry;
+    private String arrvCity;
+    private String arrvCountry;
+    private String tourDays;
+    private String tourSiteInfo;
+    private Date createDt;
+    private long createNo;
+    private Date updateDt;
+    private long updateNo;
+    private String sidoNm;
+    private String sigunguNm;
+    private String dealYn;
+    private String dealIcon;
+    private Date dealBgnDy;
+    private Date dealEndDy;
+    private Date ItemDispBgnDy;
+    private Date ItemDispEndDy;
+    private Date prdDescBgnDy;
+    private Date prdDescEndDy;
+    private String prdDescHtml;
+    private long rsvLmtQty;
+    private Date rsvLmtBgnDy;
+    private Date rsvLmtEndDy;
+    private String rsvQtyYn;
+    private String itemTermYn;
+    private String prcIcon;
+    private long rsvCnt;
+    private long sellerPrdRank;
+    private String latitude;
+    private String longitude;
+    private String locationId;
+    private long tradvsEvlCnt;
+    private long tradvsEvlScore;
+    private Date tradvsEvlClctDt;
+    private String dtlsDescTyp;
+    private String dgstDesc;
+    private String offrSvcList;
+    private String roomInfoUrl;
+    private String locInfoUrl;
+    private String useInfoUrl;
+    private String roomInfoHtml;
+    private String locInfoHtml;
+    private String useInfoHtml;
+    private String extrRefXCrdnVal;
+    private String extrRefYCrdnVal;
+}

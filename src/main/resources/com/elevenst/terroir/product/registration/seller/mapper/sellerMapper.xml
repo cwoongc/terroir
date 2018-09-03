@@ -1,0 +1,244 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.seller.mapper.SellerMapper">
+
+    <!-- 판매자 권한 정보 조회 -->
+    <select id="getSellerAuthInfo" parameterType="SellerAuthVO" resultType="SellerAuthVO">
+        <![CDATA[
+		SELECT /* getSellerAuthInfo */
+			/*+ INDEX(A PK_PD_SELLER_AUTH) */
+			A.SEL_MNBD_NO AS selMnbdNo
+			, A.USE_YN AS useYn
+			, A.AUTH_OBJ_NO AS authObjNo
+			, NVL(A.CREATE_NO, 0) AS createNo
+			, NVL(A.UPDATE_NO, 0) AS updateNo
+			, TO_CHAR(A.CREATE_DT, 'YYYY/MM/DD') AS createDt
+			, TO_CHAR(A.UPDATE_DT, 'YYYY/MM/DD') AS updateDt
+		FROM PD_SELLER_AUTH A
+		WHERE A.SEL_MNBD_NO = #{selMnbdNo}
+			AND A.AUTH_TYP_CD = #{authTypCd}
+			AND A.OBJ_CLF_CD = #{objClfCd}
+	]]>
+        <if test="mode == 'AUTH_OBJ_NO_NOT_CHK'">
+            AND A.AUTH_OBJ_NO = #{authObjNo}
+        </if>
+        <if test="useYn != null || useYn != ''">
+            AND A.USE_YN = #{useYn}
+        </if>
+    </select>
+
+    <!-- 판매자 권한 정보 조회 -->
+    <select id="getSellerAuthList" parameterType="SellerAuthVO" resultType="SellerAuthVO">
+		SELECT
+			/*+ INDEX(A PK_PD_SELLER_AUTH) */
+			A.SEL_MNBD_NO AS selMnbdNo
+			, A.USE_YN AS useYn
+			, A.AUTH_OBJ_NO AS authObjNo
+			, NVL(A.CREATE_NO, 0) AS createNo
+			, NVL(A.UPDATE_NO, 0) AS updateNo
+			, TO_CHAR(A.CREATE_DT, 'YYYY/MM/DD') AS createDt
+			, TO_CHAR(A.UPDATE_DT, 'YYYY/MM/DD') AS updateDt
+		FROM PD_SELLER_AUTH A
+		WHERE A.SEL_MNBD_NO = #{selMnbdNo}
+			AND A.AUTH_TYP_CD = #{authTypCd}
+        <if test="useYn != null || useYn != ''">
+            AND A.USE_YN = #{useYn}
+        </if>
+        /* sellerMapper.getSellerAuthList */
+    </select>
+
+    <select id="getBaseSelMnbdNck" parameterType="SellerAuthVO" resultType="java.lang.Integer">
+		SELECT /* SellerMapper.getBaseSelMnbdNck */
+			   /*+ INDEX(A PK_MB_NCK_NM) */
+		        count(1)
+		FROM    MB_NCK_NM A
+		WHERE   1 = 1
+		AND     A.MEM_NO = TO_NUMBER(#{selMnbdNo})
+		AND     A.NCK_NM_SEQ = TO_NUMBER(#{selMnbdNckNmSeq})
+		AND     A.BASE_NCK_NM_YN = 'Y'
+    </select>
+
+
+    <select id="isCupnExcldSeller" parameterType="long" resultType="long">
+        SELECT	/* sellerMapper.xml isCupnExcldSeller */
+            COUNT(1) AS EXCLD_SELLER
+        FROM MT_CUPN_EXCLD_SELLER
+        WHERE MEM_NO = #{selMnbdNo}
+        AND	SYSDATE BETWEEN APL_BGN_DY AND APL_END_DY
+        AND	CUPN_EFTV_CLF_CD = '01'
+        AND	USE_YN = 'Y'
+    </select>
+
+    <!-- 회원 아이디 불러오기 -->
+    <select id="getSellerId"  resultType="String" parameterType="long">
+        select   mem_id
+        from     mb_mem
+        where    mem_no = #{memNo}
+    </select>
+
+    <select	id="getProductSellerInfo" parameterType="long" resultMap="com.elevenst.terroir.product.registration.common.mapper.VoMapper.productVOMap">
+        SELECT	/* sellerMapper.getProductSellerInfo */
+        /*+ LEADING(a b c) USE_NL(b c) INDEX(a PK_PD_PRD) INDEX(b PK_MB_MEM) INDEX(c IX1_PD_PRD_PRC) */
+        a.prd_no as prdNo,
+        a.sel_mnbd_no as selMnbdNo,
+        b.mem_id as memId,
+        b.mem_typ_cd as memTypCd,
+        a.sel_stat_cd as selStatCd,
+        a.bsn_deal_clf as bsnDealClf,
+        (select /*+ INDEX(svc PK_PD_PRD_SVC_AREA) */ cert_type from pd_prd_svc_area where prd_no = a.prd_no) as certTypCd,
+        c.sel_prc as selPrc,
+        NVL(c.puch_prc, 0) as puchPrc,
+        NVL(c.mrgn_rt, 0) as mrgnRt,
+        NVL(c.mrgn_amt, 0) as mrgnAmt,
+        a.set_typ_cd as strSetTypCd,
+        to_char(sel_bgn_dy,'rrrrmmddhh24miss') AS selBgnDy,
+        to_char(sel_end_dy,'rrrrmmddhh24miss') AS selEndDy,
+        NVL(a.disp_ctgr_no_de, 0) AS dispCtgrNo,
+        NVL(a.dlv_clf, '02') AS dlvClf
+        FROM	pd_prd a, mb_mem b, pd_prd_prc c
+        where	a.sel_mnbd_no = b.mem_no
+        and   a.prd_no = c.prd_no
+        and	a.prd_no = #{prdNo}
+    </select>
+
+    <update id="mergePdSellerServiceLmtLog" parameterType="PdSellerServiceLmtLog">
+        MERGE /* sellerMapper.mergePdSellerServiceLmtLog */
+            /*+ INDEX(LMT PK_PD_SELLER_SERVICE_LMT_LOG) */
+            INTO PD_SELLER_SERVICE_LMT_LOG LMT
+        USING (
+            SELECT
+                TO_CHAR(SYSDATE, 'YYYYMMDD') AS CREATE_DT
+                ,TO_NUMBER(#{memNo}) AS MEM_NO
+                ,#{service} AS SERVICE
+            FROM DUAL
+        ) TMP
+        ON (A.CREATE_DT = TMP.CREATE_DT
+        AND A.MEM_NO = TMP.MEM_NO
+        AND A.SERVICE = TMP.SERVICE)
+        WHEN NOT MATCHED THEN
+            INSERT (
+                CREATE_DT, MEM_NO, SERVICE, ACCESS_CNT
+            ) VALUES (
+                TMP.CREATE_DT, TMP.MEM_NO, TMP.SERVICE, 1
+            )
+        WHEN MATCHED THEN
+            UPDATE
+                SET ACCESS_CNT = ACCESS_CNT + 1
+    </update>
+
+    <select id="getSellerServiceLmtInfo" parameterType="SellerServiceLmtVO" resultType="SellerServiceLmtVO">
+        SELECT /* sellerMapper.getSellerServiceLmtInfo */
+            A.MEM_NO
+            ,A.SERVICE
+            ,A.LMT_CNT
+            ,A.CREATE_DT
+            ,A.CREATE_NO
+            ,NVL((
+                SELECT
+                    B.ACCESS_CNT
+                FROM PD_SELLER_SERVICE_LMT_LOG B
+                WHERE
+                    B.MEM_NO = A.MEM_NO
+                AND B.SERVICE = A.SERVICE
+                AND B.CREATE_DT = TO_CHAR(SYSDATE, 'YYYYMMDD')
+                AND ROWNUM <![CDATA[ <= ]]> 1
+                ), 0) ACCESS_CNT
+        FROM PD_SELLER_SERVICE_LMT A
+        WHERE
+            A.MEM_NO = #{memNo}
+        AND A.SERVICE = #{service}
+    </select>
+
+    <select id="getSellerTypCd" parameterType="long" resultType="String">
+        SELECT
+        NVL(SELLER_TYP_CD, '00')
+        FROM MB_SELLER_ETC
+        WHERE MEM_NO = #{memNo}
+        /* sellerMapper.getSellerTypCd */
+    </select>
+
+    <!-- 셀러위탁 물류 정보 조회 -->
+    <select id="getConsignmentDstSellerInfo" parameterType="long" resultType="MbCnsgnDstSellerVO">
+        select
+        /*+ index(dst PK_MB_CNSGN_DST_SELLER) */
+        dst.MEM_NO memNo,
+        dst.CNSGN_YN cnsgnYn,
+        dst.CONTR_BGN_DT contrBgnDt,
+        dst.CONTR_END_DT contrEndDt,
+        dst.CONTR_EMP_NO contrEmpNo,
+        (select EMP_NM from sy_emp sy where dst.CONTR_EMP_NO = sy.emp_no) as contrEmpNm,
+        dst.DST_CHGR_NM dstChgrNm,
+        dst.DST_CHGR_EMAIL_ADDR dstChgrMailAddr,
+        dst.EMAIL_ADDR_CD emailAddrCd,
+        dst.DRCT_INPUT_EMAIL_ADDR drctInputEmailAddr,
+        dst.DST_CHGR_TELNO dstChgrTelno,
+        dst.DST_CHGR_CPNO dstChgrCpno,
+        dst.DST_SMS_RCV_YN dstSmsRcvYn,
+        dst.DST_UFEE_CLF_CD dstUfeeClfCd,
+        dst.DST_UFEE_RT dstUfeeRt,
+        dst.CREATE_DT createDt,
+        dst.CREATE_NO createNo,
+        dst.UPDATE_DT updateDt,
+        dst.UPDATE_NO updateNo
+        from MB_CNSGN_DST_SELLER dst
+        where MEM_NO=#{memNo}
+        /* sellerMapper.getConsignmentDstSellerInfo */
+    </select>
+
+    <!-- 셀러 부가 설정 정보를 가져온다. -->
+    <select id="getMbSellerAddSetInfo" resultType="MbSellerAddSetVO" parameterType="long">
+        <![CDATA[
+			SELECT
+		    MEM_NO, PAY11_USE_YN, PAY11_PRD_NO, PAY11_STOCK_NO, PAY11_UPDATE_DT
+ 		    , CTGR_CHNG_AUTH_YN, CTGR_CHNG_AUTH_EMP_NO, CTGR_CHNG_AUTH_DT
+ 		    , OVSE_SELL_SUPT_USE_YN, OVSE_SELL_SUPT_USE_CRDT, OVSE_SELL_SUPT_USE_UPDT, OVSE_SELL_SUPT_USE_CHNG_NO
+ 		    , OVSE_SELL_APRV_YN, OVSE_SELL_APRV_REG_DT, OVSE_SELL_APRV_DEL_DT, OVSE_SELL_APRV_EMP_NO, MIN_BUY_AMT_YN, MIN_BUY_AMT
+			FROM MB_SELLER_ADD_SET
+			WHERE MEM_NO = #{memNo}
+		]]>
+        /* sellerMapper.getMbSellerAddSetInfo */
+    </select>
+
+    <!-- 셀러 부가 설정 정보를 가져온다. -->
+    <select id="getMbSellerOptSetDetail" resultType="MbSellerOptSetDetailVO" parameterType="MbSellerOptSetDetailVO">
+        SELECT MEM_NO as memNo
+        ,OPT_SVC_CD as optSvcCd
+        ,OPT_CD as optCd
+        ,OPT_VAL as optVal
+        ,CREATE_NO as createNo
+        ,CREATE_DT as createDt
+        ,UPDATE_NO as updateNo
+        ,UPDATE_DT as updateDt
+        FROM MB_SELLER_OPT_SET_DETAIL
+        WHERE MEM_NO = #{memNo}
+        AND OPT_SVC_CD = #{optSvcCd}
+        AND OPT_CD = #{optCd}
+        /* sellerMapper.getMbSellerOptSetDetail */
+    </select>
+
+    <!-- 로드샵 입점신청정보 조회 -->
+    <select id="getMbRoadShopApplyInfo" resultType="MbRoadShopVO" parameterType="long">
+        SELECT
+        MEM_NO memNo,
+        ENBR_RQST_STAT_CD enbrRqstStatCd,
+        CHGR_NM chgrNm,
+        CHGR_CPNO chgrCpNo,
+        CHGR_EMAIL_ADDR chgrEmailAddr,
+        SHOP_IMG_URL1 shopImgUrl1,
+        SHOP_IMG_URL2 shopImgUrl2,
+        SHOP_IMG_URL3 shopImgUrl3,
+        RQST_MSG_CONT rqstMsgCont,
+        CREATE_DT createDt,
+        CREATE_NO createNo,
+        UPDATE_DT updateDt,
+        UPDATE_NO updateNo
+        FROM MB_ROAD_SHOP_MEM
+        WHERE MEM_NO = #{memNo}
+        /* sellerMapper.getMbRoadShopApplyInfo */
+    </select>
+
+    <select id="getSellerRtnChngDlvInfo" resultType="MbMemVO" parameterType="long">
+        SELECT RTN_DLV_FEE, CHNG_DLV_FEE, INIT_DLV_NO_FEE_MTH from mb_mem where mem_no = #{memNo}
+    </select>
+</mapper>

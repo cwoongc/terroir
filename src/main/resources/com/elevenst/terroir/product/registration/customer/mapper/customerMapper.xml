@@ -1,0 +1,937 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.customer.mapper.CustomerMapper">
+
+    <!-- 셀러의 해외 통합아이디 존재여부 조회 -->
+    <select id="getGlbItgIdsBySeller" resultType="long" parameterType="long">
+        SELECT /* getGlbItgIdsBySeller */
+        COUNT(1)
+        FROM mb_itg_mem_map a, sy_co_detail b
+        WHERE to_char(a.itg_mem_no) = b.dtls_cd
+        and b.grp_cd = 'MB100'
+        and a.sel_supl_mem_no = #{memNo}
+    </select>
+
+    <!-- 셀러의 해외 통합아이디 존재여부 조회 -->
+    <select id="getGlbItgIdsByPrdNo" resultType="long" parameterType="long">
+        SELECT /* getGlbItgIdsByPrdNo */
+        COUNT(1)
+        FROM pd_prd p, mb_itg_mem_map a, sy_co_detail b
+        WHERE to_char(a.itg_mem_no) = b.dtls_cd
+        and b.grp_cd = 'MB100'
+        and p.prd_no = #{prdNo}
+        and a.sel_supl_mem_no = p.sel_mnbd_no
+    </select>
+
+    <select id="isFrSellerByPrdNo" parameterType="long" resultType="long" >
+        /* customerMapper.isFrSellerByPrdNo */
+        SELECT COUNT(1)
+        FROM PD_FR_SELLER A, PD_PRD B
+        WHERE A.SEL_MNBD_NO = B.SEL_MNBD_NO
+        AND B.PRD_NO = #{prdNo}
+    </select>
+
+    <!--[개인정보 유효기간제] widetns 이정주 : register.getMemberInfo - t1.sprt_yn 추가 -->
+    <select id="getMemberInfo" resultType="MemberVO"  parameterType="MemberVO">
+        SELECT /* member.xml register.getMemberInfo 김형주 2014.12.22 주소테이블 JOIN으로 수정 */
+        * FROM (SELECT /*+ USE_NL(T1 T2  T3 T4 T5 T6 T7 T8 T9 T10 T11 T12 T13)  */
+        rownum
+        ,t1.mem_clf
+        ,t1.xsite
+        ,t1.mem_typ_cd
+        ,t1.mem_no
+        ,t1.mem_id
+        ,t1.mem_nm
+        ,nvl(t1.crypto_mem_scrt_no, t1.mem_scrt_no) as mem_scrt_no
+        ,t1.e_mail
+        ,t1.e_mailaddr_cd
+        ,t1.drct_mailaddr
+        ,t1.e_mail ||
+        '@' ||
+        CASE t1.e_mailaddr_cd WHEN '01' THEN t1.drct_mailaddr
+        ELSE (SELECT dtls_com_nm FROM sy_co_detail WHERE grp_cd = 'SY001' AND dtls_cd = t1.e_mailaddr_cd ) END concat_email
+        ,t1.e_mail_rcv_yn
+        ,t1.sms_rcv_yn
+        ,t1.sms_trns_rcv_yn
+        ,t1.bgn_ent_dy
+        ,t1.mem_idnty_no
+        ,t1.gnrl_tlphn_no
+        ,t1.prtbl_tlphn_no
+        ,t1.mem_stat_cd
+        ,t1.mem_stat_dtls_cd
+        ,(SELECT dtls_com_nm FROM sy_co_detail WHERE grp_cd = 'MB016' AND dtls_cd = t1.mem_stat_dtls_cd) mem_stat_dtls_nm
+        ,t1.mem_stat_dtls_rsn
+        ,t1.scssn_rsn_dtls
+        ,t1.reent_yn
+        ,t1.stlmnt_amt_rcv_mtd_cd
+        ,t1.prd_pool_ent_yn
+        ,t1.scssn_dt
+        ,t1.scssn_rsn_cd
+        ,t1.real_nm_crtf_typ
+        ,t1.real_nm_crtf_yn
+        ,t1.real_nm_crtf_dy
+        ,t1.ent_cmmn_clf
+        ,t1.ocb_card_num
+        ,t1.TMEMBERSHIP_CARD_NUM
+        ,t1.update_dt
+        ,t1.create_dt
+        ,t1.wire_cmmn_clf
+        ,t1.mem_itrst_cd
+        ,(SELECT dtls_com_nm
+        FROM sy_co_detail
+        WHERE grp_cd = 'MB035'
+        AND dtls_cd = t1.mem_itrst_cd) mem_itrst_nm
+        ,(SELECT /*+ INDEX_DESC(mb_mry_dy_info PK_MB_MRY_DY_INFO) */ anvy_dy
+        FROM   mb_mry_dy_info
+        WHERE  mem_no = t1.mem_no
+        AND  anvy_day_clf = '01'
+        AND  rownum = 1) anvy_dy
+        ,t2.rsdnt_no_frgnr_reg_no
+        ,t2.natv_yn
+        ,t2.brth
+        ,t2.brth_dd
+        ,t2.sex
+        ,t2.frgn_clf
+        ,t4.psn_cobs_enpr_no
+        ,t4.cobs_rptv_reg_no
+        ,t4.cobs_rptv
+        ,t4.itm
+        ,t4.bsns_st
+        ,t4.fax_no
+        ,t4.enp_plc_mail_no
+        ,case when NVL(t4.enp_plc_mail_no,'') = ''
+        then (' ' || t4.enp_plc_base_addr || ' ' || t4.enp_plc_dtls_addr)
+        else ('(' || t4.enp_plc_mail_no || ')' || ' ' || t4.enp_plc_base_addr || ' ' || t4.enp_plc_dtls_addr)
+        end enp_addr
+        ,t4.enp_plc_base_addr
+        ,t4.enp_plc_dtls_addr
+        ,t4.crgr_nm
+        ,t4.bsns_nm etprs_bsns_nm
+        ,t4.rptv_tlphn_no
+        ,t4.enpr_clf
+        ,case when t4.comu_mren_dcl_no is null or t4.comu_mren_dcl_no = '' then '미신고'
+        else '신고'
+        end comu_mren_dcl_yn
+        ,case when t4.comu_mren_dcl_not_code = '99' then t4.comu_mren_dcl_not_etc
+        else (select dtls_com_nm FROM sy_co_detail WHERE grp_cd = 'MB041' AND dtls_cd = t4.comu_mren_dcl_not_code)
+        end comu_mren_dcl_not_rsn
+        ,t4.comu_mren_dcl_no
+        ,t4.comu_mren_dcl_not_code
+        ,t4.comu_mren_dcl_not_etc
+        ,t4.frgn_clf as etpr_Frgn_clf
+        ,t4.ocb_zone_appv_cd
+        ,t4.enpr_mem_crtf_stat_cd
+        ,t4.enpr_aprv_end_dt
+        ,t5.addr_nm
+        ,t5.addr_seq
+        ,t5.mail_no
+        ,t5.mail_no_seq
+        ,t5.dtls_addr
+        ,t5.rcvr_nm
+        ,t5.addr_cd
+        ,NVL(t5.addr_typ_cd,'01') addr_typ_cd
+        ,NVL(t5.build_mng_no,'') BUILD_MNG_NO
+        ,case when TMN.use_yn = 'N'
+        then 'N'
+        else (case when (case when (t5.addr_typ_cd = '02' and t5.build_mng_no is not null)
+        then TRA.expr_yn else 'N' end) = 'Y'
+        then 'N' else 'Y' end)
+        end as mail_no_use_yn
+        ,FN_MB_MEMBER_INFO(t1.mem_no, '12') concat_nck_nm
+        ,t6.nck_nm
+        ,(SELECT COUNT(*) FROM mb_nck_nm WHERE mem_no = t1.mem_no) nck_cnt
+        ,nvl(t6.nck_nm_seq, 0) nck_nm_seq
+        ,t6.nck_nm_img_url
+        ,t7.acct_clf
+        ,t7.bnk_cd
+        ,t7.acct_no
+        ,t7.acct_own_nm
+        ,t7.acct_no_real_crtf_yn
+        ,t7.mem_own_acct_seq
+        ,(SELECT dtls_com_nm FROM sy_co_detail WHERE grp_cd = 'SY003' AND dtls_cd = t7.bnk_cd) bnk_nm
+        ,t7.acct_no_rl_nm_crtf_dt
+        ,case
+        when t5.addr_typ_cd = '02' then ( case
+        when t1.ent_site_lang_clf = '02'
+        AND    TRA.sido_nm_eng is NOT null then TRA.sido_nm_eng ||' ' || TRA.sigungu_nm_eng || ' ' || TRA.ueupmyon_nm_eng || ' ' || TRA.road_nm_eng || ' ' || TRA.build_main_no || decode(TRA.build_sub_no,0,'','-' || TRA.build_sub_no)
+        else TRA.sido_nm ||' ' || TRA.sigungu_nm || ' ' || TRA.ueupmyon_nm || ' ' || TRA.road_nm || ' ' || TRA.build_main_no || decode(TRA.build_sub_no,0,'','-' || TRA.build_sub_no) || case
+        when TRA.law_dong_nm is null
+        AND    TRA.sigungu_build_nm is null then ''
+        when TRA.law_dong_nm is null then ' (' || TRA.sigungu_build_nm || ')'
+        when TRA.sigungu_build_nm is null then ' (' || TRA.law_dong_nm || ')'
+        else ' (' || TRA.law_dong_nm || ', ' || TRA.sigungu_build_nm || ')'
+        end
+        end )
+        else ( case when t1.ent_site_lang_clf = '02'
+        AND    TMN.sido_nm_eng is NOT null then TMN.sido_nm_eng ||' ' || TMN.sigungu_nm_eng || ' ' || TMN.ueupmyon_nm_eng || ' ' || TMN.rhyee_nm_eng || ' ' || TMN.bld_nm_eng
+        else TMN.sido_nm ||' ' || TMN.sigungu_nm || ' ' || TMN.ueupmyon_nm || ' ' || TMN.rhyee_nm || ' ' || TMN.dosoe_nm || ' ' || TMN.bld_nm
+        end )
+        end addr
+        ,TRA.area_no
+        ,case when t5.addr_typ_cd = '02' then TRA.jeju_yn else TMN.jeju_yn end jeju_yn
+        ,case when t5.addr_typ_cd = '02' then TRA.island_yn else TMN.island_yn end island_yn
+        ,(select svc_yn from MB_GUARANTEE_SELLER where mem_no = t1.mem_no) SVC_YN
+        ,nvl(t9.buy_actn_mngmt_grd, 05) buy_actn_mngmt_grd
+        ,nvl(t9.buy_crdt_pnt, 0) buy_crdt_pnt
+        ,nvl(t9.buy_amt, 0) buy_amt
+        ,nvl(t10.sell_crdt_grd, 05) sell_crdt_grd
+        ,t11.mngmt_crdt_grd
+        ,nvl(t11.cmlt_sel_crdt_scor, 0) cmlt_sel_crdt_scor
+        ,nvl(t11.cmlt_sel_amt, 0) cmlt_sel_amt
+        ,t1.prtbl_tlphn_crtf_yn
+        ,case when t12.rmvl_yn = 'N' then 'Y'
+        else 'N' end blackList_yn
+        ,nvl(t1.uotp_ent_yn,'') uotp_ent_yn
+        ,nvl(t1.uotp_user_id, '') uotp_user_id
+        ,nvl(t1.cert_yn,'N')  cert_yn
+        ,nvl(t1.cert_ip,'')  cert_ip
+        ,t1.cert_dt
+        ,t1.tax_manage_yn
+        ,t1.tax_manage_dt
+        ,t1.prtbl_tlphn_crtf_cnt
+        ,t1.prtbl_tlphn_crtf_cnt_dt
+        ,t1.st_agree_dt
+        ,t1.ch_agree_dt
+        ,t1.mo_agree_dt
+        ,t1.st_agree_yn
+        ,t1.ch_agree_yn
+        ,t1.mo_agree_yn
+        ,t1.mm_integ_stat_cd
+        ,t1.integ_dt
+        ,t13.SH_CARD_NO
+        ,t13.CUPN_DOWN_DT
+        ,t13.CARD_CD
+        ,t4.hotline_prtbl_tlphn_no
+        ,t1.MB_ENG_NM
+        ,t1.china_apply_stat_cd
+        ,t1.plural_yn
+        ,t2.prd_deli_typ_cd	prvt_prd_deli_typ_cd
+        ,t2.impt_typ_cd		prvt_impt_typ_cd
+        ,t2.adlt_crtf_yn
+        ,t2.acct_mem_idnty_no
+        ,t2.SK_GRP_COM_MEM_XSITE_VAL sk_grp_com_mem_xsite_val
+        ,t2.SK_GRP_COM_MEM_XSITE_CRTF_DT sk_grp_com_mem_xsite_crtf_dt
+        ,t4.prd_deli_typ_cd	entpr_prd_deli_typ_cd
+        ,t4.impt_typ_cd		entpr_impt_typ_cd
+        ,t4.prdct_req_tlphn_no_yn	prdct_req_tlphn_no_yn
+        ,t4.clm_req_tlphn_no_yn	clm_req_tlphn_no_yn
+        ,t4.prdct_req_tlphn_no	prdct_req_tlphn_no
+        ,t4.clm_req_tlphn_no		clm_req_tlphn_no
+        ,t4.entrust_stl_mthd_cd	entrust_stl_mthd_cd
+        ,nvl(t4.entrust_stl_rt,0)		entrust_stl_rt
+        ,t4.entrust_stl_doc_no	entrust_stl_doc_no
+        ,t1.ent_evnt_no
+        ,t4.key_seller_yn
+        ,t4.mng_team_nm
+        ,t4.mng_mngr_nm
+        ,t4.mng_tel_no
+        ,t4.recommend_mem_id
+        ,t2.minor_prvt_seller_appr_yn
+        ,t1.pub_cert_dn
+        ,t1.mem_free_return_yn
+        ,nvl(t1.auto_cancel_yn,'Y') auto_cancel_yn
+        ,t1.pub_cert_dt
+        ,t1.pub_cert_expire_dt
+        ,t1.pub_cert_oid
+        ,t1.mem_di
+        ,nvl(t2.inner_vip_yn,'N') inner_vip_yn
+        ,t2.inner_vip_yn_upd_dt
+        ,(select count(*) from mb_mem_trns where mem_no =t1.mem_no AND trns_req_stat_cd ='01') trns_cnt
+        ,nvl(t1.login_log_yn,'N') login_log_yn
+        ,t1.login_log_yn_dt
+        ,NULL soho_yn
+        ,t1.auto_reg_yn
+        ,nvl(t1.fee_update_dt,'') fee_update_dt
+        ,nvl(t1.fee_update_yn,'N') fee_update_yn
+        ,(SELECT /*+ INDEX_DESC(A IX1_MB_FEE_HIST) */
+        FEE_UPDATE_YN
+        FROM MB_FEE_HIST A
+        WHERE MEM_NO =  t1.mem_no
+        AND FEE_APPLY_DT <![CDATA[<=]]> TRUNC(SYSDATE)
+        AND ROWNUM <![CDATA[<=]]> 1) real_fee_update_yn
+        ,(SELECT /*+ INDEX_DESC(A IX1_MB_FEE_HIST) */
+        nvl(FEE_EXCEPT_SELLER_YN, 'N')
+        FROM MB_FEE_HIST A
+        WHERE MEM_NO =  t1.mem_no
+        AND FEE_APPLY_DT <![CDATA[<=]]> TRUNC(SYSDATE)
+        AND ROWNUM <![CDATA[<=]]> 1) real_fee_except_seller_yn
+        ,sel_agree_dt
+        ,t1.skt_auth_dt
+        ,t1.bsn_deal_clf
+        ,t1.dlv_clf
+        ,t1.offshore_dlv_clf
+        ,t1.rep_seller_no
+        ,nvl(t1.adv_sms_rcv_cd,'04') adv_sms_rcv_cd
+        ,nvl(t1.cert_card_yn,'N') cert_card_yn
+        ,nvl(t1.town_seller_yn, 'N') town_seller_yn
+        ,t1.int_svc_no
+        ,t1.int_update_dt
+        ,t1.login_fail_cnt
+        ,t1.ent_site_lang_clf /* 영문회원 구분 추가 by jkin */
+        ,t1.eng_ent_mth_typ /* 영문회원 인증방식 by jkin */
+        ,t1.eng_addr_type /* 영문회원 주소 형식(01:해외,02:국내) */
+        ,t1.rtn_dlv_fee
+        ,t1.chng_dlv_fee
+        ,t1.init_dlv_no_fee_mth
+        ,t1.recent_ord_dt
+        ,t2.country_tlphn_cd
+        ,t4.base_info_update_dt
+        ,t1.sprt_yn
+        ,t1.wms_use_clf_cd /* 물류센터이용코드 MB150 */
+        ,t1.stl_cycle_cd /* 정산주기 SE242 */
+        ,t4.supl_cmp_clf_cd /* 공급업체구분 MB149 */
+        FROM (SELECT
+        <if test="memDI != null and memDI != ''">
+            /*+ no_merge index(mb_mem(mem_di)) */
+        </if>
+        *
+        FROM mb_mem
+        where 1=1
+        <if test="memID != null and memID != '' ">
+            and mem_id = #{memID}
+        </if>
+        <if test="memNO != '0'">
+            and mem_no = #{memNO}
+        </if>
+        <if test="(memDI != null and memDI != '')">
+            and mem_di = #{memDI}
+            and mem_stat_cd != '03'
+        </if>
+        <if test="memID == null and memID == ''">
+            <if test="(memDI == null and memDI == '') and (memNO == '0')">
+                and mem_no = 0
+            </if>
+        </if>
+        ) t1
+        LEFT OUTER JOIN mb_prvt_mem t2 ON t1.mem_no = t2.mem_no
+        LEFT OUTER JOIN mb_bsn_etprs_mem t4 ON t1.mem_no = t4.mem_no
+        LEFT OUTER JOIN mb_addr t5 ON t1.mem_no = t5.mem_no
+        AND t5.base_addr_yn = 'Y' AND t5.addr_cd ='01' AND t5.del_yn = 'N'
+        LEFT OUTER JOIN mb_nck_nm t6 ON t1.mem_no = t6.mem_no
+        AND t6.base_nck_nm_yn = 'Y'
+        LEFT OUTER JOIN mb_mem_own_acct t7 ON t1.mem_no = t7.mem_no
+        AND t7.base_acct_yn = 'Y'
+        AND t7.acct_clf = '01'
+        LEFT OUTER JOIN mb_mem_mg_gr t9 ON t1.mem_no = t9.mem_no
+        AND t9.mg_gr_clf = '01'
+        AND to_char(t9.end_dy, 'YYYYMMDD') = '99991231'
+        LEFT OUTER JOIN mb_mem_mg_gr t10 ON t1.mem_no = t10.mem_no
+        AND t10.mg_gr_clf = '03'
+        AND to_char(t10.end_dy, 'YYYYMMDD') = '99991231'
+        LEFT OUTER JOIN mb_mem_mg_gr t11 ON t1.mem_no = t11.mem_no
+        AND t11.mg_gr_clf = '02'
+        AND to_char(t11.end_dy, 'YYYYMMDD') = '99991231'
+        LEFT OUTER JOIN mb_flty_mem t12 ON t1.mem_no = t12.mem_no
+        AND t12.rmvl_yn = 'N'
+        LEFT OUTER JOIN MB_SHCARD_LIST t13 ON t1.mem_no = t13.mem_no
+        AND t1.MEM_IDNTY_NO = t13.MEM_IDNTY_NO
+        LEFT OUTER JOIN SY_MAIL_NO TMN ON t5.MAIL_NO= TMN.MAIL_NO
+        AND t5.MAIL_NO_SEQ= TMN.MAIL_NO_SEQ
+        LEFT OUTER JOIN SY_ROAD_ADDR TRA ON t5.BUILD_MNG_NO= TRA.BUILD_MNG_NO
+        )
+        WHERE rownum = 1
+    </select>
+
+    <!--[개인정보 유효기간제] widetns 이정주 : mb_mem_sprt_vw - 분리보관회윈 인라인뷰 추가 -->
+    <sql id="mb_mem_sprt_vw">
+        select a.mem_no,
+        b.mem_id,
+        b.mem_nm,
+        b.mem_scrt_no,
+        a.mem_clf,
+        a.mem_idnty_no,
+        a.mem_typ_cd,
+        a.mem_stat_cd,
+        a.mem_stat_dtls_cd,
+        b.gnrl_tlphn_no,
+        b.prtbl_tlphn_no,
+        b.e_mail,
+        b.e_mailaddr_cd,
+        b.drct_mailaddr,
+        a.e_mail_rcv_yn,
+        a.sms_rcv_yn,
+        a.etprs_crgr_no,
+        a.recm_psn_mem_no,
+        b.bgn_ent_dy,
+        a.real_nm_crtf_yn,
+        b.real_nm_crtf_dy,
+        a.co_path_cd,
+        a.co_path_dtls_cd,
+        a.mem_stat_dtls_rsn,
+        a.scssn_rsn_cd,
+        a.scssn_rsn_dtls,
+        a.scssn_dt,
+        a.reent_yn,
+        a.reent_dy,
+        a.prtbl_tlphn_crtf_yn,
+        a.prtbl_tlphn_crtf_dt,
+        a.prtbl_tlphn_re_crtf_yn,
+        a.stlmnt_amt_rcv_mtd_cd,
+        a.wire_cmmn_clf,
+        a.wire_scssn_clf,
+        a.ent_cmmn_clf,
+        a.ent_chnl_cd,
+        a.scssn_chnl_cd,
+        a.prd_pool_ent_yn,
+        a.xsite,
+        a.xsite_ap_id,
+        a.create_no,
+        a.create_dt,
+        a.create_ip,
+        a.update_dt,
+        a.update_no,
+        a.update_ip,
+        a.mem_itrst_cd,
+        a.ocb_card_num,
+        a.temp_stop_dt,
+        a.temp_stop_rele_dt,
+        a.perm_stop_dt,
+        a.pc_id,
+        a.rsdnt_no_back,
+        a.rsdnt_no_part,
+        a.plural_yn,
+        a.icas_scssn_yn,
+        a.ent_evnt_no,
+        a.sms_trns_rcv_yn,
+        a.uotp_ent_yn,
+        a.uotp_user_id,
+        a.cert_yn,
+        a.cert_ip,
+        a.cert_dt,
+        a.tax_manage_yn,
+        a.tax_manage_dt,
+        a.prtbl_tlphn_crtf_cnt_dt,
+        a.prtbl_tlphn_crtf_cnt,
+        a.recent_ord_dt,
+        a.st_agree_dt,
+        a.ch_agree_dt,
+        a.mo_agree_dt,
+        a.st_agree_yn,
+        a.ch_agree_yn,
+        a.mo_agree_yn,
+        b.mb_eng_nm,
+        a.china_apply_stat_cd,
+        a.mm_integ_stat_cd,
+        a.integ_dt,
+        a.scrt_no_update_dt,
+        a.ord_scrt_no,
+        a.ord_scrt_no_issue_clf,
+        a.ord_scrt_no_update_dt,
+        a.pub_cert_dn,
+        a.pub_cert_serial,
+        a.pub_cert_dt,
+        a.pub_cert_expire_dt,
+        a.pub_cert_oid,
+        a.cert_upd_no,
+        a.cert_upd_reason,
+        a.mem_free_return_yn,
+        a.mem_di,
+        a.login_log_yn,
+        a.login_log_yn_dt,
+        a.auto_reg_yn,
+        a.fee_update_dt,
+        a.fee_update_yn,
+        a.sel_agree_dt,
+        a.auto_cancel_yn,
+        a.scrt_next_upd_dt,
+        a.m_mem_no,
+        a.m_mem_use_dt,
+        a.skt_auth_dt,
+        a.stl_basic_cd,
+        a.stl_cycle_cd,
+        a.stl_basic_bgn_dt,
+        a.login_fail_cnt,
+        a.login_fail_dt,
+        a.tmembership_card_num,
+        a.tmembership_crtf_dt,
+        a.ocb_crtf_dt,
+        a.rep_seller_no,
+        a.bsn_deal_clf,
+        a.dlv_clf,
+        a.offshore_dlv_clf,
+        a.authr_grp_cd,
+        b.crypto_mem_scrt_no,
+        a.cert_card_yn,
+        a.cert_card_dt,
+        a.adv_agree_cd,
+        a.adv_sms_rcv_cd,
+        a.town_seller_yn,
+        a.int_svc_no,
+        b.int_update_dt,
+        a.ent_site_lang_clf,
+        a.eng_ent_mth_typ,
+        a.eng_addr_type,
+        a.mobi_recent_ord_dt,
+        a.rtn_dlv_fee,
+        a.chng_dlv_fee,
+        a.init_dlv_no_fee_mth,
+        b.real_nm_crtf_typ,
+        a.ord_scrt_fail_cnt,
+        a.sprt_yn,
+        a.wms_use_clf_cd
+        from   mb_mem a,
+        mb_mem_sprt b
+        where  a.mem_no=b.mem_no
+    </sql>
+
+    <!--[개인정보 유효기간제] widetns 이정주 : register.getMemberInfoSprt 추가 -->
+    <!--분리보관회원 기본정보에 통합서비스번호 추가함 -->
+    <select id="getMemberInfoSprt" resultType="MemberVO"  parameterType="MemberVO">
+        SELECT /* getMemberInfoSprt */
+        * FROM (SELECT /*+ USE_NL(T1 T2  T3 T4 T5 T6 T7 T8 T9 T10 T11 T12 T13)  */
+        rownum
+        ,t1.mem_clf
+        ,t1.xsite
+        ,t1.mem_typ_cd
+        ,t1.mem_no
+        ,t1.mem_id
+        ,t1.mem_nm
+        ,nvl(t1.crypto_mem_scrt_no, t1.mem_scrt_no) as mem_scrt_no
+        ,t1.e_mail
+        ,t1.e_mailaddr_cd
+        ,t1.drct_mailaddr
+        ,t1.e_mail ||
+        '@' ||
+        CASE t1.e_mailaddr_cd WHEN '01' THEN t1.drct_mailaddr
+        ELSE (SELECT dtls_com_nm FROM sy_co_detail WHERE grp_cd = 'SY001' AND dtls_cd = t1.e_mailaddr_cd ) END concat_email
+        ,t1.e_mail_rcv_yn
+        ,t1.sms_rcv_yn
+        ,t1.sms_trns_rcv_yn
+        ,t1.bgn_ent_dy
+        ,t1.mem_idnty_no
+        ,t1.gnrl_tlphn_no
+        ,t1.prtbl_tlphn_no
+        ,t1.mem_stat_cd
+        ,t1.mem_stat_dtls_cd
+        ,(SELECT dtls_com_nm FROM sy_co_detail WHERE grp_cd = 'MB016' AND dtls_cd = t1.mem_stat_dtls_cd) mem_stat_dtls_nm
+        ,t1.mem_stat_dtls_rsn
+        ,t1.scssn_rsn_dtls
+        ,t1.reent_yn
+        ,t1.stlmnt_amt_rcv_mtd_cd
+        ,t1.prd_pool_ent_yn
+        ,t1.scssn_dt
+        ,t1.scssn_rsn_cd
+        ,t1.real_nm_crtf_typ
+        ,t1.real_nm_crtf_yn
+        ,t1.real_nm_crtf_dy
+        ,t1.ent_cmmn_clf
+        ,t1.ocb_card_num
+        ,t1.TMEMBERSHIP_CARD_NUM
+        ,t1.update_dt
+        ,t1.create_dt
+        ,t1.wire_cmmn_clf
+        ,t1.mem_itrst_cd
+        ,(SELECT dtls_com_nm
+        FROM sy_co_detail
+        WHERE grp_cd = 'MB035'
+        AND dtls_cd = t1.mem_itrst_cd) mem_itrst_nm
+        ,(SELECT /*+ INDEX_DESC(mb_mry_dy_info PK_MB_MRY_DY_INFO) */ anvy_dy
+        FROM   mb_mry_dy_info
+        WHERE  mem_no = t1.mem_no
+        AND  anvy_day_clf = '01'
+        AND  rownum = 1) anvy_dy
+        ,t2.rsdnt_no_frgnr_reg_no
+        ,t2.natv_yn
+        ,t2.brth
+        ,t2.brth_dd
+        ,t2.sex
+        ,t2.frgn_clf
+        ,t4.psn_cobs_enpr_no
+        ,t4.cobs_rptv_reg_no
+        ,t4.cobs_rptv
+        ,t4.itm
+        ,t4.bsns_st
+        ,t4.fax_no
+        ,t4.enp_plc_mail_no
+        ,case when NVL(t4.enp_plc_mail_no,'') = ''
+        then (' ' || t4.enp_plc_base_addr || ' ' || t4.enp_plc_dtls_addr)
+        else ('(' || t4.enp_plc_mail_no || ')' || ' ' || t4.enp_plc_base_addr || ' ' || t4.enp_plc_dtls_addr)
+        end enp_addr
+        ,t4.enp_plc_base_addr
+        ,t4.enp_plc_dtls_addr
+        ,t4.crgr_nm
+        ,t4.bsns_nm etprs_bsns_nm
+        ,t4.rptv_tlphn_no
+        ,t4.enpr_clf
+        ,case when t4.comu_mren_dcl_no is null or t4.comu_mren_dcl_no = '' then '미신고'
+        else '신고'
+        end comu_mren_dcl_yn
+        ,case when t4.comu_mren_dcl_not_code = '99' then t4.comu_mren_dcl_not_etc
+        else (select dtls_com_nm FROM sy_co_detail WHERE grp_cd = 'MB041' AND dtls_cd = t4.comu_mren_dcl_not_code)
+        end comu_mren_dcl_not_rsn
+        ,t4.comu_mren_dcl_no
+        ,t4.comu_mren_dcl_not_code
+        ,t4.comu_mren_dcl_not_etc
+        ,t4.frgn_clf as etpr_Frgn_clf
+        ,t4.ocb_zone_appv_cd
+        ,t4.enpr_mem_crtf_stat_cd
+        ,t4.enpr_aprv_end_dt
+        ,t5.addr_nm
+        ,t5.addr_seq
+        ,t5.mail_no
+        ,t5.mail_no_seq
+        ,t5.dtls_addr
+        ,t5.rcvr_nm
+        ,t5.addr_cd
+        ,NVL(t5.addr_typ_cd,'01') addr_typ_cd
+        ,NVL(t5.build_mng_no,'') BUILD_MNG_NO
+        ,case when TMN.use_yn = 'N'
+        then 'N'
+        else (case when (case when (t5.addr_typ_cd = '02' and t5.build_mng_no is not null)
+        then TRA.expr_yn else 'N' end) = 'Y'
+        then 'N' else 'Y' end)
+        end as mail_no_use_yn
+        ,FN_MB_MEMBER_INFO(t1.mem_no, '12') concat_nck_nm
+        ,t6.nck_nm
+        ,(SELECT COUNT(*) FROM mb_nck_nm WHERE mem_no = t1.mem_no) nck_cnt
+        ,nvl(t6.nck_nm_seq, 0) nck_nm_seq
+        ,t6.nck_nm_img_url
+        ,t7.acct_clf
+        ,t7.bnk_cd
+        ,t7.acct_no
+        ,t7.acct_own_nm
+        ,t7.acct_no_real_crtf_yn
+        ,t7.mem_own_acct_seq
+        ,(SELECT dtls_com_nm FROM sy_co_detail WHERE grp_cd = 'SY003' AND dtls_cd = t7.bnk_cd) bnk_nm
+        ,t7.acct_no_rl_nm_crtf_dt
+        ,case
+        when t5.addr_typ_cd = '02' then ( case
+        when t1.ent_site_lang_clf = '02'
+        AND    TRA.sido_nm_eng is NOT null then TRA.sido_nm_eng ||' ' || TRA.sigungu_nm_eng || ' ' || TRA.ueupmyon_nm_eng || ' ' || TRA.road_nm_eng || ' ' || TRA.build_main_no || decode(TRA.build_sub_no,0,'','-' || TRA.build_sub_no)
+        else TRA.sido_nm ||' ' || TRA.sigungu_nm || ' ' || TRA.ueupmyon_nm || ' ' || TRA.road_nm || ' ' || TRA.build_main_no || decode(TRA.build_sub_no,0,'','-' || TRA.build_sub_no) || case
+        when TRA.law_dong_nm is null
+        AND    TRA.sigungu_build_nm is null then ''
+        when TRA.law_dong_nm is null then ' (' || TRA.sigungu_build_nm || ')'
+        when TRA.sigungu_build_nm is null then ' (' || TRA.law_dong_nm || ')'
+        else ' (' || TRA.law_dong_nm || ', ' || TRA.sigungu_build_nm || ')'
+        end
+        end )
+        else ( case when t1.ent_site_lang_clf = '02'
+        AND    TMN.sido_nm_eng is NOT null then TMN.sido_nm_eng ||' ' || TMN.sigungu_nm_eng || ' ' || TMN.ueupmyon_nm_eng || ' ' || TMN.rhyee_nm_eng || ' ' || TMN.bld_nm_eng
+        else TMN.sido_nm ||' ' || TMN.sigungu_nm || ' ' || TMN.ueupmyon_nm || ' ' || TMN.rhyee_nm || ' ' || TMN.dosoe_nm || ' ' || TMN.bld_nm
+        end )
+        end addr
+        ,TRA.area_no
+        ,case when t5.addr_typ_cd = '02' then TRA.jeju_yn else TMN.jeju_yn end jeju_yn
+        ,case when t5.addr_typ_cd = '02' then TRA.island_yn else TMN.island_yn end island_yn
+        ,(select svc_yn from MB_GUARANTEE_SELLER where mem_no = t1.mem_no) SVC_YN
+        ,nvl(t9.buy_actn_mngmt_grd, 05) buy_actn_mngmt_grd
+        ,nvl(t9.buy_crdt_pnt, 0) buy_crdt_pnt
+        ,nvl(t9.buy_amt, 0) buy_amt
+        ,nvl(t10.sell_crdt_grd, 05) sell_crdt_grd
+        ,t11.mngmt_crdt_grd
+        ,nvl(t11.cmlt_sel_crdt_scor, 0) cmlt_sel_crdt_scor
+        ,nvl(t11.cmlt_sel_amt, 0) cmlt_sel_amt
+        ,t1.prtbl_tlphn_crtf_yn
+        ,case when t12.rmvl_yn = 'N' then 'Y'
+        else 'N' end blackList_yn
+        ,nvl(t1.uotp_ent_yn,'') uotp_ent_yn
+        ,nvl(t1.uotp_user_id, '') uotp_user_id
+        ,nvl(t1.cert_yn,'N')  cert_yn
+        ,nvl(t1.cert_ip,'')  cert_ip
+        ,t1.cert_dt
+        ,t1.tax_manage_yn
+        ,t1.tax_manage_dt
+        ,t1.prtbl_tlphn_crtf_cnt
+        ,t1.prtbl_tlphn_crtf_cnt_dt
+        ,t1.st_agree_dt
+        ,t1.ch_agree_dt
+        ,t1.mo_agree_dt
+        ,t1.st_agree_yn
+        ,t1.ch_agree_yn
+        ,t1.mo_agree_yn
+        ,t1.mm_integ_stat_cd
+        ,t1.integ_dt
+        ,t13.SH_CARD_NO
+        ,t13.CUPN_DOWN_DT
+        ,t13.CARD_CD
+        ,t4.hotline_prtbl_tlphn_no
+        ,t1.MB_ENG_NM
+        ,t1.china_apply_stat_cd
+        ,t1.plural_yn
+        ,t2.prd_deli_typ_cd	prvt_prd_deli_typ_cd
+        ,t2.impt_typ_cd		prvt_impt_typ_cd
+        ,t2.adlt_crtf_yn
+        ,t2.acct_mem_idnty_no
+        ,t2.SK_GRP_COM_MEM_XSITE_VAL sk_grp_com_mem_xsite_val
+        ,t2.SK_GRP_COM_MEM_XSITE_CRTF_DT sk_grp_com_mem_xsite_crtf_dt
+        ,t4.prd_deli_typ_cd	entpr_prd_deli_typ_cd
+        ,t4.impt_typ_cd		entpr_impt_typ_cd
+        ,t4.prdct_req_tlphn_no_yn	prdct_req_tlphn_no_yn
+        ,t4.clm_req_tlphn_no_yn	clm_req_tlphn_no_yn
+        ,t4.prdct_req_tlphn_no	prdct_req_tlphn_no
+        ,t4.clm_req_tlphn_no		clm_req_tlphn_no
+        ,t4.entrust_stl_mthd_cd	entrust_stl_mthd_cd
+        ,nvl(t4.entrust_stl_rt,0)		entrust_stl_rt
+        ,t4.entrust_stl_doc_no	entrust_stl_doc_no
+        ,t1.ent_evnt_no
+        ,t4.key_seller_yn
+        ,t4.mng_team_nm
+        ,t4.mng_mngr_nm
+        ,t4.mng_tel_no
+        ,t4.recommend_mem_id
+        ,t2.minor_prvt_seller_appr_yn
+        ,t1.pub_cert_dn
+        ,t1.mem_free_return_yn
+        ,nvl(t1.auto_cancel_yn,'Y') auto_cancel_yn
+        ,t1.pub_cert_dt
+        ,t1.pub_cert_expire_dt
+        ,t1.pub_cert_oid
+        ,t1.mem_di
+        ,nvl(t2.inner_vip_yn,'N') inner_vip_yn
+        ,t2.inner_vip_yn_upd_dt
+        ,(select count(*) from mb_mem_trns where mem_no =t1.mem_no AND trns_req_stat_cd ='01') trns_cnt
+        ,nvl(t1.login_log_yn,'N') login_log_yn
+        ,t1.login_log_yn_dt
+        ,NULL soho_yn
+        ,t1.auto_reg_yn
+        ,nvl(t1.fee_update_dt,'') fee_update_dt
+        ,nvl(t1.fee_update_yn,'N') fee_update_yn
+        ,(SELECT /*+ INDEX_DESC(A IX1_MB_FEE_HIST) */
+        FEE_UPDATE_YN
+        FROM MB_FEE_HIST A
+        WHERE MEM_NO =  t1.mem_no
+        AND FEE_APPLY_DT <![CDATA[<=]]> TRUNC(SYSDATE)
+        AND ROWNUM <![CDATA[<=]]> 1) real_fee_update_yn
+        ,(SELECT /*+ INDEX_DESC(A IX1_MB_FEE_HIST) */
+        nvl(FEE_EXCEPT_SELLER_YN, 'N')
+        FROM MB_FEE_HIST A
+        WHERE MEM_NO =  t1.mem_no
+        AND FEE_APPLY_DT <![CDATA[<=]]> TRUNC(SYSDATE)
+        AND ROWNUM <![CDATA[<=]]> 1) real_fee_except_seller_yn
+        ,sel_agree_dt
+        ,t1.skt_auth_dt
+        ,t1.bsn_deal_clf
+        ,t1.dlv_clf
+        ,t1.offshore_dlv_clf
+        ,t1.rep_seller_no
+        ,nvl(t1.adv_sms_rcv_cd,'04') adv_sms_rcv_cd
+        ,nvl(t1.cert_card_yn,'N') cert_card_yn
+        ,nvl(t1.town_seller_yn, 'N') town_seller_yn
+        ,t1.int_svc_no
+        ,t1.int_update_dt
+        ,t1.login_fail_cnt
+        ,t1.ent_site_lang_clf /* 영문회원 구분 추가 by jkin */
+        ,t1.eng_ent_mth_typ /* 영문회원 인증방식 by jkin */
+        ,t1.eng_addr_type /* 영문회원 주소 형식(01:해외,02:국내) */
+        ,t1.rtn_dlv_fee
+        ,t1.chng_dlv_fee
+        ,t1.init_dlv_no_fee_mth
+        ,t1.recent_ord_dt
+        ,t2.country_tlphn_cd
+        ,t4.base_info_update_dt
+        ,t1.sprt_yn
+        ,t1.wms_use_clf_cd /* 물류센터이용코드 MB150 */
+        ,t1.stl_cycle_cd /* 정산주기 SE242 */
+        ,t4.supl_cmp_clf_cd /* 공급업체구분 MB149 */
+        FROM (<include refid="mb_mem_sprt_vw"/>
+        and 1=1
+
+        <if test="memID != null and memID != ''">
+            and b.mem_id = #{memID}
+        </if>
+        <if test="memNO != '0'">
+            and a.mem_no = #{memNO}
+        </if>
+        <if test="memDI != null and memDI != ''">
+            and a.mem_di = #{memDI}
+            and a.mem_stat_cd != '03'
+        </if>
+        <if test="memID == null and memID == ''">
+            <if test="(memDI == null || memDI == '') and (memNO == '0')">
+                and a.mem_no = 0
+            </if>
+        </if>
+
+        ) t1
+        LEFT OUTER JOIN mb_prvt_mem t2 ON t1.mem_no = t2.mem_no
+        LEFT OUTER JOIN mb_bsn_etprs_mem t4 ON t1.mem_no = t4.mem_no
+        LEFT OUTER JOIN mb_addr t5 ON t1.mem_no = t5.mem_no
+        AND t5.base_addr_yn = 'Y' AND t5.addr_cd ='01' AND t5.del_yn = 'N'
+        LEFT OUTER JOIN mb_nck_nm t6 ON t1.mem_no = t6.mem_no
+        AND t6.base_nck_nm_yn = 'Y'
+        LEFT OUTER JOIN mb_mem_own_acct t7 ON t1.mem_no = t7.mem_no
+        AND t7.base_acct_yn = 'Y'
+        AND t7.acct_clf = '01'
+        LEFT OUTER JOIN mb_mem_mg_gr t9 ON t1.mem_no = t9.mem_no
+        AND t9.mg_gr_clf = '01'
+        AND to_char(t9.end_dy, 'YYYYMMDD') = '99991231'
+        LEFT OUTER JOIN mb_mem_mg_gr t10 ON t1.mem_no = t10.mem_no
+        AND t10.mg_gr_clf = '03'
+        AND to_char(t10.end_dy, 'YYYYMMDD') = '99991231'
+        LEFT OUTER JOIN mb_mem_mg_gr t11 ON t1.mem_no = t11.mem_no
+        AND t11.mg_gr_clf = '02'
+        AND to_char(t11.end_dy, 'YYYYMMDD') = '99991231'
+        LEFT OUTER JOIN mb_flty_mem t12 ON t1.mem_no = t12.mem_no
+        AND t12.rmvl_yn = 'N'
+        LEFT OUTER JOIN MB_SHCARD_LIST t13 ON t1.mem_no = t13.mem_no
+        AND t1.MEM_IDNTY_NO = t13.MEM_IDNTY_NO
+        LEFT OUTER JOIN SY_MAIL_NO TMN ON t5.MAIL_NO= TMN.MAIL_NO
+        AND t5.MAIL_NO_SEQ= TMN.MAIL_NO_SEQ
+        LEFT OUTER JOIN SY_ROAD_ADDR TRA ON t5.BUILD_MNG_NO= TRA.BUILD_MNG_NO
+        )
+        WHERE rownum = 1
+    </select>
+
+    <!--[개인정보 유효기간제] widetns 이정주 : register.getMemberSprtInfo 추가 -->
+    <select id="getMemberSprtInfo" resultType="MemberVO" parameterType="MemberVO">
+        select /* getMemberSprtInfo 분리보관된 회원정보 조회 */
+        mem_no,
+        mem_id,
+        mem_nm,
+        mb_eng_nm,
+        nvl(crypto_mem_scrt_no, mem_scrt_no) as mem_scrt_no,
+        prtbl_tlphn_no,
+        gnrl_tlphn_no,
+        e_mail ||
+        '@' ||
+        CASE e_mailaddr_cd WHEN '01' THEN drct_mailaddr
+        ELSE (SELECT dtls_com_nm FROM sy_co_detail WHERE grp_cd = 'SY001' AND dtls_cd = e_mailaddr_cd ) END concat_email,
+        e_mail,
+        e_mailaddr_cd,
+        drct_mailaddr,
+        real_nm_crtf_typ,
+        real_nm_crtf_dy,
+        bgn_ent_dy,
+        int_update_dt,
+        int_svc_no
+        from mb_mem_sprt
+        where mem_no = #{memNO}
+    </select>
+
+    <select id="getSellersByItgID" resultType="MemberVO" parameterType="ItgMemVO">
+        SELECT  /* member.xml register.getSellersByItgID 김도현  2011.1.4 */
+        b.mem_no as memNO,
+        b.mem_id as memID,
+        b.mem_nm as memNm,
+        b.mem_idnty_no as memIdntyNo,
+        b.mem_clf as memClf,
+        b.mem_typ_cd as memTypCD,
+        b.mem_stat_cd as memStatCD,
+        b.mem_stat_dtls_cd as memStatDtlsCD,
+        b.bsn_deal_clf as bsnDealClf,
+        b.dlv_clf as dlvClf,
+        b.offshore_dlv_clf as offshoreDlvClf,
+        b.authr_grp_cd as authrGrpCD
+        FROM MB_ITG_MEM_MAP a, mb_mem b
+        WHERE a.SEL_SUPL_MEM_NO = b.mem_no
+        <if test="itgMemNO != 0">
+            and a.ITG_MEM_NO = #{itgMemNO}
+        </if>
+        <if test ="itgMemNO == 0">
+            <if test ="itgMemID != null">
+                and a.ITG_MEM_NO = ( select mem_no from mb_mem where mem_id = #{itgMemID} )
+            </if>
+            <if test ="itgMemID==null">
+                and a.ITG_MEM_NO = 0
+            </if>
+        </if>
+        ORDER BY b.mem_id ASC
+    </select>
+
+    <!-- 대표업체번호 조회 -->
+    <select id="getRepSellerNo" resultType="MemberVO" parameterType="long">
+        SELECT
+        rep_seller_no
+        FROM   mb_mem
+        WHERE  mem_no = #{memNo}
+        /* customerMapper.getRepSellerNo */
+    </select>
+
+    <select id="getNckNMListOrg" resultType="NickNameVO" parameterType="long">
+        SELECT
+        nck_nm_seq
+        , nck_nm
+        ,	base_nck_nm_yn
+        , mem_no
+        , nck_nm_img_url
+        , create_dt
+        , create_no
+        FROM    mb_nck_nm
+        WHERE   mem_no = #{memNo}
+        ORDER BY create_dt DESC
+        /* customerMapper.getNckNMListOrg */
+    </select>
+
+    <select id="getBaseNckNM" resultType="NickNameVO" parameterType="long">
+        SELECT
+        nck_nm_seq as "nickNMSeq"
+        , nck_nm as "nickNM"
+        ,	base_nck_nm_yn as "baseNickNMYN"
+        , mem_no as "memNO"
+        , nck_nm_img_url as "nickNMImgUrl"
+        , create_dt as "createDT"
+        , create_no as "createNO"
+        FROM    mb_nck_nm
+        WHERE   mem_no = #{memNo}
+        AND     BASE_NCK_NM_YN = 'Y'
+        ORDER BY create_dt DESC
+        /* customerMapper.getNckNMListOrg */
+    </select>
+
+    <select id="isFrSeller" parameterType="long" resultType="long" >
+        SELECT COUNT(1)
+        FROM PD_FR_SELLER A
+        WHERE A.SEL_MNBD_NO = #{memNo}
+        /* customerMapper.isFrSeller */
+    </select>
+
+
+
+    <select id="getMemberPrivateVO" parameterType="long" resultType="PrivateMemberVO">
+        <![CDATA[
+		SELECT
+			MEM_NO as memNo,
+			NATV_YN as natvYn,
+			MEM_NM as memNm,
+			RSDNT_NO_FRGNR_REG_NO as rsdntNoFrgnrRegNo,
+			BRTH as brth,
+			BRTH_DD as brthDd,
+			SEX as sex,
+			ADLT_CRTF_YN as adltCrtfYn,
+			MARR_YN as marrYn,
+			SK_GRP_COM_MEM_YN as skGrpComMemYn,
+			CHGE_RQST_SEQ as chgeRqstSeq,
+			CREATE_DT as createDt,
+			CREATE_NO as createNo,
+			UPDATE_DT as updateDt,
+			UPDATE_NO as updateNo,
+			FRGN_CLF as frgnClf,
+			PRD_DELI_TYP_CD as prdDeliTypCd,
+			IMPT_TYP_CD as imptTypCd,
+			PASSPORT_NO as passportNo,
+			PRD_DELI_AREA as prdDeliArea
+    	FROM
+    		MB_PRVT_MEM
+		WHERE
+			MEM_NO = #{memNo}
+			]]>
+    </select>
+
+    <select id="getExAmt" parameterType="long" resultType="PdFrExchangeVO">
+        /*  FrCommon.xml id=FrCommon.getExAmt */
+        SELECT /*+ index_desc(B pk_PD_FR_EXCHANGE ) */
+        C.DTLS_COM_NM currencyNm
+        , B.CURRENCY_CD currencyCd
+        , B.EX_AMT exAmt
+        FROM PD_FR_SELLER A
+        , PD_FR_EXCHANGE B
+        , SY_CO_DETAIL C
+        WHERE A.CURRENCY_CD = B.CURRENCY_CD
+        AND B.CURRENCY_CD = C.DTLS_CD
+        AND A.SEL_MNBD_NO = #{memNo}
+        AND B.EX_TYP = '04'
+        AND B.START_DT <![CDATA[ <= ]]> SYSDATE
+        AND C.GRP_CD = 'FR002'
+        AND ROWNUM = 1
+    </select>
+
+    <select id="isRoadShopSeller" parameterType="long" resultType="long">
+        SELECT COUNT(1) FROM MB_MEM_SVC_RQST
+        WHERE ST11_SVC_CLF_CD = '02'
+          AND RQST_STAT_CD IN ('02','03')
+          AND MEM_NO = #{memNo}
+    </select>
+
+</mapper>

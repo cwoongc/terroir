@@ -1,0 +1,127 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.product.mapper.ProductGroupMapper">
+
+
+    <select id="getProductGroupNo" parameterType="long" resultType="long">
+        SELECT /* [productGroupDAOMap.xml] productGroup.getProductExist */
+        nvl(max(PRD_GRP_NO),0)
+        FROM (
+                SELECT /*+ INDEX(A IX1_PD_PRD_GRP_MAPP) */
+                        PRD_GRP_NO
+                FROM PD_PRD_GRP_MAPP
+                        WHERE  PRD_NO = #{prdNo}
+                        AND USE_YN='Y' and rownum = 1 )
+
+    </select>
+
+    <select id="getGroupInfo" parameterType="long" resultType="ProductGroupVO" >
+            SELECT /* [productGroupDAOMap.xml] productGroup.getGroupInfo */
+            /*+ LEADING(A B) USE_NL(B) INDEX(A PK_PD_PRD_GRP) */
+                a.PRD_GRP_NO as prdGrpNo,
+                a.PRD_GRP_NM as prdGrpNm,
+                a.SEL_MNBD_NO as selMnbdNo,
+                a.BASI_CTGR_NO as basiCtgrNo,
+                a.BASI_CTGR_LEVEL as basiCtgrLevel,
+                a.BASI_DLV_MTHD_CD as basiDlvMthdCd,
+                a.BASI_PRD_CLF_CD as basiPrdClfCd,
+                a.BASI_DLV_CAN_RGN_CD as basiDlvCanRgnCd,
+                a.MINOR_BUY_CAN_YN as minorBuyCanYn,
+                a.DISP_YN as dispYn,
+                to_char(DISP_BGN_DT,'YYYYMMDDHH24MISS') as dispBgnDt,
+                to_char(DISP_END_DT,'YYYYMMDDHH24MISS') as dispEndDt,
+                a.PRD_GRP_TYP_CD as prdGrpTypCd,
+                a.GRP_DTL_IMG_URL  as grpDtlImgUrl,
+                a.GRP_DISP_TYP_CD as grpDispTypCd,
+                to_char(a.CREATE_DT,'YYYYMMDDHH24MISS') as createDt,
+                a.CREATE_NO as createNo,
+                to_char(a.UPDATE_DT,'YYYYMMDDHH24MISS') as updateDt,
+                a.UPDATE_NO as updateNo,
+                fn_pd_sell_disp_ctgr_path ( a.BASI_CTGR_NO ) as basiCtgrPath,
+                b.DISP_CTGR1_NO as dispCtgr1No,
+                nvl(DISP_CTGR2_NO,0) as dispCtgr2No
+            FROM PD_PRD_GRP a, DP_DISP_CTGR_LIST b
+            WHERE  PRD_GRP_NO = #{prdGrpNo}
+              AND a.BASI_CTGR_NO = b.DISP_CTGR_NO
+
+
+    </select>
+
+    <update id="updatePdPrdGrpMapp" parameterType="PdPrdGrpMapp">
+        MERGE /* [productGroupDAOMap.xml] productGroup.updateProduct */
+        /*+ INDEX(A PK_PD_PRD_GRP_MAPP) */
+        INTO PD_PRD_GRP_MAPP A
+        USING DUAL
+        ON (	PRD_GRP_NO = #{prdGrpNo}
+                AND PRD_NO = #{prdNo}	)
+        WHEN MATCHED THEN
+        UPDATE SET
+            DISP_PRRT = #{dispPrrt},
+            REP_PRD_YN = nvl(#{repPrdYn},'N'),
+            USE_YN = nvl(#{useYn},'N'),
+            UPDATE_DT = SYSDATE,
+            UPDATE_NO = #{updateNo}
+        WHEN NOT MATCHED THEN
+        INSERT (
+            PRD_GRP_NO,
+            PRD_NO,
+            DISP_PRRT,
+            REP_PRD_YN,
+            USE_YN,
+            CREATE_DT,
+            CREATE_NO,
+            UPDATE_DT,
+            UPDATE_NO
+        )
+        VALUES (
+            #{prdGrpNo},
+            #{prdNo},
+            #{dispPrrt},
+            nvl(#{repPrdYn},'N'),
+            nvl(#{useYn},'N'),
+            SYSDATE,
+            #{createNo},
+            SYSDATE,
+            #{updateNo}
+        )
+        WHERE NOT EXISTS ( SELECT 1 FROM PD_PRD_GRP_MAPP WHERE PRD_NO = #{prdNo} AND USE_YN='Y' )
+    </update>
+
+
+    <select id="productGroupBasePrdInfo" parameterType="ProductGroupVO" resultType="ProductGroupVO">
+        SELECT /* [productGroupDAOMap.xml] productGroup.getBasePrdInfo */
+        /*+ INDEX(A PK_PD_PRD) */
+            #{repPrdNo} as repPrdNo,
+            decode(#{basiCtgrLevel}, 1, DISP_CTGR1_NO_DE , DISP_CTGR2_NO_DE )  as basiCtgrNo,
+            #{basiCtgrLevel} as basiCtgrLevel,
+            DLV_WY_CD as basiDlvMthdCd,
+            PRD_TYP_CD as basiPrdClfCd,
+            DLV_CN_AREA_CD as basiDlvCanRgnCd,
+            MINOR_SEL_CN_YN  as minorBuyCanYn,
+            'Y' as dispYn,
+            to_char(sysdate,'YYYYMMDDHH24MISS') as dispBgnDt,
+            '29991231235959' as dispEndDt,
+            fn_pd_sell_disp_ctgr_path ( decode(#{basiCtgrLevel}, 1, DISP_CTGR1_NO_DE , DISP_CTGR2_NO_DE ) ) as basiCtgrPath,
+            DISP_CTGR1_NO_DE as dispCtgr1No,
+            nvl(DISP_CTGR2_NO_DE,0) as dispCtgr2No,
+            PRD_STAT_CD as prdStatCd
+        FROM PD_PRD A
+        WHERE  PRD_NO  = #{repPrdNo}
+    </select>
+
+    <select id="getProductCartUse" parameterType="long" resultType="String">
+        SELECT /* [productGroupDAOMap.xml] productGroup.getProductCartUse */
+            /*+ INDEX(A PK_PD_PRD) */
+            CASE WHEN
+            exists ( SELECT 1 FROM DP_DISP_CTGR WHERE disp_ctgr_no = A.disp_ctgr_no_de
+            AND ( BCKT_EX_YN = 'N' OR BCKT_EX_YN IS NULL OR A.BCKT_EX_YN = 'N' )
+            AND ( MOBILE_YN != 'Y' OR MOBILE_YN IS NULL ) )
+            and not exists ( SELECT 1 FROM PD_PRD_PRC WHERE prd_no = A.prd_no and SEL_PRC = 1 )
+            THEN 'Y' else 'N' end as ProductCartUse
+        FROM PD_PRD A
+        WHERE PRD_NO=#{prdNo}
+
+    </select>
+
+</mapper>

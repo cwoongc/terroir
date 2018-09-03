@@ -1,0 +1,187 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.shop.mapper.ShopMapper">
+
+
+    <insert id="insertProductShopBranch" parameterType="PdTownShopBranchComp">
+        INSERT /* shopMapper.insertProductShopBranch */ INTO PD_TOWN_SHOP_BRANCH_COMP (
+				PRD_NO
+				,SHOP_NO
+				,SHOP_BRANCH_NO
+			)
+			VALUES (
+				#{prdNo}
+				,#{shopNo}
+				,#{shopBranchNo}
+			)
+    </insert>
+
+
+    <select id="getShopBranchNoList" parameterType="long" resultType="long">
+        SELECT /* shopMapper.getShopBranchNoList */
+          SHOP_BRANCH_NO
+        FROM DP_TOWN_SHOP_BRANCH
+        WHERE SHOP_NO = #{shopNo}
+    </select>
+
+
+    <!-- 구) shop.TownShopBranchNMList -->
+    <select id="getShopBranchList" parameterType="long" resultType="ShopBranchVO">
+        SELECT /* shopMapper.getShopBranchNMList */
+            SHOP_NO,
+            SHOP_BRANCH_NO,
+            NVL(SHOP_BRANCH_TYP_CD,'') AS SHOP_BRANCH_TYP_CD,
+            NVL(SHOP_BRANCH_KIND_CD,'') AS SHOP_BRANCH_KIND_CD,
+            NVL(SHOP_BRANCH_NM,'') AS SHOP_BRANCH_NM,
+            NVL(SHOP_BRANCH_CD,'') AS SHOP_BRANCH_CD,
+            NVL(SHOP_SCRT_NO,'') AS SHOP_SCRT_NO,
+            NVL(MAIL_NO,'') AS MAIL_NO,
+            '' AS MAIL_NO_SEQ,
+            NVL(BASE_ADDR,'') AS BASE_ADDR,
+            NVL(DTLS_ADDR,'') AS DTLS_ADDR,
+            NVL(DISP_PRRT_RNK,0) AS DISP_PRRT_RNK,
+            NVL(DISP_CTGR1_NO_AREA,0) AS DISP_CTGR1_NO_AREA,
+            NVL(DISP_CTGR2_NO_AREA,0) AS DISP_CTGR2_NO_AREA,
+            NVL(DISP_CTGR3_NO_AREA, 0) AS DISP_CTGR3_NO_AREA,
+            NVL(DISP_CTGR4_NO_AREA,0) AS DISP_CTGR4_NO_AREA,
+            NVL(USE_YN,'') AS USE_YN,
+            NVL(CREATE_DT,'') AS CREATE_DT,
+            CREATE_NO,
+            NVL(UPDATE_DT,'') AS UPDATE_DT,
+            UPDATE_NO,
+            NVL(MAP_POINT_X,0) AS MAP_POINT_X,
+            NVL(MAP_POINT_Y,0) AS MAP_POINT_Y,
+            NVL(MAP_POS_X, '0') AS MAP_POS_X,
+            NVL(MAP_POS_Y, '0') AS MAP_POS_Y,
+            '0' AS MAP_POS_X_LIFE_PLUS,
+            '0' AS MAP_POS_Y_LIFE_PLUS,
+            NVL(STR_IMG_URL, '') AS STR_IMG_URL,
+            NVL(ADVRT_STMT_CONT, '') AS ADVRT_STMT_CONT,
+            NVL(STRT_GUIDE_STMT_CONT,'') AS STRT_GUIDE_STMT_CONT,
+            NVL(PARKNG_CAN_YN,'') AS PARKING_CAN_YN,
+            NVL(STR_INTR_IMG_URL,'') AS STR_INTR_IMG_URL,
+            NVL((SELECT /*+ INDEX(B PK_DP_TOWN_SHOP_TEL)*/ SHOP_TEL_NO
+	           FROM DP_TOWN_SHOP_TEL B
+	          WHERE A.SHOP_NO = B.SHOP_NO
+	            AND A.SHOP_BRANCH_NO = B.SHOP_BRANCH_NO
+	            AND TEL_PRRT_RNK = 0),'') AS TEL_NO_STR,
+	        NVL((SELECT DISP_CTGR1_NM ||'>'||DISP_CTGR2_NM FROM DP_DISP_CTGR_LIST WHERE DISP_CTGR_NO = DISP_CTGR2_NO_AREA),'0') AS DISP_CTGR_NM_AREA_DE,
+	        NVL(MEM_NO,0) AS MEM_NO,
+	        NVL((SELECT SEL_NO FROM DP_TOWN_SHOP C WHERE C.SHOP_NO = A.SHOP_NO ),0) AS SEL_MNBD_NO,
+	        NVL((SELECT MEM_ID FROM MB_MEM WHERE MEM_NO = (SELECT SEL_NO
+	           FROM DP_TOWN_SHOP C
+	          WHERE C.SHOP_NO = A.SHOP_NO )),'') AS MEM_ID,
+	        NVL((SELECT MEM_NM FROM MB_MEM WHERE MEM_NO = (SELECT SEL_NO
+	           FROM DP_TOWN_SHOP C
+	          WHERE C.SHOP_NO = A.SHOP_NO )),'') AS MEM_NM,
+	         0 as SALE_TIME_CNT
+ 		 FROM DP_TOWN_SHOP_BRANCH A
+		WHERE A.SHOP_NO = #{shopNo}
+		order by DISP_PRRT_RNK, SHOP_BRANCH_NM
+    </select>
+
+    <select id="getPromotionCheck" parameterType="ShopBranchVO" resultType="int">
+        SELECT
+        COUNT(*) AS CNT
+        FROM PD_PRD
+        WHERE SEL_MNBD_NO = #{selMnbdNo}
+        AND SHOP_NO = #{shopNo}
+        AND TO_CHAR(CREATE_DT,'YYYYMM') = TO_CHAR(SYSDATE,'YYYYMM')
+        AND SVC_AREA_CD = '03'
+        AND PRD_TYP_CD = '20'
+        AND NVL(TEMPLATE_YN, 'N') = 'N'
+        /* shopMapper.getPromationCheck */
+    </select>
+
+    <select id="getTownShopBranchUsingList" parameterType="java.lang.Long" resultType="ShopBranchVO">
+        SELECT
+        SHOP_NO,
+        SHOP_BRANCH_NO,
+        SHOP_BRANCH_TYP_CD,
+        SHOP_BRANCH_KIND_CD,
+        SHOP_BRANCH_NM,
+        SHOP_BRANCH_CD,
+        SHOP_SCRT_NO,
+        MAIL_NO,
+        '' AS MAIL_NO_SEQ,
+        BASE_ADDR,
+        DTLS_ADDR,
+        DISP_PRRT_RNK,
+        DISP_CTGR1_NO_AREA,
+        DISP_CTGR2_NO_AREA,
+        DISP_CTGR3_NO_AREA,
+        DISP_CTGR4_NO_AREA,
+        USE_YN,
+        CREATE_DT,
+        CREATE_NO,
+        UPDATE_DT,
+        UPDATE_NO,
+        MAP_POINT_X,
+        MAP_POINT_Y,
+        NVL(MAP_POS_X, '0') AS MAP_POS_X,
+        NVL(MAP_POS_Y, '0') AS MAP_POS_Y,
+        '' AS GRS80_X_CRDN_VAL,
+        '' AS GRS80_Y_CRDN_VAL,
+        STR_IMG_URL,
+        ADVRT_STMT_CONT,
+        STRT_GUIDE_STMT_CONT,
+        PARKNG_CAN_YN,
+        STR_INTR_IMG_URL,
+        '' AS TEL_NO_STR,
+        (SELECT DISP_CTGR1_NM ||'>'||DISP_CTGR2_NM FROM DP_DISP_CTGR_LIST WHERE DISP_CTGR_NO = DISP_CTGR2_NO_AREA) AS DISP_CTGR_NM_AREA_DE,
+        MEM_NO,
+        0 SEL_NO,
+        (SELECT MEM_ID FROM MB_MEM WHERE MEM_NO = (SELECT SEL_NO
+        FROM DP_TOWN_SHOP C
+        WHERE C.SHOP_NO = A.SHOP_NO )) AS MEM_ID,
+        (SELECT MEM_NM FROM MB_MEM WHERE MEM_NO = (SELECT SEL_NO
+        FROM DP_TOWN_SHOP C
+        WHERE C.SHOP_NO = A.SHOP_NO )) AS MEM_NM,
+        (SELECT count(STR_NO)
+        FROM PD_STR_SALE_TIME
+        WHERE STR_NO = a.SHOP_BRANCH_NO
+        ) AS SALE_TIME_CNT
+        FROM DP_TOWN_SHOP_BRANCH A
+        WHERE A.SHOP_NO = #{shopNo}
+        AND A.USE_YN = 'Y'
+        order by SHOP_BRANCH_TYP_CD, SHOP_BRANCH_NM
+        /* shopMapper.getTownShopBranchUsingList */
+    </select>
+
+    <select id="getShopNo" resultType="ShopBranchVO" parameterType="long">
+        SELECT SHOP_NO
+        FROM   DP_TOWN_SHOP_BRANCH a
+        WHERE  SHOP_BRANCH_NO = #{shopBranchNo}
+        /* shopMapper.getShopNo */
+    </select>
+
+    <!-- 상점 목록 조회 (SELECT BOX 사용) -->
+    <select id="getShopList" parameterType="long" resultType="ShopBranchVO">
+        SELECT
+        shop_no,
+        shop_nm,
+        DISP_CTGR3_NO_DE as dispCtgr3NoArea
+        FROM   dp_town_shop
+        WHERE  sel_no = #{selNo}
+        AND    use_yn = 'Y'
+        ORDER BY shop_nm
+        /* shopMapper.getShopList */
+    </select>
+
+    <select id="getCheckBranchList" parameterType="ShopBranchVO" resultType="ShopBranchVO">
+        SELECT
+        /*+ LEADING(B A) USE_NL(A) INDEX(B PK_PD_TOWN_SHOP_BRANCH_COMP) INDEX(A PK_DP_TOWN_SHOP_BRANCH) */
+        B.PRD_NO AS PRD_NO
+        ,B.SHOP_NO AS SHOP_NO
+        ,B.SHOP_BRANCH_NO AS SHOP_BRANCH_NO
+        FROM DP_TOWN_SHOP_BRANCH A, PD_TOWN_SHOP_BRANCH_COMP B
+        WHERE A.SHOP_NO = B.SHOP_NO
+        AND A.SHOP_BRANCH_NO = B.SHOP_BRANCH_NO
+        AND B.PRD_NO = #{prdNo}
+        AND B.SHOP_NO = #{shopNo}
+        AND A.USE_YN ='Y'
+        /* shopMapper.getCheckBranchList */
+    </select>
+
+</mapper>

@@ -1,0 +1,113 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.cert.mapper.CertMapper">
+
+    <select id="getProductCertInfo" parameterType="java.lang.Long" resultType="HashMap">
+        SELECT /* certMapper.getProductCertInfo */
+                DTLS_CD             AS dtlsCd
+              , DTLS_COM_NM         AS certNm
+              , nvl(CD_VAL1, 'N')   AS kcMarkYn
+              , nvl(CD_VAL2, '')    AS kcMarkColor
+              , nvl(CD_VAL3, '')    AS certGroup
+              , A.disp_ctgr_no      AS dispCtgrNo
+        FROM
+                DP_DISP_CTGR_EXPT A
+              , DP_DISP_CTGR_EXPT_MAP B
+              , SY_CO_DETAIL C
+        WHERE   A.EXPT_TYPE     = B.EXPT_TYPE
+        AND     B.REF_KEY       = C.DTLS_CD
+        AND     A.DISP_CTGR_NO  = #{dispCtgrNo}
+        AND     B.DISP_CTGR_NO  = #{dispCtgrNo}
+        AND     A.USE_YN        = 'Y'
+        AND     B.EXPT_TYPE     = '101'
+        AND     C.GRP_CD        = 'PD065'
+        AND     C.USE_YN        = 'Y'
+        ORDER BY C.PRRT_RNK
+    </select>
+
+	<select id="getProductCertInfoCamelCase" parameterType="java.lang.Long" resultType="HashMap">
+		SELECT /* certMapper.getProductCertInfoCamelCase */
+		DTLS_CD             "dtlsCd"
+		, DTLS_COM_NM        "certNm"
+		, nvl(CD_VAL1, 'N')   "kcMarkYn"
+		, nvl(CD_VAL2, '')    "kcMarkColor"
+		, nvl(CD_VAL3, '')    "certGroup"
+		, A.disp_ctgr_no      "dispCtgrNo"
+		FROM
+		DP_DISP_CTGR_EXPT A
+		, DP_DISP_CTGR_EXPT_MAP B
+		, SY_CO_DETAIL C
+		WHERE   A.EXPT_TYPE     = B.EXPT_TYPE
+		AND     B.REF_KEY       = C.DTLS_CD
+		AND     A.DISP_CTGR_NO  = #{dispCtgrNo}
+		AND     B.DISP_CTGR_NO  = #{dispCtgrNo}
+		AND     A.USE_YN        = 'Y'
+		AND     B.EXPT_TYPE     = '101'
+		AND     C.GRP_CD        = 'PD065'
+		AND     C.USE_YN        = 'Y'
+		ORDER BY C.PRRT_RNK
+	</select>
+
+    <select id="getProductCertList" parameterType="long" resultType="ProductCertInfoVO">
+		select
+		       a.prd_no,
+		       a.cert_no,
+		       a.cert_type,
+		       a.cert_auth,
+		       a.cert_key ,
+		       (select dtls_com_nm
+		        from   sy_co_detail
+		        where  grp_cd = 'PD065'
+		        and    dtls_cd = a.CERT_TYPE) cert_type_nm ,
+		        (select dtls_com_eng_nm
+		        from   sy_co_detail
+		        where  grp_cd = 'PD065'
+		        and    dtls_cd = a.CERT_TYPE) cert_type_eng_nm ,
+		       nvl(b.cd_val1, 'N') AS kcMarkYn ,
+		       nvl(b.cd_val2, '') AS kcMarkColor
+		from   pd_cert a,
+		       SY_CO_DETAIL b
+		where  a.cert_type = b.dtls_cd
+		and    a.prd_no = #{prdNo}
+		and    a.use_yn = 'Y'
+		and    b.use_yn = 'Y'
+		and    b.grp_cd = 'PD065'
+    </select>
+
+    <update id="updateCertInfoUseToN" parameterType="ProductCertInfoVO">
+		update pd_cert
+		    set use_yn = 'N'
+		    	, update_dt = sysdate
+		where prd_no = #{prdNo}
+			<if test="certNo != '0'">
+		    and cert_no = #{certNo}
+			</if>
+		    and use_yn = 'Y'
+    </update>
+
+    <update id="insertNewCertInfo" parameterType="ProductCertinfoVO">
+		insert into pd_cert(PRD_NO,CERT_NO,CERT_TYPE,CERT_KEY,CREATE_NO,UPDATE_NO)
+		select #{prdNo}
+		    , NVL((
+		        select /*+ INDEX_DESC(a IDX1_PD_CERT) */ cert_no
+		        from pd_cert a
+		        where a.prd_no = #{prdNo}
+		            and rownum = 1
+		    ),0)+1
+		    , #{certType}
+		    , #{certKey}
+		    , #{createNo}
+		    , #{updateNo}
+		from dual
+    </update>
+
+
+	<select id="getMemberCertType" parameterType="long" resultType="String">
+		SELECT /* certMapper.xml getMemberCertType */
+			CERT_TYPE
+		FROM SM_CERT_MEM_TYPE
+		WHERE MEM_NO = #memNo#
+	</select>
+
+</mapper>

@@ -1,0 +1,861 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.delivery.mapper.DeliveryMapper">
+
+    <select id="isExistUserAddressSeq" parameterType="ClaimAddressInfoVO" resultType="long">
+        <choose>
+            <when test="@org.apache.commons.lang.StringUtils@equals(mbAddrLocation,'02')">
+                SELECT /* productDAOMap.xml id=product.isExistUserAddressSeq */ count(*)
+                FROM MB_GLOBAL_ADDR
+                WHERE ADDR_SEQ = #{addrSeq}
+                AND MEM_NO = #{memNo}
+                AND del_yn ='N'
+                <if test="!(@org.apache.commons.lang.StringUtils@isEmpty(addrCd))">
+                    AND ADDR_CD = #{addrCd}
+                </if>
+            </when>
+            <otherwise>
+                SELECT /* productDAOMap.xml id=product.isExistUserAddressSeq */ count(*)
+                FROM mb_addr
+                WHERE ADDR_SEQ = #{addrSeq}
+                AND MEM_NO = #{memNo}
+                AND del_yn ='N'
+                <if test="!(@org.apache.commons.lang.StringUtils@isEmpty(addrCd))">
+                    AND ADDR_CD = #{addrCd}
+                </if>
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getSellerBasiDlvCstList" parameterType="long" resultType="ProductSellerBasiDeliveryCostVO">
+       SELECT
+       		   dlv_cst_inst_no,
+       		   sel_mnbd_no,
+		       ord_bgn_amt,
+		       ord_end_amt,
+		       dlv_cst
+		FROM   pd_seller_basi_dlv_cst
+		WHERE  sel_mnbd_no = #{memNo}
+		ORDER BY dlv_cst_inst_no
+    </select>
+
+    <select id="getWmGblHsCode" parameterType="WmGlobalHsCodeVO" resultType="WmGlobalHsCodeVO">
+        SELECT
+                GBL_HS_CODE_NO AS gblHsCodeNo,
+                GBL_HS_CODE AS gblHsCode,
+                KOR_NM		AS korNm,
+                ENG_NM		AS engNm,
+                CREATE_DT	AS createDt,
+                CREATE_NO	AS createNo,
+                UPDATE_DT	AS updateDt,
+                UPDATE_NO	AS updateNo
+        FROM WM_GBL_HS_CODE
+        WHERE SYSDATE BETWEEN APL_BGN_DT AND APL_END_DT
+        <if test="!(@org.apache.commons.lang.StringUtils@isEmpty(gblHsCode))">
+        AND GBL_HS_CODE = #{gblHsCode}
+        </if>
+        <if test="gblHsCodeNo gt 0"> <!-- greater then -->
+        AND GBL_HS_CODE_NO = #{gblHsCodeNo}
+        </if>
+    </select>
+
+    <select id="getProductAvgDeliInfo" parameterType="long" resultType="TrGlobalProductAverageDeliveryVO">
+        SELECT
+                PRD_NO AS prdNo
+              , NVL(AVG_DELI_DAYS, 0) AS avgDeliDays
+              , NVL(TOTAL_DELI_DAYS, 0) AS totalDeliDays
+              , NVL(ORD_PRD_CNT, 0) AS ordPrdCnt
+        FROM TR_GLOBAL_PRD_AVG_DELI
+        WHERE PRD_NO = #{prdNo}
+        AND ROWNUM = 1
+    </select>
+
+    <insert id="insertTrGlobalPrdAvgDeli" parameterType="TrGlobalPrdAvgDeli">
+		INSERT INTO TR_GLOBAL_PRD_AVG_DELI
+		 (PRD_NO, AVG_DELI_DAYS, TOTAL_DELI_DAYS, ORD_PRD_CNT, CREATE_DT, UPDATE_DT)
+		VALUES
+		 (#{prdNo}, #{avgDeliDays}, #{totalDeliDays}, #{ordPrdCnt}, SYSDATE, SYSDATE)
+    </insert>
+    <insert id="insertTrGlobalPrdAvgDeliHist" parameterType="TrGlobalPrdAvgDeli">
+		INSERT INTO TR_GLOBAL_PRD_AVG_DELI_HIST
+		 (SUMMARY_DT, PRD_NO, AVG_DELI_DAYS, TOTAL_DELI_DAYS, ORD_PRD_CNT, CREATE_DT, UPDATE_DT)
+		VALUES
+		 (SYSDATE, #{prdNo}, #{avgDeliDays}, #{totalDeliDays}, #{ordPrdCnt}, SYSDATE, SYSDATE)
+    </insert>
+    <update id="updateTrGlobalPrdAvgDeli" parameterType="TrGlobalPrdAvgDeli">
+        UPDATE  TR_GLOBAL_PRD_AVG_DELI
+        SET     AVG_DELI_DAYS   = #{avgDeliDays}
+              , TOTAL_DELI_DAYS = NVL(#{totalDeliDays}, TOTAL_DELI_DAYS)
+              , ORD_PRD_CNT     = NVL(#{ordPrdCnt}, ORD_PRD_CNT)
+              , UPDATE_DT       = SYSDATE
+        WHERE   1=1
+        AND     PRD_NO = #{prdNo}
+    </update>
+
+    <delete id="deletePdPrdTgowPlcExchRtngdUsingPrdAddrClfCd" parameterType="PdPrdTgowPlcExchRtngd">
+        DELETE FROM PD_PRD_TGOW_PLC_EXCH_RTNGD
+        WHERE PRD_NO = #{prdNo}
+        <if test="!(@org.apache.commons.lang.StringUtils@isEmpty(prdAddrClfCd))">
+        AND PRD_ADDR_CLF_CD = #{prdAddrClfCd}
+        </if>
+    </delete>
+
+    <insert id="insertPdPrdTgowPlcExchRtngd">
+        /* deliveryMapper.xml insertPdPrdTgowPlcExchRtngd */
+        INSERT INTO PD_PRD_TGOW_PLC_EXCH_RTNGD (
+                PRD_NO
+              , MEM_NO
+              , ADDR_SEQ
+              , PRD_ADDR_CLF_CD
+              , CREATE_DT
+              , CREATE_NO
+              , UPDATE_DT
+              , UPDATE_NO
+              , MB_ADDR_LOCATION
+              , FR_CTR_CD
+        )
+        VALUES (
+                #{prdNo}
+            <choose>
+              <when test="memNo lte 0"><!-- less than equal -->
+                , (
+                       SELECT NVL((SELECT NVL(sel_mnbd_no, 0)
+                       FROM pd_prd
+                       WHERE prd_no = #{prdNo})
+                                   , 0)
+                       FROM DUAL)
+              </when>
+              <otherwise>
+                , #{memNo}
+              </otherwise>
+            </choose>
+              , #{addrSeq}
+              , #{prdAddrClfCd}
+              , SYSDATE
+              , #{createNo}
+              , SYSDATE
+              , #{updateNo}
+              , #{mbAddrLocation}
+              , #{frCtrCd}
+        )
+    </insert>
+
+
+    <!-- 정기배송 설정 상품 사용여부 변경 -->
+    <update id="updateProductReglUseYn" parameterType="PdReglDlvPrd">
+      <![CDATA[
+		UPDATE
+			/*+ INDEX(A PK_PD_REGL_DLV_PRD) */
+			PD_REGL_DLV_PRD A
+		SET USE_YN = #{useYn}
+			, UPDATE_DT = SYSDATE
+			, UPDATE_NO = #{updateNo}
+		WHERE A.PRD_NO = #{prdNo}
+	  ]]>
+        /* deliveryMapper.updateProductReglUseYn */
+    </update>
+
+    <!-- 상품 정기배송 설정 정보 이력 등록 -->
+    <update id="insertProductReglDeliveryInfoHist" parameterType="PdReglDlvPrdHist">
+      <![CDATA[
+		INSERT INTO PD_REGL_DLV_PRD_HIST (
+			PRD_NO, HIST_APL_DT, REGL_DLV_TYP_CD, REGL_DLV_MTHD_CD, IMDT_DLV_YN, REGL_DLV_DY, REGL_DLV_CN_WKDY
+			, USE_YN, CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO
+		)
+			SELECT /*+ INDEX(A PK_PD_REGL_DLV_PRD) */
+				A.PRD_NO, SYSDATE, A.REGL_DLV_TYP_CD, A.REGL_DLV_MTHD_CD, A.IMDT_DLV_YN, A.REGL_DLV_DY, A.REGL_DLV_CN_WKDY
+				, A.USE_YN, A.CREATE_DT, A.CREATE_NO, A.UPDATE_DT, A.UPDATE_NO
+			FROM PD_REGL_DLV_PRD A
+			WHERE A.PRD_NO = #{prdNo}
+	  ]]>
+        /* deliverMapper.insertProductReglDeliveryInfoHist */
+    </update>
+
+    <select id="selectPdReglDlvPrdUseY" parameterType="long" resultType="PrdReglDlvVO">
+		SELECT /*+ INDEX(A PK_PD_REGL_DLV_PRD) */
+                A.PRD_NO AS prdNo
+              , A.REGL_DLV_TYP_CD AS reglDlvTypCd
+              , A.REGL_DLV_MTHD_CD AS reglDlvMthdCd
+              , A.IMDT_DLV_YN AS imdtDlvYn
+              , A.REGL_DLV_DY AS reglDlvDy
+              , A.REGL_DLV_CN_WKDY AS reglDlvCnWkdy
+		FROM    PD_REGL_DLV_PRD A
+		WHERE   A.PRD_NO = #{prdNo}
+	    AND A.USE_YN = 'Y'
+    </select>
+
+    <delete id="deletePrdOrdQtyBasiDlvCst" parameterType="long">
+		DELETE
+			pd_ord_qty_basi_dlv_cst
+		WHERE
+			prd_no = #{prdNo}
+    </delete>
+
+    <update id="updateOrdQtyBasiDlvCstPrdNoHist" parameterType="long">
+        UPDATE
+			pd_ord_qty_basi_dlv_cst_hist
+		SET 	hist_apl_end_dt = sysdate
+		WHERE
+			hist_apl_end_dt = to_date('99991231235959','rrrrmmddhh24miss')
+			AND prd_no = #{prdNo}
+
+    </update>
+
+    <select id="getPrdOrdQtyBasiDlvCstPrimaryKey" resultType="long">
+		SELECT SEQ_PD_ORD_QTY_BASI_DLV_CST.nextVal from dual
+    </select>
+
+    <insert id="insertPrdOrdQtyBasiDlvCst" parameterType="PdOrdQtyBasiDlvCst">
+		INSERT
+		INTO pd_ord_qty_basi_dlv_cst
+            (
+                dlv_cst_inst_no
+                ,prd_no
+                ,ord_bgn_qty
+                ,ord_end_qty
+                ,dlv_cst
+                ,create_dt
+                ,create_no
+                ,update_dt
+                ,update_no
+			)
+		VALUES
+			(
+                #{dlvCstInstNo}
+                ,#{prdNo}
+                ,#{ordBgnQty}
+                ,#{ordEndQty}
+                ,#{dlvCst}
+                ,sysdate
+                ,#{createNo}
+                ,sysdate
+                ,#{updateNo}
+			)
+    </insert>
+
+    <update id="insertPrdOrdQtyBasiDlvCstHist" parameterType="long">
+    INSERT
+    INTO pd_ord_qty_basi_dlv_cst_hist
+				(
+					dlv_cst_inst_no,
+					hist_apl_end_dt,
+					hist_apl_bgn_dt,
+					prd_no,
+					ord_bgn_qty,
+					ord_end_qty,
+					dlv_cst,
+					create_dt,
+					create_no,
+					update_dt,
+					update_no
+				)
+				SELECT
+					dlv_cst_inst_no,
+					to_date('99991231235959','rrrrmmddhh24miss'),
+					sysdate,
+					prd_no,
+					ord_bgn_qty,
+					ord_end_qty,
+					dlv_cst,
+					create_dt,
+					create_no,
+					update_dt,
+					update_no
+				FROM pd_ord_qty_basi_dlv_cst
+				WHERE  dlv_cst_inst_no = #{dlvCstInstNo}
+    </update>
+
+    <delete id="deleteExceptSelGloInOutAddress" parameterType="PdPrdTgowPlcExchRtngd">
+        DELETE FROM pd_prd_tgow_plc_exch_rtngd
+        WHERE prd_no = #{prdNo}
+        <if test="!(@org.apache.commons.lang.StringUtils@isEmpty(prdAddrClfCd))">
+        AND prdAddrClfCd = #{prdAddrClfCd}
+        </if>
+    </delete>
+
+    <select id="getSellerIslandDlvCst" resultType="PdSellerIslandDlvCstVO" parameterType="java.lang.Long">
+        SELECT
+        sel_mnbd_no
+        , jeju_dlv_cst
+        , island_dlv_cst
+        , use_yn
+        , to_char(create_dt, 'yyyy/mm/dd hh24:mi:ss') create_dt
+        , create_no
+        , to_char(update_dt, 'yyyy/mm/dd hh24:mi:ss') update_dt
+        , update_no
+        FROM pd_seller_island_dlv_cst
+        WHERE sel_mnbd_no = #{selMnbdNo}
+        /* productMapper.getSellerIslandDlvCst */
+    </select>
+
+    <!-- 상품의 해외 통합출고지의 배송비를 구하기 위해 필요한 정보 조회 -->
+    <select id="getGlobalItgInfoForPrdDeliveryCost" parameterType="long" resultType="java.util.HashMap">
+        SELECT
+        NVL(a.PRD_WGHT, 0) AS PRDWGHT
+        , c.MEM_NO   AS ITGMEMNO
+        , b.HS_CODE  AS HSCODE
+        FROM pd_prd a
+        , dp_disp_ctgr b
+        , PD_PRD_TGOW_PLC_EXCH_RTNGD c
+        , sy_co_detail d
+        WHERE a.DISP_CTGR_NO_DE = b.DISP_CTGR_NO
+        AND a.prd_no = #{prdNo}
+        AND a.prd_no = c.prd_no
+        AND c.PRD_ADDR_CLF_CD = '01'
+        AND d.dtls_cd = to_char(c.MEM_NO)
+        AND d.grp_cd = 'MB100'
+        AND ROWNUM <![CDATA[ <= ]]> 1
+        /* deliceryMapper.getGlobalItgInfoForPrdDeliveryCost */
+    </select>
+
+    <select id="getBaseAddrInfo" parameterType="ClaimAddressInfoVO" resultType="ClaimAddressInfoVO">
+    SELECT memNo, addrSeq, concatAddr, location as mbAddrLocation, addrCd
+          FROM (
+                SELECT /* productDAOMap.xml 황정연 2009.01.07 */
+                       T1.MEM_NO AS memNo
+                       ,T1.ADDR_SEQ AS addrSeq
+                       ,CASE WHEN (T1.ADDR_TYP_CD = '02' AND T1.BUILD_MNG_NO IS NOT NULL)
+                                THEN (SELECT TRIM(T2.SIDO_NM||' '||T2.SIGUNGU_NM||' '||T2.UEUPMYON_NM||' '||T2.ROAD_NM||' '||T2.BUILD_MAIN_NO||DECODE(T2.BUILD_SUB_NO,0,'','-'||T2.BUILD_SUB_NO))
+                                                    ||CASE WHEN (T2.LAW_DONG_NM IS NULL AND T2.SIGUNGU_BUILD_NM IS NULL) THEN ' '
+                                                            WHEN T2.LAW_DONG_NM IS NULL THEN ' ('||T2.SIGUNGU_BUILD_NM||') '
+                                                            WHEN T2.SIGUNGU_BUILD_NM IS NULL THEN ' ('||T2.LAW_DONG_NM||') '
+                                                            ELSE ' ('||T2.LAW_DONG_NM||','||T2.SIGUNGU_BUILD_NM||') ' END || T1.DTLS_ADDR || ' ' AS ADDR
+                                        FROM SY_ROAD_ADDR T2
+                                        WHERE T2.BUILD_MNG_NO = T1.BUILD_MNG_NO)
+                                ELSE (SELECT TRIM(T2.SIDO_NM||' '||T2.SIGUNGU_NM||' ' ||T2.UEUPMYON_NM||' '||T2.RHYEE_NM||' '||T2.DOSOE_NM||' '||T2.BLD_NM)||' ' || T1.DTLS_ADDR || ' '  AS ADDR
+                                        FROM SY_MAIL_NO T2
+                                        WHERE T2.MAIL_NO = T1.MAIL_NO AND T2.MAIL_NO_SEQ = T1.MAIL_NO_SEQ)
+                             END concatAddr
+                         ,'01' AS location
+                         ,ADDR_CD as addrCd
+                FROM MB_ADDR T1
+                WHERE MEM_NO = #{memNo}
+                AND BASE_ADDR_YN = 'Y'
+                AND ADDR_CD = #{addrCd}
+                AND DEL_YN = 'N'
+                UNION ALL
+                SELECT
+                       T1.MEM_NO AS memNO
+                       ,T1.ADDR_SEQ AS addrSeq
+                       ,T1.addr2 || ' ' || T1.addr1 || ', ' || T1.city || ', ' || T1.state || ', ' || T1.zip_code || ' '
+                        || (SELECT DTLS_COM_NM FROM SY_CO_DETAIL WHERE GRP_CD = 'MB047' AND DTLS_CD = T1.COUNTRY_CD) as concatAddr
+                       ,'02' AS location
+                       ,ADDR_CD as addrCd
+                FROM MB_GLOBAL_ADDR T1
+                WHERE MEM_NO = #{memNo}
+                AND BASE_ADDR_YN = 'Y'
+                AND ADDR_CD = #{addrCd}
+                AND DEL_YN = 'N')
+    WHERE ROWNUM = 1
+    </select>
+
+    <select id="getAddrBasiDlvCstText" parameterType="ClaimAddressInfoVO" resultType="String">
+        SELECT /* deliveryMapper.xml getAddrBasiDlvCstText */
+        /*+ NO_FILTERING */
+            MAX(LTRIM (SYS_CONNECT_BY_PATH (TO_CHAR(NVL(DLV_CST, 0), 'FM999,999,999,990') || '@' || TO_CHAR(ORD_BGN_AMT, 'FM999,999,999,990') || '@' || TO_CHAR(ORD_END_AMT, 'FM999,999,999,990'), '/'), '/')) AS addrBasiDlvCstText
+        FROM (
+            SELECT
+                ROW_NUMBER () OVER (PARTITION BY SEL_MNBD_NO ORDER BY DLV_CST_INST_NO) RNUM
+                ,SEL_MNBD_NO
+                ,DLV_CST
+                ,ORD_BGN_AMT
+                ,ORD_END_AMT
+            FROM  PD_ADDR_BASI_DLV_CST
+            WHERE SEL_MNBD_NO = #{memNo}
+                AND ADDR_SEQ = #{addrSeq}
+                AND MB_ADDR_LOCATION = #{mbAddrLocation}
+            ORDER BY DLV_CST_INST_NO
+        )
+        START WITH RNUM = 1
+        CONNECT BY PRIOR RNUM = RNUM - 1
+    </select>
+
+    <!-- 회원의 통합 출고지 기본주소 조회  -->
+    <select id="getItgBaseOutAddrInfo" resultType="ClaimAddressInfoVO" parameterType="ClaimAddressInfoVO">
+        SELECT *
+        FROM (
+        select
+        mem_no AS memNO
+        ,addr_seq AS addrSeq
+        ,(CASE WHEN (a.ADDR_TYP_CD = '02'  AND   a.BUILD_MNG_NO IS NOT NULL)
+        THEN (SELECT  TRIM(T2.SIDO_NM||' '||T2.SIGUNGU_NM||' '||T2.UEUPMYON_NM||' '||T2.ROAD_NM||' '||T2.BUILD_MAIN_NO||DECODE(T2.BUILD_SUB_NO, 0, '', '-'||T2.BUILD_SUB_NO)) ||
+        CASE WHEN (T2.LAW_DONG_NM IS NULL  AND  T2.SIGUNGU_BUILD_NM IS NULL) THEN ' '
+        WHEN T2.LAW_DONG_NM IS NULL THEN ' ('||T2.SIGUNGU_BUILD_NM||') '
+        WHEN T2.SIGUNGU_BUILD_NM IS NULL THEN ' ('||T2.LAW_DONG_NM||') '
+        ELSE ' ('||T2.LAW_DONG_NM||','||T2.SIGUNGU_BUILD_NM||') '
+        END AS ADDR
+        FROM   SY_ROAD_ADDR T2
+        WHERE  T2.BUILD_MNG_NO = a.BUILD_MNG_NO) || a.dtls_addr
+        ELSE (SELECT   TRIM(T2.SIDO_NM||' '||T2.SIGUNGU_NM||' ' ||T2.UEUPMYON_NM||' '||T2.RHYEE_NM||' '||T2.DOSOE_NM||' '||T2.BLD_NM) ||' '|| a.dtls_addr AS ADDR
+        FROM   SY_MAIL_NO T2
+        WHERE  T2.MAIL_NO = a.MAIL_NO
+        AND    T2.MAIL_NO_SEQ = a.MAIL_NO_SEQ)
+        end)  AS concatAddr
+        ,MB_ADDR_LOCATION AS location
+        ,nvl(a.ITG_ADDR_SEQ, 0) AS itgAddrSeq
+        from (
+        select ITG_MEM_NO, ITG_MEM_ADDR_BASE_SEQ, MB_ADDR_LOCATION
+        , SEL_SUPL_MEM_NO
+        from mb_itg_mem_map
+        where SEL_SUPL_MEM_NO = #{memNo}
+        and ITG_MEM_ADDR_BASE_SEQ <![CDATA[ >= ]]> 1
+        and MB_ADDR_LOCATION = '01'
+        ) aa, mb_addr a
+        WHERE a.mem_no = aa.ITG_MEM_NO and a.addr_seq = aa.ITG_MEM_ADDR_BASE_SEQ and a.addr_cd ='02'
+        UNION
+        SELECT
+        mem_no AS memNO
+        ,addr_seq AS addrSeq
+        ,(( SELECT dtls_com_nm
+        FROM   sy_co_detail
+        WHERE  grp_cd = 'MB047'
+        AND    dtls_cd = country_cd)||' '||ADDR1||' '||ADDR2||' '||CITY||' '||STATE||' '||ZIP_CODE) AS concatAddr
+        ,MB_ADDR_LOCATION AS location
+        ,nvl(a.ITG_ADDR_SEQ, 0) AS itgAddrSeq
+        FROM (
+        select ITG_MEM_NO, ITG_MEM_ADDR_BASE_SEQ, MB_ADDR_LOCATION
+        , SEL_SUPL_MEM_NO
+        from mb_itg_mem_map
+        where SEL_SUPL_MEM_NO = #{memNo}
+        and ITG_MEM_ADDR_BASE_SEQ <![CDATA[ >= ]]> 1
+        and MB_ADDR_LOCATION = '02'
+        ) aa, mb_global_addr a
+        WHERE a.mem_no = aa.ITG_MEM_NO and a.addr_seq = aa.ITG_MEM_ADDR_BASE_SEQ and a.addr_cd ='02')
+        WHERE ROWNUM = 1
+        /* deliveryMapper.getItgBaseOutAddrInfo */
+    </select>
+
+    <!-- 회원의 통합 교환/반품지 기본주소 조회  -->
+    <select id="getItgBaseInAddrInfo" resultType="ClaimAddressInfoVO" parameterType="ClaimAddressInfoVO">
+        SELECT *
+        FROM (
+        SELECT
+        b.mem_no AS memNO
+        ,b.addr_seq AS addrSeq
+        ,(CASE WHEN (b.ADDR_TYP_CD = '02'  AND   b.BUILD_MNG_NO IS NOT NULL)
+        THEN (SELECT  TRIM(T2.SIDO_NM||' '||T2.SIGUNGU_NM||' '||T2.UEUPMYON_NM||' '||T2.ROAD_NM||' '||T2.BUILD_MAIN_NO||DECODE(T2.BUILD_SUB_NO, 0, '', '-'||T2.BUILD_SUB_NO)) ||
+        CASE WHEN (T2.LAW_DONG_NM IS NULL  AND  T2.SIGUNGU_BUILD_NM IS NULL) THEN ' '
+        WHEN T2.LAW_DONG_NM IS NULL THEN ' ('||T2.SIGUNGU_BUILD_NM||') '
+        WHEN T2.SIGUNGU_BUILD_NM IS NULL THEN ' ('||T2.LAW_DONG_NM||') '
+        ELSE ' ('||T2.LAW_DONG_NM||','||T2.SIGUNGU_BUILD_NM||') '
+        END AS ADDR
+        FROM   SY_ROAD_ADDR T2
+        WHERE  T2.BUILD_MNG_NO = b.BUILD_MNG_NO) || b.dtls_addr
+        ELSE (SELECT   TRIM(T2.SIDO_NM||' '||T2.SIGUNGU_NM||' ' ||T2.UEUPMYON_NM||' '||T2.RHYEE_NM||' '||T2.DOSOE_NM||' '||T2.BLD_NM) ||' '|| b.dtls_addr AS ADDR
+        FROM   SY_MAIL_NO T2
+        WHERE  T2.MAIL_NO = b.MAIL_NO
+        AND    T2.MAIL_NO_SEQ = b.MAIL_NO_SEQ)
+        end)  AS concatAddr
+        ,'01' AS location, nvl(b.ITG_ADDR_SEQ, 0) AS itgAddrSeq
+        FROM (
+        select a.mem_no, a.addr_seq, a.ITG_ADDR_SEQ, MB_ADDR_LOCATION from (
+        select ITG_MEM_NO, ITG_MEM_ADDR_BASE_SEQ, MB_ADDR_LOCATION, SEL_SUPL_MEM_NO
+        from mb_itg_mem_map
+        where SEL_SUPL_MEM_NO = #{memNo}
+        and ITG_MEM_ADDR_BASE_SEQ <![CDATA[ >= ]]> 1
+        and MB_ADDR_LOCATION = '01'
+        ) aa, mb_addr a
+        where a.mem_no = aa.ITG_MEM_NO and a.addr_seq = aa.ITG_MEM_ADDR_BASE_SEQ and a.addr_cd ='02'
+        union
+        select a.mem_no, a.addr_seq, a.ITG_ADDR_SEQ, aa.MB_ADDR_LOCATION from (
+        select ITG_MEM_NO, ITG_MEM_ADDR_BASE_SEQ, MB_ADDR_LOCATION
+        , SEL_SUPL_MEM_NO
+        from mb_itg_mem_map
+        where SEL_SUPL_MEM_NO = #{memNo}
+        and ITG_MEM_ADDR_BASE_SEQ <![CDATA[ >= ]]> 1
+        and MB_ADDR_LOCATION = '02'
+        ) aa, mb_global_addr a
+        where a.mem_no = aa.ITG_MEM_NO and a.addr_seq = aa.ITG_MEM_ADDR_BASE_SEQ and a.addr_cd ='02'
+        ) bb, mb_addr b /* 통합 출고지를 가져와서, 통합 출고지에 묶인 반품 교환지를 가져온다. */
+        WHERE bb.mem_no = b.mem_no
+        AND b.ADDR_CD = '03' /* 반품지 */
+        AND bb.ITG_ADDR_SEQ = b.ITG_ADDR_SEQ
+        UNION
+        SELECT
+        b.mem_no AS memNO
+        ,b.addr_seq AS addrSeq
+        ,(( SELECT dtls_com_nm
+        FROM   sy_co_detail
+        WHERE  grp_cd = 'MB047'
+        AND    dtls_cd = country_cd)||' '||ADDR1||' '||ADDR2||' '||CITY||' '||STATE||' '||ZIP_CODE) AS concatAddr
+        ,'02' AS location, nvl(b.ITG_ADDR_SEQ, 0) AS itgAddrSeq
+        FROM (
+        select a.mem_no, a.addr_seq, a.ITG_ADDR_SEQ, MB_ADDR_LOCATION from (
+        select ITG_MEM_NO, ITG_MEM_ADDR_BASE_SEQ, MB_ADDR_LOCATION, SEL_SUPL_MEM_NO
+        from mb_itg_mem_map
+        where SEL_SUPL_MEM_NO = #{memNo}
+        and ITG_MEM_ADDR_BASE_SEQ <![CDATA[ >= ]]> 1
+        and MB_ADDR_LOCATION = '01'
+        ) aa, mb_addr a
+        where a.mem_no = aa.ITG_MEM_NO and a.addr_seq = aa.ITG_MEM_ADDR_BASE_SEQ and a.addr_cd ='02'
+        union
+        select a.mem_no, a.addr_seq, a.ITG_ADDR_SEQ, aa.MB_ADDR_LOCATION from (
+        select ITG_MEM_NO, ITG_MEM_ADDR_BASE_SEQ, MB_ADDR_LOCATION
+        , SEL_SUPL_MEM_NO
+        from mb_itg_mem_map
+        where SEL_SUPL_MEM_NO = #{memNo}
+        and ITG_MEM_ADDR_BASE_SEQ <![CDATA[ >= ]]> 1
+        and MB_ADDR_LOCATION = '02'
+        ) aa, mb_global_addr a
+        where a.mem_no = aa.ITG_MEM_NO and a.addr_seq = aa.ITG_MEM_ADDR_BASE_SEQ and a.addr_cd ='02'
+        ) bb, mb_global_addr b /* 통합 출고지를 가져와서, 통합 출고지에 묶인 반품 교환지를 가져온다. */
+        WHERE bb.mem_no = b.mem_no
+        AND b.ADDR_CD = '03' /* 반품지 */
+        AND bb.ITG_ADDR_SEQ = b.ITG_ADDR_SEQ
+        )
+        WHERE ROWNUM = 1
+        /* deliveryMapper.getItgBaseInAddrInfo */
+    </select>
+
+    <!-- 회원 기본 해외 출고지 조회  -->
+    <select id="getSellerBasicInOutAddrInfo" resultType="ClaimAddressInfoVO" parameterType="ClaimAddressInfoVO">
+        SELECT
+        a.MEM_NO AS memNO ,
+        a.ADDR_SEQ AS addrSeq ,
+        a.addr2 || ' ' || a.addr1 || ', ' || a.city || ', ' || a.state || ', ' || a.zip_code || ' ' || (SELECT DTLS_COM_NM
+        FROM   SY_CO_DETAIL
+        WHERE  GRP_CD = 'MB047'
+        AND    DTLS_CD = a.COUNTRY_CD) as concatAddr ,
+        '02' AS location ,
+        CASE WHEN a.COUNTRY_CD = 'US' THEN NVL(b.free_pickup_yn, 'N')
+        ELSE 'N'
+        END freePickupYn
+        FROM   MB_GLOBAL_ADDR a,
+        mb_global_zip_code b
+        WHERE  a.zip_code = b.zip_code(+)
+        AND    MEM_NO = #{memNo}
+        AND    BASE_ADDR_YN = 'Y'
+        AND    ADDR_CD = #{addrCd}
+        AND    DEL_YN = 'N'
+        AND    ROWNUM = 1
+        /* deliveryMapper.getSellerBasicInOutAddrInfo */
+    </select>
+
+    <!-- 주문수량기준배송비 조회 -->
+    <select id="getProductOrdDlvCstList" resultType="PrdOrderCountBaseDeliveryVO" parameterType="long">
+        SELECT
+        dlv_cst_inst_no,
+        prd_no,
+        ord_bgn_qty,
+        ord_end_qty,
+        dlv_cst,
+        create_dt,
+        create_no,
+        update_dt,
+        update_no
+        FROM  pd_ord_qty_basi_dlv_cst
+        WHERE prd_no=#{prdNo}
+        ORDER BY ord_bgn_qty asc
+        /* productMapper.getProductOrdDlvCstList */
+    </select>
+    <select id="getSellerBasiDlvCstTxt" resultType="string" parameterType="java.lang.Long">
+		SELECT /* deliveryMapper.xml getSellerBasiDlvCstTxt 선슬기 */
+	    	/*+ no_filtering */ MAX(LTRIM (SYS_CONNECT_BY_PATH (DECODE(TO_CHAR(NVL(dlv_cst, 0), 'fm999,999,999,990')||'원', '0원', '무료', TO_CHAR(NVL(dlv_cst, 0), 'fm999,999,999,990')||'원') || '@' || seller_dlv_text, '/'), '/')) seller_basi_dlv_cst_text
+        FROM (
+        	SELECT
+        		ROW_NUMBER () OVER (PARTITION BY sel_mnbd_no order by dlv_cst_inst_no) rnum
+        		,sel_mnbd_no
+        		,case when (ord_bgn_amt = 0 AND ord_end_amt <![CDATA[ < ]]> 999999999999 ) then TO_CHAR(NVL(ord_end_amt, 0), 'fm999,999,999,990')||'원 미만 구매'
+                      when (ord_bgn_amt > 0 AND ord_end_amt <![CDATA[ < ]]> 999999999999 ) AND  ( ord_bgn_amt != ord_end_amt) then TO_CHAR(NVL(ord_bgn_amt, 0), 'fm999,999,999,990')||'원 이상 ~ '||TO_CHAR(NVL(ord_end_amt, 0), 'fm999,999,999,990')||'원 미만 구매'
+                      when (ord_bgn_amt > 0 AND ord_end_amt = 999999999999 ) then TO_CHAR(NVL(ord_bgn_amt, 0), 'fm999,999,999,990')||'원 이상 구매'
+                      end as seller_dlv_text
+                ,dlv_cst
+            FROM  pd_seller_basi_dlv_cst
+            WHERE sel_mnbd_no = #{memNo}
+            ORDER BY dlv_cst_inst_no
+            )
+            START WITH rnum = 1
+            CONNECT BY PRIOR rnum = rnum - 1
+    </select>
+    <select id="getNowDlvCstTxt" resultType="string" parameterType="java.lang.String">
+        SELECT /* deliveryMapper.xml getNowDlvCstTxt 박봉원 */
+        MAX(APL_DLV_CST) || '@' || MIN(APL_END_AMT)
+        FROM PD_ORD_BASI_DLV_CST
+        WHERE DLV_CST_INST_BASI_CD = #{dlvCstInstBasiCd}
+    </select>
+
+    <!-- 전세계 배송 셀러 정보 조회 -->
+    <select id="getGlobalDeliverSeller" parameterType="long" resultType="MemberGlobalDeliverVO">
+        SELECT
+            MEM_NO AS memNo
+            ,GBL_DLV_YN AS gblDlvYn
+            ,FEE_RT
+            ,FEE_APPLY_DT
+            ,CREATE_DT
+            ,CREATE_NO
+            ,UPDATE_DT
+            ,UPDATE_NO
+            ,CONVERT_YN
+            ,CONVERT_AGREE_DT
+            ,CONVERT_DT
+            ,CONVERT_MAIL_AGREE_DT
+            ,CN_SEL_AGREE_YN
+            ,CN_SEL_AGREE_CHG_DT
+            ,GBL_DLV_YN_CHG_DT
+        FROM MB_GBL_DLV
+        WHERE MEM_NO = #{memNO}
+        /* deliveryMapper.getGlobalDeliverSeller */
+    </select>
+
+    <delete id="deleteSellerBasiDlvCst" parameterType="long">
+        DELETE /* deliveryMapper.xml deleteSellerBasiDlvCst 선슬기 */
+        pd_seller_basi_dlv_cst
+        WHERE
+        sel_mnbd_no = #{memNo}
+    </delete>
+
+    <update id="updateSellerBasiDlvCstHist" parameterType="long">
+        UPDATE /* deliveryMapper.xml updateSellerBasiDlvCstHist 선슬기 */
+        pd_seller_basi_dlv_cst_hist
+        SET hist_apl_end_dt = sysdate
+        WHERE
+        hist_apl_end_dt = to_date('99991231235959','yyyymmddhh24miss')
+        AND sel_mnbd_no = #{memNo}
+    </update>
+
+    <update id="insertSellerBasiDlvCst" parameterType="ProductSellerBasiDeliveryCostVO">
+        INSERT INTO pd_seller_basi_dlv_cst
+        (
+        dlv_cst_inst_no
+        ,sel_mnbd_no
+        ,ord_bgn_amt
+        ,ord_end_amt
+        ,dlv_cst
+        ,create_dt
+        ,create_no
+        ,update_dt
+        ,update_no
+        )
+        VALUES
+        (
+        #{dlvCstInstNo}
+        ,#{selMnbdNo}
+        ,#{ordBgnAmt}
+        ,#{ordEndAmt}
+        ,#{dlvCst}
+        ,sysdate
+        ,#{createNo}
+        ,sysdate
+        ,#{updateNo}
+        )
+        /* deliveryMapper.xml insertSellerBasiDlvCst 선슬기 */
+    </update>
+
+    <update id="insertSellerBasiDlvCstHist" parameterType="ProductSellerBasiDeliveryCostVO">
+        INSERT INTO pd_seller_basi_dlv_cst_hist
+        (
+        dlv_cst_inst_no
+        ,hist_apl_end_dt
+        ,hist_apl_bgn_dt
+        ,sel_mnbd_no
+        ,ord_bgn_amt
+        ,ord_end_amt
+        ,dlv_cst
+        ,create_dt
+        ,create_no
+        ,update_dt
+        ,update_no
+        )
+        SELECT
+        dlv_cst_inst_no,
+        to_date('99991231235959','rrrrmmddhh24miss'),
+        sysdate,
+        sel_mnbd_no,
+        ord_bgn_amt,
+        ord_end_amt,
+        dlv_cst,
+        create_dt,
+        create_no,
+        update_dt,
+        update_no
+        FROM pd_seller_basi_dlv_cst
+        WHERE  dlv_cst_inst_no = #{dlvCstInstNo}
+        /* dlvInfo.xml register.insertSellerBasiDlvCstHist 선슬기 */
+    </update>
+
+    <select id="geSellerBasiDlvCstSeq" resultType="long">
+        SELECT /* deliveryMapper.xml geSellerBasiDlvCstSeq 선슬기 */ seq_pd_seller_basi_dlv_cst.nextVal FROM dual
+    </select>
+
+    <select id="getGlobalHsCode" parameterType="BaseVO" resultType="BaseVO">
+        select	/* deliveryMapper.xml getGlobalHsCode */
+        gbl_hs_code_no as gblHsCodeNo,
+        gbl_hs_code as gblHsCode,
+        kor_nm		as korNm,
+        eng_nm		as engNm,
+        create_dt	as createDt,
+        create_no	as createNo,
+        update_dt	as updateDt,
+        update_no	as updateNo
+        from wm_gbl_hs_code
+        where sysdate between apl_bgn_dt and apl_end_dt
+        <if test="gblHsCode != ''">
+            and gbl_hs_code = #gblHsCode#
+        </if>
+        <if test="gblHsCodeNo > 0">
+            and gbl_hs_code_no = #gblHsCodeNo#
+        </if>
+    </select>
+
+    <select id="getAddrBasiDlvCstTxt" resultType="string" parameterType="ProductSellerBasiDeliveryCostVO">
+        SELECT /* deliveryMapper.xml getAddrBasiDlvCstTxt */
+        /*+ no_filtering */ MAX(LTRIM (SYS_CONNECT_BY_PATH (DECODE(TO_CHAR(NVL(dlv_cst, 0), 'fm999,999,999,990')||'원', '0원', '무료', TO_CHAR(NVL(dlv_cst, 0), 'fm999,999,999,990')||'원') || '@' || addr_dlv_text, '/'), '/')) addr_basi_dlv_cst_text
+        FROM (
+        SELECT
+        ROW_NUMBER () OVER (PARTITION BY sel_mnbd_no order by dlv_cst_inst_no) rnum
+        ,sel_mnbd_no
+        ,case when (ord_bgn_amt = 0 AND ord_end_amt <![CDATA[ < ]]> 999999999999 ) then TO_CHAR(NVL(ord_end_amt, 0), 'fm999,999,999,990')||'원 미만 구매'
+        when (ord_bgn_amt > 0 AND ord_end_amt <![CDATA[ < ]]> 999999999999 ) AND  ( ord_bgn_amt != ord_end_amt) then TO_CHAR(NVL(ord_bgn_amt, 0), 'fm999,999,999,990')||'원 이상 ~ '||TO_CHAR(NVL(ord_end_amt, 0), 'fm999,999,999,990')||'원 미만 구매'
+        when (ord_bgn_amt > 0 AND ord_end_amt = 999999999999 ) then TO_CHAR(NVL(ord_bgn_amt, 0), 'fm999,999,999,990')||'원 이상 구매'
+        end as addr_dlv_text
+        ,dlv_cst
+        FROM  pd_addr_basi_dlv_cst
+        WHERE sel_mnbd_no = #{selMnbdNo}
+        and addr_seq = #{addrSeq}
+        and mb_addr_location = #{mbAddrLocation}
+        ORDER BY dlv_cst_inst_no
+        )
+        START WITH rnum = 1
+        CONNECT BY PRIOR rnum = rnum - 1
+    </select>
+
+    <select id="getAddrBasiDlvCstTxt2" resultType="string" parameterType="ProductSellerBasiDeliveryCostVO">
+        SELECT /* deliveryMapper.xml getAddrBasiDlvCstTxt2 */
+        /*+ no_filtering */ MAX(LTRIM (SYS_CONNECT_BY_PATH (TO_CHAR(NVL(dlv_cst, 0), 'fm999,999,999,990') || '@' || TO_CHAR(ord_bgn_amt, 'fm999,999,999,990') || '@' || TO_CHAR(ord_end_amt, 'fm999,999,999,990'), '/'), '/')) addr_basi_dlv_cst_text
+        FROM (
+        SELECT
+        ROW_NUMBER () OVER (PARTITION BY sel_mnbd_no order by dlv_cst_inst_no) rnum
+        ,sel_mnbd_no
+        ,dlv_cst
+        ,ord_bgn_amt
+        ,ord_end_amt
+        FROM  pd_addr_basi_dlv_cst
+        WHERE sel_mnbd_no = #{selMnbdNo}
+        and addr_seq = #{addrSeq}
+        and mb_addr_location = #{mbAddrLocation}
+        ORDER BY dlv_cst_inst_no
+        )
+        START WITH rnum = 1
+        CONNECT BY PRIOR rnum = rnum - 1
+    </select>
+
+    <select id="isFreePickupSupplyTarget" parameterType="ClaimAddressInfoVO" resultType="ClaimAddressInfoVO">
+		SELECT /* deliveryMapper.xml isFreePickupSupplyTarget */
+		       a.zip_code as zipCode,
+		       a.state,
+		       a.city,
+		       a.country_cd as countryCd,
+		       a.position,
+		       nvl(a.free_pickup_yn, 'N') as freePickupYn
+		FROM   mb_global_zip_code a,
+		       MB_GLOBAL_ADDR b
+		WHERE  a.zip_code = b.zip_code
+		AND    del_yn ='N'
+		AND    addr_seq = #{addrSeq}
+		AND    addr_cd = #{addrCd}
+		AND    mem_no = #{memNo}
+		AND    rownum = 1
+    </select>
+
+
+
+
+    <select id="getAddrLocation" resultType="String">
+        SELECT mb_addr_location FROM pd_prd_tgow_plc_exch_rtngd WHERE PRD_NO = #{prdNo} AND PRD_ADDR_CLF_CD = #{prdAddrClfCd}
+    </select>
+
+    <select id="getDomesticAddress" resultType="AddressVO">
+      SELECT /* getDomesticAddress */
+			   a.prd_no,
+			   a.mem_no,
+			   a.addr_seq,
+			   CASE
+                         WHEN (c.ADDR_TYP_CD = '02'
+                AND    c.BUILD_MNG_NO IS NOT NULL) THEN (SELECT TRIM(T2.SIDO_NM||' '||T2.SIGUNGU_NM||' '||T2.UEUPMYON_NM||' '||T2.ROAD_NM||' '||T2.BUILD_MAIN_NO||DECODE(T2.BUILD_SUB_NO, 0, '', '-'||T2.BUILD_SUB_NO)) ||
+                                       CASE
+                                         WHEN (T2.LAW_DONG_NM IS NULL
+                        AND    T2.SIGUNGU_BUILD_NM IS NULL) THEN ' '
+                                         WHEN T2.LAW_DONG_NM IS NULL THEN ' ('||T2.SIGUNGU_BUILD_NM||') '
+                                         WHEN T2.SIGUNGU_BUILD_NM IS NULL THEN ' ('||T2.LAW_DONG_NM||') '
+                                         ELSE ' ('||T2.LAW_DONG_NM||','||T2.SIGUNGU_BUILD_NM||') '
+                                       END AS ADDR
+                FROM   SY_ROAD_ADDR T2
+                WHERE  T2.BUILD_MNG_NO = c.BUILD_MNG_NO) || c.dtls_addr
+                         ELSE (SELECT TRIM(T2.SIDO_NM||' '||T2.SIGUNGU_NM||' ' ||T2.UEUPMYON_NM||' '||T2.RHYEE_NM||' '||T2.DOSOE_NM||' '||T2.BLD_NM) ||' '|| c.dtls_addr AS ADDR
+                FROM   SY_MAIL_NO T2
+                WHERE  T2.MAIL_NO = c.MAIL_NO
+                AND    T2.MAIL_NO_SEQ = c.MAIL_NO_SEQ)
+                       END addr_nm,
+			   a.prd_addr_clf_cd,
+			   a.create_dt,
+			   a.create_no,
+			   a.update_dt,
+			   a.update_no,
+			   a.mb_addr_location,
+			   nvl(c.itg_addr_seq, 0) as itg_addr_seq
+		FROM pd_prd_tgow_plc_exch_rtngd a
+		    ,pd_prd b
+			,mb_addr c
+		where a.prd_no = b.prd_no and
+		      a.mem_no = c.mem_no and
+			  a.addr_seq = c.addr_seq and
+		      a.prd_no =#{prdNo}	and
+		      a.prd_addr_clf_cd = #{prdAddrClfCd}
+    </select>
+
+    <select id="getOverseaAddress" resultType="AddressVO">
+        SELECT
+			   a.prd_no,
+			   a.mem_no,
+			   a.addr_seq,
+			   c.addr2 || ' ' || c.addr1 || ', ' || c.city || ', ' || c.state || ', ' || c.zip_code || ' '
+			     || (select dtls_com_nm from sy_co_detail where grp_cd = 'MB047' and dtls_cd = c.country_cd) as addr_nm,
+			   a.prd_addr_clf_cd,
+			   a.create_dt,
+			   a.create_no,
+			   a.update_dt,
+			   a.update_no,
+			   a.mb_addr_location,
+			   nvl(c.itg_addr_seq, 0) as itg_addr_seq,
+			   a.fr_ctr_cd
+		FROM pd_prd_tgow_plc_exch_rtngd a
+		    ,pd_prd b
+			,mb_global_addr c
+		where a.prd_no = b.prd_no and
+		      a.mem_no = c.mem_no and
+			  a.addr_seq = c.addr_seq and
+		      a.prd_no =#{prdNo}	and
+		      a.prd_addr_clf_cd = #{prdAddrClfCd}
+    </select>
+
+    <select id="getGlobalOutAddress" resultType="AddressVO">
+        SELECT
+			   a.prd_no,
+			   a.mem_no,
+			   a.addr_seq,
+			   c.addr2 || ' ' || c.addr1 || ', ' || c.city || ', ' || c.state || ', ' || c.zip_code || ' '
+			     || (select dtls_com_nm from sy_co_detail where grp_cd = 'MB047' and dtls_cd = c.country_cd) as addr_nm,
+			   a.prd_addr_clf_cd,
+			   a.create_dt,
+			   a.create_no,
+			   a.update_dt,
+			   a.update_no,
+			   a.mb_addr_location,
+			   nvl(c.itg_addr_seq, 0) as itg_addr_seq,
+		       CASE WHEN c.COUNTRY_CD = 'US' THEN NVL(d.free_pickup_yn, 'N')
+		       ELSE 'N'
+		       END freePickupYn
+		FROM pd_prd_tgow_plc_exch_rtngd a
+		    ,pd_prd b
+			,mb_global_addr c
+       		,mb_global_zip_code d
+		where a.prd_no = b.prd_no and
+		      a.mem_no = c.mem_no and
+			  a.addr_seq = c.addr_seq and
+			  c.zip_code = d.zip_code(+) and
+		      a.prd_no =#{prdNo}	and
+		      a.prd_addr_clf_cd = #{prdAddrClfCd}
+    </select>
+
+</mapper>

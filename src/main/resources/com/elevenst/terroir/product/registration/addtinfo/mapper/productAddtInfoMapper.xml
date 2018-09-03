@@ -1,0 +1,71 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.addtinfo.mapper.ProductAddtInfoMapper">
+
+    <insert id="insertProductAddtInfo" parameterType="PdPrdAddtInfo">
+        INSERT 	/* ProductAddtInfoMapper.insertProductAddtInfo */
+        INTO PD_PRD_ADDT_INFO (
+        PRD_NO,
+        ADDT_INFO_CLF_CD,
+        ADDT_INFO_CONT,
+        CREATE_DT,
+        CREATE_NO,
+        UPDATE_DT,
+        UPDATE_NO
+        )
+        VALUES (
+        #{prdNo},
+        #{addtInfoClfCd},
+        #{addtInfoCont},
+        sysdate,
+        #{createNo},
+        sysdate,
+        #{updateNo}
+        )
+    </insert>
+
+
+
+    <update id="updateProductAddtInfo" parameterType="PdPrdAddtInfo">
+        UPDATE 	/* productAddtInfoMapper.updateProductAddtInfo */
+        PD_PRD_ADDT_INFO
+        SET
+        ADDT_INFO_CONT = #{addtInfoCont},
+        UPDATE_DT = sysdate,
+        UPDATE_NO = #{updateNo}
+        WHERE PRD_NO = #{prdNo}
+        AND ADDT_INFO_CLF_CD = #{addtInfoClfCd}
+    </update>
+
+
+
+    <select id="getProductAddtInfoList" resultType="PdPrdAddtInfo" parameterType="long">
+        SELECT 	/* productAddtInfoMapper.getProductAddtInfoList */
+        PRD_NO,
+        ADDT_INFO_CLF_CD,
+        ADDT_INFO_CONT,
+        CREATE_DT,
+        CREATE_NO,
+        UPDATE_DT,
+        UPDATE_NO
+        FROM PD_PRD_ADDT_INFO
+        WHERE PRD_NO = #{prdNo}
+    </select>
+
+    <delete id="deleteProductAddtInfoWithClfCd" parameterType="PdPrdAddtInfo">
+        DELETE 	/* productAddtInfoMapper.deleteProductAddtInfo */
+        FROM
+        PD_PRD_ADDT_INFO
+        WHERE PRD_NO = #{prdNo}
+          AND ADDT_INFO_CLF_CD = #{addtInfoClfCd}
+    </delete>
+
+    <delete id="deleteProductAddtInfo" parameterType="long">
+        DELETE 	/* productAddtInfoMapper.deleteProductAddtInfo */
+        FROM
+        PD_PRD_ADDT_INFO
+        WHERE PRD_NO = #{prdNo}
+    </delete>
+
+</mapper>

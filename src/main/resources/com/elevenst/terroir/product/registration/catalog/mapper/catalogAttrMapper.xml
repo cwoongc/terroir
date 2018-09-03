@@ -1,0 +1,146 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.catalog.mapper.CatalogAttrMapper">
+
+    <select id="getCtgrAttrList" resultType="CatalogAttrVO" parameterType="HashMap">
+        SELECT
+        A.dispCtgrNo,
+        A.ctlgAttrNo,
+        A.ctlgAttrNm,
+        A.inputMthdCd,
+        A.reqiredYn,
+        A.useYn,
+        (select attr_clf_cd from pd_std_prd_attr_comp where prd_no = #{prdNo} and ctlg_attr_no = a.ctlgAttrNo) as attrClfCd,
+        (select ctlg_attr_value_no from pd_std_prd_attr_comp where prd_no = #{prdNo} and ctlg_attr_no = a.ctlgAttrNo) as ctlgAttrValueNo,
+        (select std_attr_value_nm from pd_std_prd_attr_comp where prd_no = #{prdNo} and ctlg_attr_no = a.ctlgAttrNo) as stdAttrValueNm
+
+        FROM (
+        SELECT /* [categoryDAOMap.xml] categoryDAOMap.getCtgrAttrList */
+        /*+ LEADING(ATTR CTAT) USE_NL(CTAT) INDEX(ATTR PK_PD_CTLG_ATTR_MAPP) INDEX(CTAT PK_PD_CTLG_ATTR) */
+        ATTR.DISP_CTGR_NO as dispCtgrNo,
+        ATTR.CTLG_ATTR_NO as ctlgAttrNo,
+        NVL(ATTR.FLTR_DISP_ATTR_NM, CTAT.CTLG_ATTR_NM) AS ctlgAttrNm,
+        ATTR.USE_YN as useYn,
+        ATTR.INPUT_MTHD_CD AS inputMthdCd,
+        ATTR.NESS_ATTR_YN as reqiredYn
+        FROM PD_CTLG_ATTR_MAPP ATTR ,
+        PD_CTLG_ATTR CTAT
+        WHERE ATTR.DISP_CTGR_NO = FN_PD_CTLG_ATTR_CTGR(TO_NUMBER(#{dispCtgrNo}), 0)
+        AND ATTR.FLTR_DISP_YN = 'Y'
+        AND ATTR.USE_YN ='Y'
+        AND CTAT.USE_YN = 'Y'
+        AND ATTR.ADDT_ATTR_YN='N'
+        AND ATTR.INPUT_MTHD_CD = '01' /*선택형만 조회*/
+        AND ATTR.CTLG_ATTR_NO = CTAT.CTLG_ATTR_NO
+        ORDER BY ATTR.DISP_RNK, NVL(ATTR.FLTR_DISP_ATTR_NM, CTAT.CTLG_ATTR_NM)
+        ) A
+        WHERE ROWNUM <![CDATA[<=]]> 3 /*최대 3개까지만 노출*/
+
+    </select>
+
+    <select id="getCtgrAttrValList" resultType="CatalogAttrValueVO" parameterType="java.util.HashMap">
+        SELECT /* [categoryDAOMap.xml] categoryDAOMap.getCtgrAttrValList */
+        /*+ INDEX(PCFAV PK_PD_CTLG_ATTR_VAL_MAPP) INDEX(PCAV PK_PD_CTLG_ATTR_VALUE) */
+
+        <if test="(ctlgNo > 0 and prdNo > 0) or (ctlgNo > 0 and prdNo == 0)">
+            (select decode(count(1),0,'N','Y') from PD_CTLG_ATTR_COMP
+            where CTLG_ATTR_NO = PCAV.CTLG_ATTR_NO
+            and CTLG_ATTR_VALUE_NO = PCAV.CTLG_ATTR_VALUE_NO
+            and CTLG_NO = #{ctlgNo} ) as selectYn,
+        </if>
+        <if test="ctlgNo == 0 and prdNo > 0">
+            (select decode(count(1),0,'N','Y') from PD_STD_PRD_ATTR_COMP
+            where CTLG_ATTR_NO = PCAV.CTLG_ATTR_NO
+            and CTLG_ATTR_VALUE_NO = PCAV.CTLG_ATTR_VALUE_NO
+            and prd_no = #{prdNo} ) as selectYn,
+        </if>
+        PCFAV.CTLG_ATTR_VAL_NO AS ctlgAttrValNo ,
+        NVL(PCFAV.FLTR_DISP_ATTR_NM, PCAV.CTLG_ATTR_VALUE_NM) AS ctlgAttrValNm
+        FROM PD_CTLG_ATTR_VAL_MAPP PCFAV ,
+        PD_CTLG_ATTR_VALUE PCAV
+
+        WHERE PCFAV.DISP_CTGR_NO = TO_NUMBER(#{dispCtgrNo})
+        AND PCFAV.CTLG_ATTR_NO = TO_NUMBER(#{ctlgAttrNo})
+        AND PCFAV.FLTR_DISP_YN = 'Y'
+        AND PCAV.USE_YN='Y'
+        AND PCAV.CTLG_ATTR_VALUE_NO = PCFAV.CTLG_ATTR_VAL_NO
+        AND PCAV.CTLG_ATTR_NO = PCFAV.CTLG_ATTR_NO
+
+        ORDER BY PCFAV.DISP_RNK, NVL(PCFAV.FLTR_DISP_ATTR_NM, PCAV.CTLG_ATTR_VALUE_NM)
+    </select>
+
+
+    <select id="getProductCtlgAttrValList" resultType="HashMap" parameterType="long">
+        SELECT 	/* [productCtgrAttrDAOMap.xml] productCtgrAttr.selectProductCtgrAttrList */
+        /*+ INDEX(A PK_PD_STD_PRD_ATTR_COMP) */
+        PRD_NO as "prdNo",
+        STD_ATTR_COMP_NO as "stdAttrCompNo",
+        STD_ATTR_VALUE_NM as "stdAttrValueNm",
+        ATTR_CLF_CD as "attrClfCd",
+        CTLG_ATTR_NO as "ctlgAttrNo",
+        nvl(CTLG_ATTR_VALUE_NO,0) as "ctlgAttrValueNo"
+        FROM PD_STD_PRD_ATTR_COMP A
+        WHERE PRD_NO = #{prdNo}
+    </select>
+
+    <select id="getCtlgAttrValueList" resultType="HashMap" parameterType="long">
+        SELECT /* [productCtlgAttrDAOMap.xml] productCtlgAttr.selectProductCtlgAttrList */
+        /*+ LEADING(A B C) USE_NL(B C) INDEX(A PK_PD_CTLG_ATTR_COMP) */
+        B.CTLG_ATTR_NO as "ctlgAttrNo",
+        B.CTLG_ATTR_VALUE_NO as "ctlgAttrValueNo",
+        B.CTLG_ATTR_VALUE_NM as "ctlgAttrValueNm"
+        FROM PD_CTLG_ATTR_COMP A, PD_CTLG_ATTR_VALUE B, PD_CTLG_ATTR C
+        WHERE A.CTLG_ATTR_NO = b.CTLG_ATTR_NO and A.CTLG_ATTR_VALUE_NO = B.CTLG_ATTR_VALUE_NO
+        AND A.CTLG_ATTR_NO = C.CTLG_ATTR_NO
+        AND A.DISP_YN = 'Y'
+        AND B.USE_YN = 'Y'
+        AND C.USE_YN = 'Y'
+        AND A.CTLG_NO=#{ctlgNo}
+    </select>
+
+    <!-- 상품 속성을 입력한다 -->
+    <insert id="insertCatalogProductAttr" parameterType="PdStdPrdAttrComp">
+        INSERT 	/* [productCtgrAttrDAOMap.xml] productCtgrAttr.insertProductCtgrAttr */
+        INTO PD_STD_PRD_ATTR_COMP (
+            PRD_NO,
+            STD_ATTR_COMP_NO,
+            STD_ATTR_VALUE_NM,
+            ATTR_CLF_CD,
+            CTLG_ATTR_NO,
+            CTLG_ATTR_VALUE_NO,
+            CREATE_DT,
+            CREATE_NO,
+            UPDATE_DT,
+            UPDATE_NO
+        )
+        VALUES (
+            #{prdNo},
+            ( SELECT nvl(MAX(STD_ATTR_COMP_NO),0)+1 FROM PD_STD_PRD_ATTR_COMP WHERE PRD_NO = #{prdNo} ) ,
+            #{ctlgAttrValueNm},
+            #{attrClfCd},
+            #{ctlgAttrNo},
+            decode(#{ctlgAttrValueNo},0,null,#{ctlgAttrValueNo}),
+            sysdate,
+            #{createNo},
+            sysdate,
+            #{updateNo}
+        )
+    </insert>
+
+    <!-- 상품속성 삭제 -->
+    <delete id="deleteProductCatalogAttr" parameterType="long" >
+        DELETE 	/* [productCtgrAttrDAOMap.xml] productCtgrAttr.deleteProductCtgrAttr */
+        /*+ INDEX(A PK_PD_STD_PRD_ATTR_COMP) */
+        FROM
+        PD_STD_PRD_ATTR_COMP A
+        WHERE PRD_NO = #{prdNo}
+    </delete>
+
+
+
+
+
+
+
+</mapper>

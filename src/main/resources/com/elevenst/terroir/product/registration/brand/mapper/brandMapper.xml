@@ -1,0 +1,75 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.brand.mapper.BrandMapper">
+    <select id="getBrandList" parameterType="HashMap" resultType="BrandVO">
+        SELECT /* catalog.getPrdBrandCatalogList (catalogDAOMap.xml) */
+		  b.BRAND_CD as brandCd,
+			   b.BRAND_NM brandNm,
+			   NVL(b.brdCd , 'N') AS brdCd,
+			   b.totalCount as totalCount
+		FROM (SELECT a.BRAND_CD,
+					   a.BRAND_NM,
+					   (SELECT brand_cd
+						  FROM dp_brand_list dbl,
+							   dp_disp_ctgr ddc
+						 WHERE dbl.add_disp_ctgr_no = ddc.disp_ctgr_no
+						   AND dbl.brand_cd = a.BRAND_CD
+						   AND ddc.disp_ctgr_stat_cd = '03') AS brdCd,
+					   a.TOTAL_COUNT AS totalCount,
+					   a.RNUM
+				FROM (SELECT BRAND_CD,
+							   BRAND_NM,
+							   ROWNUM AS RNUM,
+							   COUNT(*) OVER() AS TOTAL_COUNT
+					  FROM (SELECT /*+ LEADING(A C) USE_NL(C) INDEX(A IX2_PD_BRAND_MNG_DIC) */
+								  BRAND_CD,
+									   BRAND_NM
+						     FROM PD_BRAND_MNG_DIC A,
+									   PD_PRD_ATTR_VALUE_CD C
+							WHERE A.BRAND_CD = C.PRD_ATTR_VALUE_CD
+								AND A.USE_YN = 'Y'
+                            	AND C.CM_CD_YN = 'Y'
+                            	AND C.USE_YN = 'Y'
+                               <choose>
+                                   <when test='incheck == "Y"'>
+                                       AND UPPER(A.BRAND_NM) = REPLACE(UPPER(#{brandName}),' ','')
+                                   </when>
+                                   <otherwise>
+                                       AND UPPER(A.BRAND_NM) like  REPLACE(UPPER(#{brandName}),' ','')||'%'
+                                   </otherwise>
+                               </choose>
+
+
+								 UNION
+							SELECT /*+ LEADING(SYN A C) USE_NL(A C) INDEX(A PK_PD_BRAND_MNG_DIC) */
+								  BRAND_CD,
+								  BRAND_NM
+	    					FROM PD_BRAND_MNG_DIC A,
+								  PD_PRD_ATTR_VALUE_CD C
+							WHERE A.BRAND_CD = C.PRD_ATTR_VALUE_CD
+								AND A.USE_YN = 'Y'
+                            	AND C.CM_CD_YN = 'Y'
+                            	AND C.USE_YN = 'Y'
+	  						    AND BRAND_CD IN (SELECT /*+ INDEX(SYN IX2_PD_PRD_ATTR_VAL_SYN) */PRD_ATTR_VALUE_CD
+										  		 FROM PD_PRD_ATTR_VAL_SYN SYN
+                                                <choose>
+                                                    <when test='incheck == "Y"'>
+                                                        WHERE UPPER(SYN_NM) = REPLACE(UPPER(#{brandName}),' ','')
+                                                    </when>
+                                                    <otherwise>
+                                                        WHERE UPPER(SYN_NM) like REPLACE(UPPER(#{brandName}),' ','')||'%'
+                                                    </otherwise>
+                                                </choose>
+
+												)
+						    )
+				) A <![CDATA[
+				WHERE ROWNUM <= #{limit} ]]>
+				) B <![CDATA[
+		WHERE #{start} <= B.RNUM
+		   AND B.RNUM < #{limit} ]]>
+    </select>
+
+
+</mapper>

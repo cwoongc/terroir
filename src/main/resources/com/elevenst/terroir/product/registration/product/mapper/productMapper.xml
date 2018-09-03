@@ -1,0 +1,3282 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.product.mapper.ProductMapper">
+
+
+
+    <!-- 상품  번호를 구한다.  -->
+    <select id="getProductNo" resultType="long">
+        SELECT /* productMapper.getProductNo */  SEQ_PD_PRD.NEXTVAL FROM DUAL
+    </select>
+
+    <!--  상품   정보 PD_PRD 를  조회한다 -->
+    <select id="getProduct" resultMap="com.elevenst.terroir.product.registration.common.mapper.VoMapper.productVOMap" parameterType="java.lang.Long">
+        SELECT /* productMapper.getProduct */
+        prd_no                 AS prdNo,
+        nvl(shop_no,0)         AS shopNo,
+        mstr_prd_no            AS mstrPrdNo,
+        sel_mnbd_no            AS selMnbdNo,
+        sel_mnbd_nck_nm_seq    AS selMnbdNckNmSeq,
+        prd_auto_prcs_no       AS prdAutoPrcsNo,
+        prd_nm                 AS prdNm,
+        advrt_stmt             AS advrtStmt,
+        orgn_nm                AS orgnNm,
+        to_char(sel_bgn_dy,'rrrrmmddhh24miss')             AS selBgnDy,
+        to_char(sel_end_dy,'rrrrmmddhh24miss')             AS selEndDy,
+        to_char(eftv_dy,'rrrrmmddhh24miss')            	  AS useBgnDy,
+        to_char(EFTV_END_DY,'rrrrmmddhh24miss')            AS useEndDy,
+        use_mon		          AS useMon,
+        TOWN_LMT_CLF_CD        AS townLmtClfCd,
+        sel_mnbd_clf_cd        AS selMnbdClfCd,
+        sel_mthd_cd            AS selMthdCd,
+        prd_comp_typ_cd        AS prdCompTypCd,
+        sel_stat_cd            AS selStatCd,
+        dlv_cn_area_cd         AS dlvCnAreaCd,
+        dlv_wy_cd              AS dlvWyCd,
+        dlv_cst_pay_typ_cd     AS dlvCstPayTypCd,
+        dlv_cst                AS dlvCst,
+        nvl(prd_fr_dlv_basi_amt,0)   AS prdFrDlvBasiAmt,
+        rtngd_dlv_cst          AS rtngdDlvCst,
+        exch_dlv_cst           AS exchDlvCst,
+        bndl_dlv_cn_yn         AS bndlDlvCnYn,
+        today_dlv_cn_yn        AS todayDlvCnYn,
+        appmt_dy_dlv_cn_yn     AS appmtDyDlvCnYn,
+        snd_pln_trm            AS sndPlnTrm,
+        rcpt_isu_cn_yn         AS rcptIsuCnYn,
+        prd_typ_cd             AS prdTypCd,
+        minor_sel_cn_yn        AS minorSelCnYn,
+        aprv_ness_yn           AS aprvNessYn,
+        to_char(mnfc_dy,'rrrrmmdd')                AS mnfcDy,
+        to_char(eftv_dy,'rrrrmmdd')                AS eftvDy,
+        to_char(mnfc_dy,'rrrr/mm/dd')                AS theaterMnfcDy,
+        to_char(eftv_dy,'rrrr/mm/dd')                AS theaterEftvDy,
+        prd_stat_cd            AS prdStatCd,
+        supl_dtyfr_prd_clf_cd  AS suplDtyfrPrdClfCd,
+        seller_prd_cd          AS sellerPrdCd,
+        create_dt              AS createDt,
+        create_no              AS createNo,
+        update_dt              AS updateDt,
+        update_no              AS updateNo,
+        dlv_cst_inst_basi_cd   AS dlvCstInstBasiCd,
+        orgn_typ_cd            AS orgnTypCd,
+        un_dlv_cn_yn           AS unDlvCnYn,
+        sel_prd_clf_cd		  AS selPrdClfCd,
+        bagrn_sel_prd_yn       AS bagrnSelPrdYn,
+        wirelss_prd_dtl_desc   AS wirelssPrdDtlDesc,
+        prc_cmp_exp_yn         AS prcCmpExpYn,
+        nvl(abrd_brand_yn,'N') AS abrdBrandYn,
+        abrd_buy_place		  AS abrdBuyPlace,
+        nvl(display_Yn,'Y')	  AS displayYn,
+        nvl(china_sale_yn,'N') AS chinaSaleYn,
+        nvl(china_sel_prc,0)   AS chinaSelPrc,
+        nvl(low_prc_comp_ex_yn,'N') AS lowPrcCompExYn, 	<!-- e-최저가보상 제외 여부: Y(제외) -->
+        nvl(ctgr_pnt_pre_ex_yn,'N') AS ctgrPntPreExYn 		<!-- 포인트선할인 제외 여부: Y(제외) -->
+        ,nvl(sel_limit_term,0) as selLimitTerm
+        ,nvl(sel_limit_qty,0) as selLimitQty
+        ,nvl(sel_limit_typ_cd,'00') as selLimitTypCd
+        ,nvl(sel_min_limit_qty,0) as selMinLimitQty
+        ,nvl(sel_min_limit_typ_cd,'00') as selMinLimitTypCd
+        ,orgn_typ_dtls_cd    as orgnTypDtlsCd
+        ,ORGN_DIFFERENT_YN   as orgnDifferentYn
+        ,CUPN_EX_CD          as cupnExCd
+        ,nvl(disp_ctgr_no_de,0)  as dispCtgrNo
+        ,nvl(disp_ctgr1_no_de,0) as rootCtgrNo
+        ,nvl(disp_ctgr2_no_de,0) as mdispCtgrNo
+        ,dlv_cst_info_cd     as dlvCstInfoCd
+        ,nvl(mobile_1won_yn, 'N') as mobile1wonYn
+        ,bckt_ex_yn          as bcktExYn <!-- 장바구니 제외 여부 -->
+        ,review_disp_yn      as reviewDispYn
+        ,ORDER_CMLT_OUT_LINK      as orderCmltOutLink
+        ,ORD_CN_STEP_CD           as ordCnStepCd
+        ,STD_PRD_YN               as stdPrdYn
+        ,STD_PRD_NM               as stdPrdNm
+        ,MKT_PRD_NM               as mktPrdNm
+        ,(case
+          when DISP_CTGR_NO_DE is not null AND DISP_CTGR_NO_DE > 0
+            then nvl((SELECT SEL_PRC FROM pd_prd_prc WHERE prd_no = #{prdNo} AND use_yn = 'Y' AND rownum=1),0)
+            else nvl((SELECT SEL_PRC FROM pd_add_prd_comp WHERE COMP_PRD_NO = #{prdNo} AND use_yn = 'Y' AND rownum=1),0)
+          end) as selPrc
+        ,abrd_sizetable_disp_yn as abrdSizetableDispYn
+        ,nvl((select 'Y' from pd_prd_gift g where g.prd_no = a.prd_no),'N') as useGiftYn
+        ,visit_dlv_yn as visitDlvYn
+        ,bsn_deal_clf as bsnDealClf
+        ,dlv_clf as dlvClf
+        ,nvl(abrd_cn_dlv_cst, 0) abrdCnDlvCst
+        ,nvl(abrd_in_cd, '') abrdInCd
+        ,nvl(prd_wght, 0) prdWght
+        ,nvl(review_opt_disp_yn, 'Y') reviewOptDispYn
+        ,nvl(jeju_dlv_cst, 0) as jejuDlvCst
+        ,nvl(island_dlv_cst, 0) as islandDlvCst
+        ,nvl(hide_yn, 'N') as hideyn
+        ,book_add_cd as bookAddCd
+        ,fr_prd_nm as frPrdNm
+        ,minor_sel_cn_bo_yn as minorSelCnBoYn
+        ,rmaterial_typ_cd as rmaterialTypCd
+        ,nvl(for_abrd_buy_clf,'01') as forAbrdBuyClf
+        ,nvl((select CSTM_APL_PRC from pd_prd_prc where prd_no = #{prdNo}), 0) as cstmAplPrc
+        ,nvl((select makt_prc from pd_prd_prc where prd_no = #{prdNo}), 0) as maktPrc
+        ,nvl(use_mon,0) as useMon
+        ,(select count(1) from pd_event_prc_aprv
+        where prd_no = #{prdNo}
+        and use_yn='Y'
+        and aprv_stat_cd='07'
+        and prd_add_stat_cd in ('02', '03')
+        and sysdate between (event_bgn_dt - 1/72) and (event_end_dt + 1/1440) /* 20분전부터 ~ end+1분 */
+        ) as pdEventCnt  <!-- 쇼킹딜 판매중 -->
+        ,(select count(1) from pd_event_prc_aprv
+        where prd_no = #{prdNo}
+        and aprv_stat_cd='07'
+        and prd_add_stat_cd = '01'
+        and use_yn='Y'
+        ) as evtConfirmCnt  <!-- 쇼킹딜 확정완료 상태 -->
+        , HS_CODE hsCode
+        ,disp_ctgr1_no_de as dispCtgr1NoDe
+        ,disp_ctgr2_no_de as dispCtgr2NoDe
+        ,disp_ctgr3_no_de as dispCtgr3NoDe
+        ,disp_ctgr4_no_de as dispCtgr4NoDe
+        , (select disp_ctgr_nm from dp_disp_ctgr where disp_ctgr_no = a.disp_ctgr_no_de) AS dispCtgrNm
+        , (select disp_ctgr_nm from dp_disp_ctgr where disp_ctgr_no = a.disp_ctgr1_no_de) AS dispCtgr1Nm
+        , (select disp_ctgr_nm from dp_disp_ctgr where disp_ctgr_no = a.disp_ctgr2_no_de) AS dispCtgr2Nm
+        , (select disp_ctgr_nm from dp_disp_ctgr where disp_ctgr_no = a.disp_ctgr3_no_de) AS dispCtgr3Nm
+        , (select disp_ctgr_nm from dp_disp_ctgr where disp_ctgr_no = a.disp_ctgr4_no_de) AS dispCtgr4Nm
+        ,om_prd_yn as omPrdYn
+        ,svc_area_cd as svcAreaCd
+        ,rtngd_dlv_cd rtngdDlvCd
+        ,nvl((select CERT_DOWN_YN from PD_PRD_SVC_AREA  where prd_no = a.prd_no and prd_typ_cd in ('19', '20')),'N') as certDownYn
+        ,nvl((select ALL_BRANCH_USE_YN from PD_PRD_SVC_AREA  where prd_no = a.prd_no and prd_typ_cd in ('19', '20', '35')),'N') as allBranchUseYN
+        , CASE WHEN A.SEL_LIMIT_TYP_CD = '02'
+        THEN CASE WHEN A.prd_typ_cd in ('19', '20')
+        THEN nvl((select TOWN_SEL_LMT_DY from PD_PRD_SVC_AREA  where prd_no = a.prd_no and prd_typ_cd in ('19', '20')), 0)
+        ELSE NVL(SEL_LIMIT_TERM, 30) END
+        ELSE 0 END AS townSelLmtDy
+        ,nvl((select CERT_TYPE from PD_PRD_SVC_AREA  where prd_no = a.prd_no and prd_typ_cd in ('19', '20')),'0') as certTypCd
+        ,nvl(template_yn, 'N') as templateYn
+        ,nvl(a.GBL_DLV_YN,'N') as  gblDlvYn
+        ,nt_no as ntNo
+        ,(SELECT gbl_hs_code_no FROM  wm_gbl_hs_code WHERE gbl_hs_code_no = a.gbl_hs_code_no) as gblHsCodeNo
+        ,case when nvl(a.gbl_hs_code_no,0) >0 then (SELECT gbl_hs_code FROM  wm_gbl_hs_code WHERE gbl_hs_code_no = a.gbl_hs_code_no)
+        else '' end as gblHsCode
+        ,a.GBL_DLV_YN AS gblDlvYn
+        ,'' AS gblDlvYnReason
+        ,prd_nm_eng AS prdNmEng
+        ,nvl(eng_disp_yn, 'Y') AS engDispYn
+        ,nvl(info_type_ctgr_no, 0) AS infoTypeCtgrNo
+        ,nvl((select gnrl_stck_qty from dp_gnrl_disp where prd_no= a.prd_no and rownum=1), 0) AS prdStckQty
+        ,lp_cupn_ex_yn AS lpCupnExYn
+        ,partner_cupn_ex_yn AS partnerCupnExYn
+        ,issue_cupn_expt_cd as issueCupnExptCd
+        , (select offer_disp_lmt_yn from dp_disp_ctgr where disp_ctgr_no = a.disp_ctgr_no_de) AS offerDispLmtYn
+        , nvl((select model_no from pd_prd_model where prd_no = a.prd_no and mnbd_clf_cd = '02'),0)as modelNo
+        , NVL((select mobile_yn from dp_disp_ctgr where disp_ctgr_no = a.disp_ctgr_no_de), 'N') AS mobileYn
+        , (select prd_typ_cd from dp_disp_ctgr where disp_ctgr_no = a.disp_ctgr_no_de) AS dispCtgrPrdTypCd
+        , opt_typ_cd AS optTypCd
+        , rfnd_typ_cd AS rfndTypCd
+        , (select book_clf_cd from dp_disp_ctgr where disp_ctgr_no = a.DISP_CTGR2_NO_DE) AS bookClfCd
+        , set_typ_cd AS setTypCd
+        , (CASE WHEN BSN_DEAL_CLF = '01'
+            THEN TO_CHAR(CREATE_DT,'YYYYMMDD')
+            ELSE NVL((
+                    SELECT TO_CHAR(MIN(CREATE_DT),'YYYYMMDD')
+                    FROM PD_PRD_STAT_HIST
+                    WHERE PRD_STAT_CD != '101'
+                    AND PRD_NO = A.PRD_NO)
+                ,TO_CHAR(CREATE_DT,'YYYYMMDD'))
+        END) AS stdBaseDt
+        ,(
+            SELECT
+                MAX(PRD_ATTR_VALUE_NM)
+            FROM PD_PRD_ATTR_COMP
+            WHERE
+                OBJ_PRD_NO = A.PRD_NO
+            AND PRD_ATTR_CD = '11821'
+            AND OBJ_CLF_CD = '01'
+        ) AS brandNm
+        ,(
+            SELECT
+                MODEL_NM
+            FROM
+                PD_PRD_MODEL
+            WHERE
+                PRD_NO = #{prdNo}
+            AND MNBD_CLF_CD = '06'
+        ) AS modelNm
+        FROM   pd_prd a
+        WHERE  prd_no = #{prdNo}
+    </select>
+
+
+    <!--  상품   정보 PD_PRD 를  입력한다 -->
+    <insert id="insertPdPrd" parameterType="PdPrd">
+        INSERT /* productMapper.insertPdPrd */ INTO PD_PRD (
+            PRD_NO
+            ,MSTR_PRD_NO
+            ,SEL_MNBD_NO
+            ,SEL_MNBD_NCK_NM_SEQ
+            ,PRD_AUTO_PRCS_NO
+            ,PRD_NM
+            ,ADVRT_STMT
+            ,ORGN_TYP_CD
+            ,ORGN_NM
+            ,SEL_PRD_CLF_CD
+            ,SEL_BGN_DY
+            ,SEL_END_DY
+            ,SEL_MNBD_CLF_CD
+            ,SEL_MTHD_CD
+            ,PRD_COMP_TYP_CD
+            ,SEL_STAT_CD
+            ,DLV_CN_AREA_CD
+            ,DLV_WY_CD
+            ,DLV_CST_INST_BASI_CD
+            ,DLV_CST
+            ,DLV_CST_PAY_TYP_CD
+            ,RTNGD_DLV_CST
+            ,EXCH_DLV_CST
+            ,BNDL_DLV_CN_YN
+            ,TODAY_DLV_CN_YN
+            ,APPMT_DY_DLV_CN_YN
+            ,SND_PLN_TRM
+            ,RCPT_ISU_CN_YN
+            ,PRD_TYP_CD
+            ,MINOR_SEL_CN_YN
+            ,APRV_NESS_YN
+            ,MNFC_DY
+            ,EFTV_DY
+            ,PRD_STAT_CD
+            ,SUPL_DTYFR_PRD_CLF_CD
+            ,SELLER_PRD_CD
+            ,UN_DLV_CN_YN
+            ,WIRELSS_PRD_NM
+            ,WIRELSS_PRD_DTL_DESC
+            ,BAGRN_SEL_PRD_YN
+            ,CREATE_DT
+            ,CREATE_NO
+            ,UPDATE_DT
+            ,UPDATE_NO
+            ,CREATE_IP
+            ,UPDATE_IP
+            ,SELLER_PC_ID
+            ,PRC_CMP_EXP_YN
+            ,TOT_SEL_QTY
+            ,ABRD_BRAND_YN
+            ,ABRD_BUY_PLACE
+            ,DISP_CTGR_NO_DE
+            ,DISP_CTGR1_NO_DE
+            ,DISP_CTGR2_NO_DE
+            ,DISP_CTGR3_NO_DE
+            ,DISP_CTGR4_NO_DE
+            ,DISPLAY_YN
+            ,CREATE_CD
+            ,CHINA_SALE_YN
+            ,CHINA_SEL_PRC
+            ,SEL_LIMIT_TYP_CD
+            ,SEL_LIMIT_QTY
+            ,LOW_PRC_COMP_EX_YN
+            ,CTGR_PNT_PRE_EX_YN
+            ,MSTR_PRD_MATCH_CLF_CD
+            ,ORGN_TYP_DTLS_CD
+            ,ORGN_DIFFERENT_YN
+            ,ORDER_CMLT_OUT_LINK
+            ,CUPN_EX_CD
+            ,MYPAGE_OUT_LINK
+            ,DLV_CST_INFO_CD
+            ,SELLER_AGENCY_CD
+            ,MOBILE_1WON_YN
+            ,BCKT_EX_YN
+            ,PRD_FR_DLV_BASI_AMT
+            ,REVIEW_DISP_YN
+            ,ORD_CN_STEP_CD
+            ,SEL_MIN_LIMIT_TYP_CD
+            ,SEL_MIN_LIMIT_QTY
+            ,ABRD_SIZETABLE_DISP_YN
+            ,VISIT_DLV_YN
+            ,BSN_DEAL_CLF
+            ,DLV_CLF
+            ,ABRD_CN_DLV_CST
+            ,ABRD_IN_CD
+            ,PRD_WGHT
+            ,JEJU_DLV_CST
+            ,ISLAND_DLV_CST
+            ,REVIEW_OPT_DISP_YN
+            ,HIDE_YN
+            ,BOOK_ADD_CD
+            ,FR_PRD_NM
+            ,MINOR_SEL_CN_BO_YN
+            ,FOR_ABRD_BUY_CLF
+            ,RMATERIAL_TYP_CD
+            ,USE_MON
+            ,HS_CODE
+            ,OM_PRD_YN
+            ,SVC_AREA_CD
+            ,RTNGD_DLV_CD
+            ,TEMPLATE_YN
+            ,EFTV_END_DY
+            ,TOWN_LMT_CLF_CD
+            ,SHOP_NO
+            ,GBL_DLV_YN
+            ,GBL_HS_CODE_NO
+            ,NT_NO
+            ,PRD_NM_ENG
+            ,ENG_DISP_YN
+            ,INFO_TYPE_CTGR_NO
+            ,PARTNER_CUPN_EX_YN
+            ,LP_CUPN_EX_YN
+            ,OPT_TYP_CD
+            ,RFND_TYP_CD
+            ,SEL_LIMIT_TERM
+            ,SET_TYP_CD
+            ,ISSUE_CUPN_EXPT_CD
+            ,STD_PRD_NM
+            ,MKT_PRD_NM
+            ,STD_PRD_YN
+            ,STD_OPT_GRP_NO
+        ) VALUES (
+            #{prdNo}
+            ,0
+            ,#{selMnbdNo}
+            ,#{selMnbdNckNmSeq}
+            ,#{prdAutoPrcsNo}
+            ,#{prdNm}
+            ,#{advrtStmt}
+            ,#{orgnTypCd}
+            ,#{orgnNm}
+            ,#{selPrdClfCd}
+            ,TO_DATE(#{selBgnDy},'YYYYMMDDHH24MISS')
+            ,TO_DATE(#{selEndDy},'YYYYMMDDHH24MISS')
+            ,#{selMnbdClfCd}
+            ,#{selMthdCd}
+            ,#{prdCompTypCd}
+            ,#{selStatCd}
+            ,NVL(#{dlvCnAreaCd},'01')
+            ,NVL(#{dlvWyCd},'05')
+            ,NVL(#{dlvCstInstBasiCd},'01')
+            ,NVL(#{dlvCst},0)
+            ,#{dlvCstPayTypCd}
+            ,NVL(#{rtngdDlvCst},0)
+            ,NVL(#{exchDlvCst},0)
+            ,NVL(#{bndlDlvCnYn},'N')
+            ,NVL(#{todayDlvCnYn},'N')
+            ,NVL(#{appmtDyDlvCnYn},'N')
+            ,NVL(#{sndPlnTrm},4)
+            ,#{rcptIsuCnYn}
+            ,#{prdTypCd}
+            ,#{minorSelCnYn}
+            ,#{aprvNessYn}
+            ,TO_DATE(#{mnfcDy},'YYYYMMDDHH24MISS')
+            ,TO_DATE(#{eftvDy},'YYYYMMDDHH24MISS')
+            ,#{prdStatCd}
+            ,#{suplDtyfrPrdClfCd}
+            ,#{sellerPrdCd}
+            ,#{unDlvCnYn}
+            ,#{wirelssPrdNm}
+            ,#{wirelssPrdDtlDesc}
+            ,#{bagrnSelPrdYn}
+            ,SYSDATE
+            ,#{createNo}
+            ,SYSDATE
+            ,#{updateNo}
+            ,#{createIp}
+            ,#{updateIp}
+            ,#{sellerPcId}
+            ,#{prcCmpExpYn}
+            ,#{totSelQty}
+            ,#{abrdBrandYn}
+            ,#{abrdBuyPlace}
+            ,#{dispCtgrNoDe}
+            ,FN_PD_SELL_GET_DISP_CTGR('01', '1', #{dispCtgrNoDe})
+            ,FN_PD_SELL_GET_DISP_CTGR('01', '2', #{dispCtgrNoDe})
+            ,FN_PD_SELL_GET_DISP_CTGR('01', '3', #{dispCtgrNoDe})
+            ,NVL(FN_PD_SELL_GET_DISP_CTGR('01', '4', #{dispCtgrNoDe}), 0)
+            ,#{displayYn}
+            ,#{createCd}
+            ,#{chinaSaleYn}
+            ,#{chinaSelPrc}
+            ,#{selLimitTypCd}
+            ,#{selLimitQty}
+            ,#{lowPrcCompExYn}
+            ,#{ctgrPntPreExYn}
+            ,#{mstrPrdMatchClfCd}
+            ,#{orgnTypDtlsCd}
+            ,#{orgnDifferentYn}
+            ,#{orderCmltOutLink}
+            ,#{cupnExCd}
+            ,#{mypageOutLink}
+            ,#{dlvCstInfoCd}
+            ,#{sellerAgencyCd}
+            ,#{mobile1wonYn}
+            ,#{bcktExYn}
+            ,#{prdFrDlvBasiAmt}
+            ,#{reviewDispYn}
+            ,#{ordCnStepCd}
+            ,#{selMinLimitTypCd}
+            ,#{selMinLimitQty}
+            ,#{abrdSizetableDispYn}
+            ,#{visitDlvYn}
+            ,#{bsnDealClf}
+            ,#{dlvClf}
+            ,#{abrdCnDlvCst}
+            ,#{abrdInCd}
+            ,#{prdWght}
+            ,#{jejuDlvCst}
+            ,#{islandDlvCst}
+            ,#{reviewOptDispYn}
+            ,NVL(#{hideYn},null)
+            ,#{bookAddCd}
+            ,#{fdPrdNm}
+            ,#{minorSelCnBoYn}
+            ,#{forAbrdBuyClf}
+            ,#{rmaterialTypCd}
+            ,#{useMon}
+            ,#{hsCode}
+            ,#{omPrdYn}
+            ,#{svcAreaCd}
+            ,#{rtngdDlvCd}
+            ,#{templateYn}
+            ,TO_DATE(#{eftvEndDy},'YYYYMMDDHH24MISS')
+            ,#{townLmtClfCd}
+            ,#{shopNo}
+            ,#{gblDlvYn}
+            ,#{gblHsCodeNo}
+            ,#{ntNo}
+            ,#{prdNmEng}
+            ,#{engDispYn}
+            ,NVL(#{infoTypeCtgrNo},0)
+            ,#{partnerCupnExYn}
+            ,#{lpCupnExYn}
+            ,#{optTypCd}
+            ,#{rfndTypCd}
+            ,#{selLimitTerm}
+            ,#{setTypCd}
+            ,#{issueCupnExptCd}
+            ,#{stdPrdNm}
+            ,#{mktPrdNm}
+            ,NVL(#{stdPrdYn},'N')
+            ,#{stdOptGrpNo}
+        )
+    </insert>
+
+    <update id="insertPdPrdHist" parameterType="PdPrd">
+        INSERT INTO PD_PRD_HIST
+        (
+            PRD_NO
+            ,HIST_APL_BGN_DT
+            ,MSTR_PRD_NO
+            ,SEL_MNBD_NO
+            ,SEL_MNBD_NCK_NM_SEQ
+            ,PRD_AUTO_PRCS_NO
+            ,PRD_NM
+            ,ADVRT_STMT
+            ,ORGN_TYP_CD
+            ,ORGN_NM
+            ,SEL_PRD_CLF_CD
+            ,SEL_BGN_DY
+            ,SEL_END_DY
+            ,SEL_MNBD_CLF_CD
+            ,SEL_MTHD_CD
+            ,PRD_COMP_TYP_CD
+            ,SEL_STAT_CD
+            ,DLV_CN_AREA_CD
+            ,DLV_WY_CD
+            ,DLV_CST_INST_BASI_CD
+            ,DLV_CST
+            ,DLV_CST_PAY_TYP_CD
+            ,RTNGD_DLV_CST
+            ,EXCH_DLV_CST
+            ,BNDL_DLV_CN_YN
+            ,TODAY_DLV_CN_YN
+            ,APPMT_DY_DLV_CN_YN
+            ,SND_PLN_TRM
+            ,RCPT_ISU_CN_YN
+            ,PRD_TYP_CD
+            ,MINOR_SEL_CN_YN
+            ,APRV_NESS_YN
+            ,MNFC_DY
+            ,EFTV_DY
+            ,PRD_STAT_CD
+            ,SUPL_DTYFR_PRD_CLF_CD
+            ,SELLER_PRD_CD
+            ,UN_DLV_CN_YN
+            ,WIRELSS_PRD_NM
+            ,WIRELSS_PRD_DTL_DESC
+            ,BAGRN_SEL_PRD_YN
+            ,CREATE_DT
+            ,CREATE_NO
+            ,UPDATE_DT
+            ,UPDATE_NO
+            ,CREATE_IP
+            ,UPDATE_IP
+            ,DISP_CTGR_NO_DE
+            ,DISPLAY_YN
+            ,CHINA_SALE_YN
+            ,CHINA_SEL_PRC
+            ,LOW_PRC_COMP_EX_YN
+            ,CTGR_PNT_PRE_EX_YN
+            ,SEL_LIMIT_QTY
+            ,SEL_LIMIT_TYP_CD
+            ,MSTR_PRD_MATCH_CLF_CD
+            ,PRC_CMP_EXP_YN
+            ,ORGN_TYP_DTLS_CD
+            ,ORGN_DIFFERENT_YN
+            ,CUPN_EX_CD
+            ,SELLER_AGENCY_CD
+            ,MOBILE_1WON_YN
+            ,BCKT_EX_YN
+            ,PRD_FR_DLV_BASI_AMT
+            ,ORD_CN_STEP_CD
+            ,SEL_MIN_LIMIT_TYP_CD
+            ,SEL_MIN_LIMIT_QTY
+            ,ABRD_SIZETABLE_DISP_YN
+            ,VISIT_DLV_YN
+            ,BSN_DEAL_CLF
+            ,DLV_CLF
+            ,ABRD_CN_DLV_CST
+            ,ABRD_IN_CD
+            ,PRD_WGHT
+            ,JEJU_DLV_CST
+            ,ISLAND_DLV_CST
+            ,HIDE_YN
+            ,FR_PRD_NM
+            ,FOR_ABRD_BUY_CLF
+            ,RMATERIAL_TYP_CD
+            ,HS_CODE
+            ,OM_PRD_YN
+            ,SVC_AREA_CD
+            ,RTNGD_DLV_CD
+            ,GBL_DLV_YN
+            ,GBL_HS_CODE_NO
+            ,NT_NO
+            ,PRD_NM_ENG
+            ,ENG_DISP_YN
+            ,INFO_TYPE_CTGR_NO
+            ,PARTNER_CUPN_EX_YN
+            ,LP_CUPN_EX_YN
+            ,OPT_TYP_CD
+            ,RFND_TYP_CD
+            ,SEL_LIMIT_TERM
+            ,SET_TYP_CD
+            ,ISSUE_CUPN_EXPT_CD
+            ,STD_PRD_NM
+            ,MKT_PRD_NM
+            ,STD_PRD_YN
+            ,STD_OPT_GRP_NO
+        )
+        SELECT
+            PRD_NO
+            ,NVL(TO_DATE(#{histAplBgnDt},'YYYYMMDDHH24MISS'), SYSDATE) AS HIST_APL_BGN_DT
+            ,MSTR_PRD_NO
+            ,SEL_MNBD_NO
+            ,SEL_MNBD_NCK_NM_SEQ
+            ,PRD_AUTO_PRCS_NO
+            ,PRD_NM
+            ,ADVRT_STMT
+            ,ORGN_TYP_CD
+            ,ORGN_NM
+            ,SEL_PRD_CLF_CD
+            ,SEL_BGN_DY
+            ,SEL_END_DY
+            ,SEL_MNBD_CLF_CD
+            ,SEL_MTHD_CD
+            ,PRD_COMP_TYP_CD
+            ,SEL_STAT_CD
+            ,DLV_CN_AREA_CD
+            ,DLV_WY_CD
+            ,DLV_CST_INST_BASI_CD
+            ,DLV_CST
+            ,DLV_CST_PAY_TYP_CD
+            ,RTNGD_DLV_CST
+            ,EXCH_DLV_CST
+            ,BNDL_DLV_CN_YN
+            ,TODAY_DLV_CN_YN
+            ,APPMT_DY_DLV_CN_YN
+            ,SND_PLN_TRM
+            ,RCPT_ISU_CN_YN
+            ,PRD_TYP_CD
+            ,MINOR_SEL_CN_YN
+            ,APRV_NESS_YN
+            ,MNFC_DY
+            ,EFTV_DY
+            ,PRD_STAT_CD
+            ,SUPL_DTYFR_PRD_CLF_CD
+            ,SELLER_PRD_CD
+            ,UN_DLV_CN_YN
+            ,WIRELSS_PRD_NM
+            ,WIRELSS_PRD_DTL_DESC
+            ,BAGRN_SEL_PRD_YN
+            ,CREATE_DT
+            ,203 AS CREATE_NO
+            ,UPDATE_DT
+            ,UPDATE_NO
+            ,CREATE_IP
+            ,UPDATE_IP
+            ,DISP_CTGR_NO_DE
+            ,DISPLAY_YN
+            ,CHINA_SALE_YN
+            ,CHINA_SEL_PRC
+            ,LOW_PRC_COMP_EX_YN
+            ,CTGR_PNT_PRE_EX_YN
+            ,SEL_LIMIT_QTY
+            ,SEL_LIMIT_TYP_CD
+            ,MSTR_PRD_MATCH_CLF_CD
+            ,PRC_CMP_EXP_YN
+            ,ORGN_TYP_DTLS_CD
+            ,ORGN_DIFFERENT_YN
+            ,CUPN_EX_CD
+            ,SELLER_AGENCY_CD
+            ,MOBILE_1WON_YN
+            ,BCKT_EX_YN
+            ,PRD_FR_DLV_BASI_AMT
+            ,ORD_CN_STEP_CD
+            ,SEL_MIN_LIMIT_TYP_CD
+            ,SEL_MIN_LIMIT_QTY
+            ,ABRD_SIZETABLE_DISP_YN
+            ,VISIT_DLV_YN
+            ,BSN_DEAL_CLF
+            ,DLV_CLF
+            ,ABRD_CN_DLV_CST
+            ,ABRD_IN_CD
+            ,PRD_WGHT
+            ,JEJU_DLV_CST
+            ,ISLAND_DLV_CST
+            ,NVL(HIDE_YN, 'N') AS HIDE_YN
+            ,FR_PRD_NM
+            ,FOR_ABRD_BUY_CLF
+            ,RMATERIAL_TYP_CD
+            ,HS_CODE
+            ,OM_PRD_YN
+            ,SVC_AREA_CD
+            ,RTNGD_DLV_CD
+            ,GBL_DLV_YN
+            ,GBL_HS_CODE_NO
+            ,NT_NO
+            ,PRD_NM_ENG
+            ,ENG_DISP_YN
+            ,NVL(INFO_TYPE_CTGR_NO, 0) AS INFO_TYPE_CTGR_NO
+            ,PARTNER_CUPN_EX_YN
+            ,LP_CUPN_EX_YN
+            ,OPT_TYP_CD
+            ,RFND_TYP_CD
+            ,SEL_LIMIT_TERM
+            ,SET_TYP_CD
+            ,ISSUE_CUPN_EXPT_CD
+            ,STD_PRD_NM
+            ,MKT_PRD_NM
+            ,STD_PRD_YN
+            ,STD_OPT_GRP_NO
+        FROM PD_PRD
+        WHERE PRD_NO = #{prdNo}
+    </update>
+
+    <select id="getOnlySearchPdPrd" resultType="ProductVO" parameterType="long">
+        SELECT /* productMapper.getOnlySearchPdPrd */
+        SET_TYP_CD AS setTypCd
+        , NVL(DLV_CLF, '02') AS dlvClf
+        FROM
+        PD_PRD
+        WHERE
+        PRD_NO = #{prdNo}
+    </select>
+
+    <!-- 상품의 UPDATE_DT를 SYSDATE로  수정한다. 독립적으로 운영되는 상품에 대한 정보 수정시 사용(검색에서 필요시)  -->
+    <update id="updateProductUpdateDt" parameterType="ProductVO">
+        UPDATE  /* productMapper.updateProductUpdateDt */ pd_prd
+        SET    update_dt = to_date(#{updateDt},'rrrrmmddhh24miss'),
+        update_no = #{updateNo}
+        WHERE  prd_no = #{prdNo}
+    </update>
+
+    <insert id="insertPdPrdStatHist" parameterType="PdPrdStatHist">
+        INSERT /* productMapper.insertPdPrdStatHist */ INTO PD_PRD_STAT_HIST (
+            PRD_NO
+            ,APL_BGN_DT
+            ,PRD_STAT_CD
+            ,STAT_CHG_RSN
+            ,SEL_MTHD_CD
+            ,CREATE_DT
+            ,CREATE_NO
+            ,UPDATE_DT
+            ,UPDATE_NO
+        ) VALUES (
+            #{prdNo}
+            ,TO_DATE(#{aplBgnDt},'YYYYMMDDHH24MISS')
+            ,#{prdStatCd}
+            ,#{statChgRsn}
+            ,#{selMthdCd}
+            ,SYSDATE
+            ,#{createNo}
+            ,SYSDATE
+            ,#{updateNo}
+        )
+    </insert>
+
+    <!-- 상품상태만 업데이트 -->
+    <update id="updateProductStatus" parameterType="ProductVO">
+        UPDATE  /* productMapper.updateProductStatus */
+        PD_PRD
+        SET sel_stat_cd = #{selStatCd}, update_dt = sysdate, update_no = #{updateNo}
+        <if test="!selStatCd.equals('101') and !selStatCd.equals('201')">
+            , aprv_ness_yn = 'N'
+        </if>
+        <if test="hideYN != null and hideYN != ''">
+            ,hide_yn = #{hideYN}
+        </if>
+        <if test="displayYn != null and displayYn != ''">
+            ,display_Yn = #{displayYn}
+        </if>
+        WHERE prd_no = #{prdNo}
+    </update>
+
+    <!-- 추가상품상태만 업데이트 -->
+    <update id="updateAddProductStatus" parameterType="ProductVO">
+        UPDATE  /* productMapper.updateAddProductStatus */ pd_prd
+        SET sel_stat_cd = #{selStatCd}, update_dt = sysdate, update_no = #{updateNo}
+        <if test="!selStatCd.equals('101') and !selStatCd.equals('201')">
+            , aprv_ness_yn = 'N'
+        </if>
+        WHERE prd_no in ( SELECT COMP_PRD_NO FROM PD_ADD_PRD_COMP
+        WHERE MAIN_PRD_NO = #{prdNo}
+        AND PRD_COMP_TYP_CD = '02'
+        AND USE_YN != 'D' )
+    </update>
+
+    <select id="getProductList" resultType="ProductVO">
+        SELECT * FROM PD_PRD
+        WHERE ROWNUM BETWEEN 1 and 20
+    </select>
+
+    <update id="updateProduct" parameterType="PdPrd">
+        UPDATE  pd_prd
+        SET
+                PRD_NO                  = #{prdNo}
+              , SEL_MNBD_NCK_NM_SEQ     = #{selMnbdNckNmSeq}
+              , PRD_AUTO_PRCS_NO        = #{prdAutoPrcsNo}
+              , PRD_NM                  = #{prdNm}
+              , ADVRT_STMT              = #{advrtStmt}
+              , ORGN_NM                 = #{orgnNm}
+              , SEL_BGN_DY              = TO_DATE(#{selBgnDy},'rrrrmmddhh24miss')
+              , SEL_END_DY              = TO_DATE(#{selEndDy},'rrrrmmddhh24miss')
+              , PRD_COMP_TYP_CD         = #{prdCompTypCd}
+              , SEL_STAT_CD             = #{selStatCd}
+              , DLV_CN_AREA_CD          = NVL(#{dlvCnAreaCd},'01')
+              , DLV_WY_CD               = NVL(#{dlvWyCd},'05')
+              , DLV_CST_PAY_TYP_CD      = NVL(#{dlvCstPayTypCd},'01')
+              , DLV_CST                 = NVL(#{dlvCst},0)
+              , PRD_FR_DLV_BASI_AMT     = #{prdFrDlvBasiAmt}
+              , RTNGD_DLV_CST           = NVL(#{rtngdDlvCst},0)
+              , EXCH_DLV_CST            = NVL(#{exchDlvCst},0)
+              , BNDL_DLV_CN_YN          = NVL(#{bndlDlvCnYn},'N')
+              , TODAY_DLV_CN_YN         = NVL(#{todayDlvCnYn},'N')
+              , APPMT_DY_DLV_CN_YN      = NVL(#{appmtDyDlvCnYn},'N')
+              , SND_PLN_TRM             = NVL(#{sndPlnTrm},4)
+              , RCPT_ISU_CN_YN          = #{rcptIsuCnYn}
+              , PRD_TYP_CD              = #{prdTypCd}
+              , MINOR_SEL_CN_YN         = #{minorSelCnYn}
+        <if test="!(@org.apache.commons.lang.StringUtils@isEmpty(mnfcDy))">
+              , MNFC_DY                 = TO_DATE(#{mnfcDy})
+        </if>
+        <if test="!(@org.apache.commons.lang.StringUtils@isEmpty(eftvDy))">
+              , EFTV_DY                 = TO_DATE(#{eftvDy})
+        </if>
+        <!--<if test="!(@org.apache.commons.lang.StringUtils@isEmpty(useEndDy))">-->
+              <!--, EFTV_END_DY             = TO_DATE(#{useEndDy}, 'rrrrmmddhh24miss')-->
+        <!--</if>-->
+              , PRD_STAT_CD             = #{prdStatCd}
+              , SUPL_DTYFR_PRD_CLF_CD   = #{suplDtyfrPrdClfCd}
+              , SELLER_PRD_CD           = #{sellerPrdCd}
+              , UPDATE_DT               = SYSDATE
+              , UPDATE_NO               = #{updateNo}
+              , UPDATE_IP               = #{updateIp}
+              , DLV_CST_INST_BASI_CD    = NVL(#{dlvCstInstBasiCd},'01')
+              , ORGN_TYP_CD             = #{orgnTypCd}
+              , UN_DLV_CN_YN            = #{unDlvCnYn}
+              , SEL_PRD_CLF_CD          = #{selPrdClfCd}
+        <if test="!(@org.apache.commons.lang.StringUtils@isEmpty(wirelssPrdDtlDesc))">
+              , WIRELSS_PRD_DTL_DESC    = #{wirelssPrdDtlDesc}
+        </if>
+              , PRC_CMP_EXP_YN          = #{prcCmpExpYn}
+              , ABRD_BUY_PLACE          = #{abrdBuyPlace}
+              , DISPLAY_YN              = #{displayYn}
+              , CHINA_SALE_YN           = #{chinaSaleYn}
+              , CHINA_SEL_PRC           = #{chinaSelPrc}
+              , LOW_PRC_COMP_EX_YN      = #{lowPrcCompExYn}
+              , CTGR_PNT_PRE_EX_YN      = #{ctgrPntPreExYn}
+              , SEL_LIMIT_QTY           = #{selLimitQty}
+              , SEL_LIMIT_TYP_CD        = #{selLimitTypCd}
+              , MSTR_PRD_MATCH_CLF_CD   = #{mstrPrdMatchClfCd}
+              , REVIEW_DISP_YN          = #{reviewDispYn}
+              , ORDER_CMLT_OUT_LINK     = #{orderCmltOutLink}
+              , DISP_CTGR_NO_DE         = #{dispCtgrNoDe}
+              , DISP_CTGR1_NO_DE        = FN_PD_SELL_GET_DISP_CTGR('01', '1', #{dispCtgrNoDe})
+              , DISP_CTGR2_NO_DE        = FN_PD_SELL_GET_DISP_CTGR('01', '2', #{dispCtgrNoDe})
+              , DISP_CTGR3_NO_DE        = FN_PD_SELL_GET_DISP_CTGR('01', '3', #{dispCtgrNoDe})
+              , DISP_CTGR4_NO_DE        = NVL(FN_PD_SELL_GET_DISP_CTGR('01', '4', #{dispCtgrNoDe}), 0)
+              <!--<if test="selMthdCdChangeYn.equals('Y')">-->
+                  <!--, SEL_MTHD_CD             = #{selMthdCd}-->
+                  <!--, CUPN_EX_CD              = #{cupnExCd}-->
+                  <!--, PARTNER_CUPN_EX_YN      = #{partnerCupnExYn}-->
+                  <!--, LP_CUPN_EX_YN           = #{lpCupnExYn}-->
+              <!--</if>-->
+              , ORGN_TYP_DTLS_CD        = #{orgnTypDtlsCd}
+              , ORGN_DIFFERENT_YN       = #{orgnDifferentYn}
+              , DLV_CST_INFO_CD         = #{dlvCstInfoCd}
+              , BCKT_EX_YN              = #{bcktExYn}
+              , ORD_CN_STEP_CD          = #{ordCnStepCd}
+              , SEL_MIN_LIMIT_QTY       = #{selMinLimitQty}
+              , SEL_MIN_LIMIT_TYP_CD    = #{selMinLimitTypCd}
+              , ABRD_SIZETABLE_DISP_YN  = #{abrdSizetableDispYn}
+              , VISIT_DLV_YN            = #{visitDlvYn}
+              , BSN_DEAL_CLF            = #{bsnDealClf}
+              , DLV_CLF                 = #{dlvClf}
+              , ABRD_CN_DLV_CST         = #{abrdCnDlvCst}
+              , ABRD_IN_CD              = #{abrdInCd}
+              , PRD_WGHT                = #{prdWght}
+              , REVIEW_OPT_DISP_YN      = #{reviewOptDispYn}
+        <if test="!(@org.apache.commons.lang.StringUtils@isEmpty(mobile1wonYn))">
+              , MOBILE_1WON_YN          = #{mobile1wonYn}
+        </if>
+              , JEJU_DLV_CST            = #{jejuDlvCst}
+              , ISLAND_DLV_CST          = #{islandDlvCst}
+              , BOOK_ADD_CD             = #{bookAddCd}
+              , RMATERIAL_TYP_CD        = #{rmaterialTypCd}
+              , FOR_ABRD_BUY_CLF        = #{forAbrdBuyClf}
+        <!--<choose>-->
+            <!--<when test="prdTypCd.equals('19') OR prdTypCd.equals('20')">-->
+              <!--, USE_MON                 = #{useLimitDay}-->
+            <!--</when>-->
+            <!--<otherwise>-->
+              <!--, USE_MON                 = #{useMon}-->
+            <!--</otherwise>-->
+        <!--</choose>-->
+        <!--, TOWN_LMT_CLF_CD         = #{useLimitClfCd}-->
+              , TOWN_LMT_CLF_CD         = #{townLmtClfCd}
+              , HS_CODE                 = #{hsCode}
+              , OM_PRD_YN               = #{omPrdYn}
+              , SVC_AREA_CD             = #{svcAreaCd}
+              , RTNGD_DLV_CD            = #{rtngdDlvCd}
+        <if test="!(@org.apache.commons.lang.StringUtils@isEmpty(gblDlvYn))">
+              , GBL_DLV_YN              = #{gblDlvYn}
+        </if>
+              , NT_NO                   = #{ntNo}
+              , GBL_HS_CODE_NO          = #{gblHsCodeNo}
+              , PRD_NM_ENG              = #{prdNmEng}
+              , ENG_DISP_YN             = #{engDispYn}
+        <if test="infoTypeCtgrNo != 0">
+              , INFO_TYPE_CTGR_NO       = #{infoTypeCtgrNo}
+        </if>
+        <if test="!(@org.apache.commons.lang.StringUtils@isEmpty(gblDlvYn))">
+              , APRV_NESS_YN            = #{aprvNessYn}
+        </if>
+              , RFND_TYP_CD             = #{rfndTypCd}
+              , SEL_LIMIT_TERM          = #{selLimitTerm}
+        <if test="optTypCd.equals('02')">
+              , OPT_TYP_CD              = #{optTypCd}
+        </if>
+              , STD_PRD_NM              = #{stdPrdNm}
+              , MKT_PRD_NM              = #{mktPrdNm}
+        <if test="stdPrdYn.equals('Y')">
+              , STD_OPT_GRP_NO          = #{stdOptGrpNo}
+        </if>
+        WHERE   PRD_NO                  = #{prdNo}
+
+    </update>
+
+    <!-- 서비스 이용권 입력 -->
+    <insert id="insertPdSvcPassPrd" parameterType="PdSvcPassPrd">
+        INSERT INTO pd_svc_pass_prd
+        (
+        prd_no
+        ,svc_tickt_typ_cd
+        ,svc_pass_prd_eftv_prd_clf_cd
+        ,eftv_dd_qty
+        ,eftv_bgn_dy
+        ,eftv_end_dy
+        ,use_prc
+        ,mnfc_co
+        ,co_use_plc
+        ,create_dt
+        ,create_no
+        ,update_dt
+        ,update_no
+        )
+        VALUES
+        (
+        #{prdNo}
+        ,#{svcTicktTypCd}
+        ,#{svcPassPrdEftvPrdClfCd}
+        ,#{eftvDdQty}
+        ,TO_DATE(#{eftvBgnDy},'YYYY/MM/DD')
+        ,TO_DATE(#{eftvEndDy},'YYYY/MM/DD')
+        ,#{usePrc}
+        ,#{mnfcCo}
+        ,#{coUsePlc}
+        ,sysdate
+        ,#{createNo}
+        ,sysdate
+        ,#{updateNo}
+        )
+        /* productMapper.insertProductServicePass */
+    </insert>
+
+    <!-- 서비스 이용권 상품 이력  정보   History 정보 등록 -->
+    <update id="insertPdSvcPassPrdHist" parameterType="PdSvcPassPrd">
+        INSERT INTO pd_svc_pass_prd_hist
+        (
+        prd_no
+        ,hist_apl_end_dt
+        ,hist_apl_bgn_dt
+        ,svc_tickt_typ_cd
+        ,svc_pass_prd_eftv_prd_clf_cd
+        ,eftv_dd_qty
+        ,eftv_bgn_dy
+        ,eftv_end_dy
+        ,use_prc
+        ,mnfc_co
+        ,co_use_plc
+        ,create_dt
+        ,create_no
+        ,update_dt
+        ,update_no
+        )
+        SELECT
+        prd_no
+        ,to_date('99991231235959','rrrrmmddhh24miss')
+        ,sysdate
+        ,svc_tickt_typ_cd
+        ,svc_pass_prd_eftv_prd_clf_cd
+        ,eftv_dd_qty
+        ,eftv_bgn_dy
+        ,eftv_end_dy
+        ,use_prc
+        ,mnfc_co
+        ,co_use_plc
+        ,create_dt
+        ,create_no
+        ,update_dt
+        ,update_no
+        FROM pd_svc_pass_prd
+        WHERE  prd_no = #{prdNo}
+        /* productMapper.insertPdSvcPassPrdHist */
+    </update>
+
+
+
+    <!-- 원재료 -->
+    <select id="getProductRmaterialList" parameterType="long" resultType="ProductRmaterialVO">
+        SELECT /* productMapper.getProductRmaterialList */
+        PRD_NO
+        ,RMATERIAL_SEQ_NO
+        ,RMATERIAL_NM
+        FROM  PD_PRD_RMATERIAL
+        WHERE PRD_NO = #{prdNo}
+    </select>
+
+    <select id="getProductRmaterialIngredList" parameterType="PdPrdRmaterial" resultType="ProductRmaterialIngredVO">
+        SELECT /* productMapper.getProductRmaterialIngredList */
+        PRD_NO
+        ,RMATERIAL_SEQ_NO
+        ,INGRED_SEQ_NO
+        ,INGRED_NM
+        ,ORGN_COUNTRY
+        ,CONTENT
+        FROM  PD_PRD_RMATERIAL_INGRED
+        WHERE PRD_NO = #{prdNo}
+        AND RMATERIAL_SEQ_NO = #{rmaterialSeqNo}
+    </select>
+
+    <update id="insertProductRmaterial" parameterType="PdPrdRmaterial">
+        INSERT /* productMapper.insertProductRmaterial */
+        INTO PD_PRD_RMATERIAL
+        (PRD_NO
+        ,RMATERIAL_SEQ_NO
+        ,RMATERIAL_NM
+        ,CREATE_DT
+        ,CREATE_NO
+        ,UPDATE_DT
+        ,UPDATE_NO
+        )
+        VALUES
+        (#{prdNo}
+        ,#{rmaterialSeqNo}
+        ,#{rmaterialNm}
+        ,SYSDATE
+        ,#{createNo}
+        ,SYSDATE
+        ,#{updateNo}
+        )
+    </update>
+
+    <update id="insertProductRmaterialIngred" parameterType="PdPrdRmaterialIngred">
+        INSERT /* productMapper.insertProductRmaterialIngred */
+        INTO PD_PRD_RMATERIAL_INGRED
+        (PRD_NO
+        ,RMATERIAL_SEQ_NO
+        ,INGRED_SEQ_NO
+        ,INGRED_NM
+        ,ORGN_COUNTRY
+        ,CONTENT
+        )
+        VALUES
+        (#{prdNo}
+        ,#{rmaterialSeqNo}
+        ,#{ingredSeqNo}
+        ,#{ingredNm}
+        ,#{orgnCountry}
+        ,#{content}
+        )
+    </update>
+
+    <delete id="deleteAllProductRmaterial" parameterType="long">
+        DELETE /* productMapper.deleteAllProductRmaterial */
+        FROM PD_PRD_RMATERIAL
+        WHERE PRD_NO = #{prdNo}
+    </delete>
+
+    <delete id="deleteAllProductRmaterialIngred" parameterType="long">
+        DELETE /* productMapper.deleteAllProductRmaterialIngred */
+        FROM PD_PRD_RMATERIAL_INGRED
+        WHERE PRD_NO = #{prdNo}
+    </delete>
+
+    <!-- 상품모델 삭제 -->
+    <delete id="deleteProductModel" parameterType="HashMap">
+        /* productMapper.deleteProductModel */
+        delete from pd_prd_model
+        where	prd_no = #{prdNo}
+        <if test="mnbdClfCd == '03'">
+            AND mnbd_clf_cd in ('03', '04', '06', '07', '08', '09', '10')
+        </if>
+        <if test="mnbdClfCd == '04'">
+            AND mnbd_clf_cd in ('03', '04', '06', '07', '08', '09', '10')
+        </if>
+        <if test="mnbdClfCd == '06'">
+            AND mnbd_clf_cd in ('03', '04', '06', '07', '08', '09', '10')
+        </if>
+        <if test="mnbdClfCd != '03' and mnbdClfCd != '04' and mnbdClfCd != '06'">
+            AND mnbd_clf_cd = #{mnbdClfCd}
+        </if>
+    </delete>
+
+    <!-- 상품의 시간재고 사용여부 조회 -->
+    <select id="getPrdRsvSchdlYn" resultType="HashMap" parameterType="PdPrdOthers">
+        SELECT /* productMapper.getPrdRsvSchdlYn */
+        RSV_SCHDL_YN, RSV_SCHDL_CLF_CD
+        FROM PD_PRD_OTHERS PRO
+        WHERE 1=1
+        AND PRO.PRD_NO = #{prdNo}
+    </select>
+
+    <select id="isExistAdditionalProduct" parameterType="long" resultType="long">
+        SELECT  COUNT(PRD_COMP_NO) CNT
+        FROM    PD_ADD_PRD_COMP
+        WHERE   1=1
+        AND     MAIN_PRD_NO = #{mainPrdNo}
+        AND     PRD_COMP_TYP_CD = '02'
+        AND     USE_YN != 'D'
+        AND     ROWNUM = 1
+    </select>
+
+    <insert id="insertPdAddPrdCompMapGtFROMPdAddPrdComp" parameterType="ProductVO">
+        INSERT INTO PD_ADD_PRD_COMP_MAP_GT
+        (
+                ASIS_PRD_COMP_NO
+              , ASIS_PRD_NO
+              , ASIS_COMP_PRD_NO
+              , ASIS_PRD_STCK_NO
+              , TOBE_PRD_COMP_NO
+              , TOBE_PRD_NO
+              , TOBE_COMP_PRD_NO
+              , TOBE_PRD_STCK_NO
+        )
+        SELECT
+                PRD_COMP_NO                 AS ASIS_PRD_COMP_NO
+              , MAIN_PRD_NO                 AS ASIS_PRD_NO
+              , COMP_PRD_NO                 AS ASIS_COMP_PRD_NO
+              , COMP_PRD_STCK_NO            AS ASIS_PRD_STCK_NO
+              , SEQ_PD_ADD_PRD_COMP.NEXTVAL AS TOBE_COMP_PRD_NO
+              , #{prdNo}                    AS TOBE_PRD_NO
+              , SEQ_PD_PRD.NEXTVAL          AS TOBE_COMP_PRD_NO
+              , SEQ_PD_PRD_STCK.NEXTVAL     AS TOBE_PRD_STCK_NO
+        FROM    PD_ADD_PRD_COMP
+        WHERE   1=1
+        AND     MAIN_PRD_NO = #{templatePrdNo}
+    </insert>
+
+    <insert id="insertPdAddPrdGrpUseSelectFrom" parameterType="PdAddPrdGrp">
+        INSERT INTO PD_ADD_PRD_GRP (
+                MAIN_PRD_NO
+              , ADD_PRD_GRP_NO
+              , ADD_PRD_GRP_NM
+              , DISP_PRRT_RNK
+              , USE_YN
+              , CREATE_DT
+              , CREATE_NO
+              , UPDATE_DT
+              , UPDATE_NO
+        )
+        SELECT
+                #{mainPrdNo}    AS MAIN_PRD_NO
+              , ADD_PRD_GRP_NO  AS ADD_PRD_GRP_NO
+              , ADD_PRD_GRP_NM  AS ADD_PRD_GRP_NM
+              , DISP_PRRT_RNK   AS DISP_PRRT_RNK
+              , USE_YN          AS USE_YN
+              , sysdate         AS CREATE_DT
+              , #{createNo}     AS CREATE_NO
+              , sysdate         AS UPDATE_DT
+              , #{updateNo}     AS UPDATE_NO
+        FROM    PD_ADD_PRD_GRP G
+        WHERE   1=1
+        AND     G.MAIN_PRD_NO = #{mainPrdNo}
+    </insert>
+
+    <insert id="insertPdAddPrdCompFROMJoinTables" parameterType="ProductVO">
+        INSERT INTO PD_ADD_PRD_COMP (
+                PRD_COMP_NO
+              , MAIN_PRD_NO
+              , COMP_PRD_NO
+              , COMP_PRD_STCK_NO
+              , EVNT_NO
+              , APL_BGN_DY
+              , APL_END_DY
+              , MAIN_PRD_YN
+              , SEL_PRC
+              , ADD_COMP_PRC
+              , COMP_PRD_QTY
+              , DISP_PRRT_RNK
+              , PRD_COMP_TYP_CD
+              , STCK_QTY
+              , SEL_QTY
+              , USE_YN
+              , CREATE_DT
+              , CREATE_NO
+              , UPDATE_DT
+              , UPDATE_NO
+              , ADD_PRD_GRP_NO
+              , COMP_PRD_NM
+        )
+        SELECT
+                TOBE_PRD_COMP_NO                                AS PRD_COMP_NO
+              , TOBE_PRD_NO                                     AS MAIN_PRD_NO
+              , TOBE_COMP_PRD_NO                                AS COMP_PRD_NO
+              , TOBE_PRD_STCK_NO                                AS COMP_PRD_STCK_NO
+              , EVNT_NO                                         AS EVNT_NO
+              , TRUNC(SYSDATE)                                  AS APL_BGN_DY
+              , TO_DATE('29991231235959','YYYYMMDDHH24MISS')    AS APL_END_DY
+              , MAIN_PRD_YN                                     AS MAIN_PRD_YN
+              , SEL_PRC                                         AS SEL_PRC
+              , ADD_COMP_PRC                                    AS ADD_COMP_PRC
+              , COMP_PRD_QTY                                    AS COMP_PRD_QTY
+              , DISP_PRRT_RNK                                   AS DISP_PRRT_RNK
+              , PRD_COMP_TYP_CD                                 AS PRD_COMP_TYP_CD
+              , STCK_QTY                                        AS STCK_QTY
+              , SEL_QTY                                         AS SEL_QTY
+              , USE_YN                                          AS USE_YN
+              , sysdate                                         AS CREATE_DT
+              , #{createNo}                                     AS CREATE_NO
+              , sysdate                                         AS UPDATE_DT
+              , #{createNo}                                     AS UPDATE_NO
+              , ADD_PRD_GRP_NO                                  AS ADD_PRD_GRP_NO
+              , C.COMP_PRD_NM                                   AS COMP_PRD_NM
+        FROM
+                PD_ADD_PRD_COMP C
+              , PD_ADD_PRD_COMP_MAP_GT M
+        WHERE   1=1
+        AND     C.MAIN_PRD_NO = M.ASIS_PRD_NO
+        AND     M.ASIS_PRD_NO = #{templatePrdNo}
+        AND     PRD_COMP_NO = ASIS_PRD_COMP_NO
+    </insert>
+
+    <insert id="insertPdStockFROMJoinTables" parameterType="ProductVO">
+        INSERT INTO PD_STOCK(
+                STOCK_NO
+              , PRD_NO
+              , ADD_PRC
+              , STCK_QTY
+              , SEL_QTY
+              , PRD_STCK_STAT_CD
+              , CREATE_DT
+              , CREATE_NO
+              , UPDATE_DT
+              , UPDATE_NO
+        )
+        SELECT
+                TOBE_PRD_STCK_NO        AS STOCK_NO
+              , TOBE_COMP_PRD_NO        AS PRD_NO
+              , ADD_PRC                 AS ADD_PRD
+              , STCK_QTY                AS STCK_QTY
+              , SEL_QTY                 AS SEL_QTY
+              , PRD_STCK_STAT_CD        AS PRD_STCK_STAT_CD
+              , sysdate                 AS CREATE_DT
+              , #{createNo}             AS CREATE_NO
+              , sysdate                 AS UPDATE_DT
+              , #{createNo}             AS UPDATE_NO
+        FROM
+                PD_ADD_PRD_COMP_MAP_GT G
+              , PD_STOCK S
+        WHERE   1=1
+        AND     G.ASIS_PRD_NO = #{templatePrdNo}
+        AND     G.ASIS_COMP_PRD_NO = S.PRD_NO
+        AND     G.ASIS_PRD_STCK_NO = S.STOCK_NO
+    </insert>
+
+    <insert id="insertPdPrdFROMJoinTables" parameterType="ProductVO">
+        INSERT INTO PD_PRD(
+                PRD_NO
+              , MSTR_PRD_NO
+              , SEL_MNBD_NO
+              , SEL_MNBD_NCK_NM_SEQ
+              , PRD_AUTO_PRCS_NO
+              , PRD_NM
+              , ADVRT_STMT
+              , ORGN_TYP_CD
+              , ORGN_NM
+              , SEL_PRD_CLF_CD
+              , SEL_BGN_DY
+              , SEL_END_DY
+              , SEL_MNBD_CLF_CD
+              , SEL_MTHD_CD
+              , PRD_COMP_TYP_CD
+              , SEL_STAT_CD
+              , DLV_CN_AREA_CD
+              , DLV_WY_CD
+              , DLV_CST_INST_BASI_CD
+              , DLV_CST
+              , DLV_CST_PAY_TYP_CD
+              , RTNGD_DLV_CST
+              , EXCH_DLV_CST
+              , BNDL_DLV_CN_YN
+              , TODAY_DLV_CN_YN
+              , APPMT_DY_DLV_CN_YN
+              , SND_PLN_TRM
+              , RCPT_ISU_CN_YN
+              , PRD_TYP_CD
+              , MINOR_SEL_CN_YN
+              , APRV_NESS_YN
+              , MNFC_DY
+              , EFTV_DY
+              , PRD_STAT_CD
+              , SUPL_DTYFR_PRD_CLF_CD
+              , SELLER_PRD_CD
+              , UN_DLV_CN_YN
+              , WIRELSS_PRD_NM
+              , WIRELSS_PRD_DTL_DESC
+              , BAGRN_SEL_PRD_YN
+              , CREATE_DT
+              , CREATE_NO , UPDATE_DT
+              , UPDATE_NO
+              , CREATE_IP
+              , UPDATE_IP
+              , SELLER_PC_ID
+              , PRC_CMP_EXP_YN
+              , AVG_DLV_DY
+              , TOT_SEL_QTY
+              , ABRD_BRAND_YN
+              , ABRD_BUY_PLACE
+              , DISP_CTGR_NO_DE
+              , DISP_CTGR1_NO_DE
+              , DISP_CTGR2_NO_DE
+              , DISP_CTGR3_NO_DE
+              , DISP_CTGR4_NO_DE
+              , DISPLAY_YN
+              , PRD_WGHT
+        )
+        SELECT
+                TOBE_COMP_PRD_NO                                AS PRD_NO
+              , MSTR_PRD_NO                                     AS MSTR_PRD_NO
+              , #{selMnbdNo}                                    AS SEL_MNBD_NO
+              , SEL_MNBD_NCK_NM_SEQ                             AS SEL_MNBD_NCK_NM_SEQ
+              , CASE WHEN PRD_AUTO_PRCS_NO = 0 THEN 0
+                     ELSE SEQ_PD_PRD_RE_REG_DTLS.NEXTVAL
+                END                                             AS PRD_AUTO_PRCS_NO
+              , PRD_NM                                          AS PRD_NM
+              , ADVRT_STMT                                      AS ADVRT_STMT
+              , ORGN_TYP_CD                                     AS ORGN_TYP_CD
+              , ORGN_NM                                         AS ORGN_NM
+              , SEL_PRD_CLF_CD                                  AS SEL_PRD_CLF_CD
+              , TRUNC(SYSDATE)                                  AS SEL_BGN_DY
+              , TO_DATE('29991231235959','YYYYMMDDHH24MISS')    AS SEL_END_DY
+              , SEL_MNBD_CLF_CD    SEL_MNBD_CLF_CD
+              , CASE WHEN SEL_MTHD_CD IN('01','04','05') THEN SEL_MTHD_CD
+                     ELSE '01'
+                END                                             AS SEL_MTHD_CD
+              , PRD_COMP_TYP_CD                                 AS PRD_COMP_TYP_CD
+              , SEL_STAT_CD                                     AS SEL_STAT_CD
+              , DLV_CN_AREA_CD                                  AS DLV_CN_AREA_CD
+              , DLV_WY_CD                                       AS DLV_WY_CD
+              , DLV_CST_INST_BASI_CD                            AS DLV_CST_INST_BASI_CD
+              , DLV_CST                                         AS DLV_CST
+              , DLV_CST_PAY_TYP_CD                              AS DLV_CST_PAY_TYP_CD
+              , RTNGD_DLV_CST                                   AS RTNGD_DLV_CST
+              , EXCH_DLV_CST                                    AS EXCH_DLV_CST
+              , BNDL_DLV_CN_YN                                  AS BNDL_DLV_CN_YN
+              , TODAY_DLV_CN_YN                                 AS TODAY_DLV_CN_YN
+              , APPMT_DY_DLV_CN_YN                              AS APPMT_DY_DLV_CN_YN
+              , SND_PLN_TRM                                     AS SND_PLN_TRM
+              , RCPT_ISU_CN_YN                                  AS RCPT_ISU_CN_YN
+              , PRD_TYP_CD                                      AS PRD_TYP_CD
+              , MINOR_SEL_CN_YN                                 AS MINOR_SEL_CN_YN
+              , APRV_NESS_YN                                    AS APRV_NESS_YN
+              , MNFC_DY                                         AS MNFC_DY
+              , EFTV_DY                                         AS EFTV_DY
+              , PRD_STAT_CD                                     AS PRD_STAT_CD
+              , SUPL_DTYFR_PRD_CLF_CD                           AS SUPL_DTYFR_PRD_CLF_CD
+              , SELLER_PRD_CD                                   AS SELLER_PRD_CD
+              , UN_DLV_CN_YN                                    AS UN_DLV_CN_YN
+              , WIRELSS_PRD_NM                                  AS WIRELSS_PRD_NM
+              , WIRELSS_PRD_DTL_DESC                            AS WIRELSS_PRD_DTL_DESC
+              , BAGRN_SEL_PRD_YN                                AS BAGRN_SEL_PRD_YN
+              , SYSDATE                                         AS CREATE_DT
+              , #{createNo}                                     AS CREATE_NO
+              , SYSDATE                                         AS UPDATE_DT
+              , #{createNo}                                     AS UPDATE_NO
+              , CREATE_IP                                       AS CREATE_IP
+              , UPDATE_IP                                       AS UPDATE_IP
+              , SELLER_PC_ID                                    AS SELLER_PC_ID
+              , PRC_CMP_EXP_YN                                  AS PRC_CMP_EXP_YN
+              , AVG_DLV_DY                                      AS AVG_DLV_DY
+              , TOT_SEL_QTY                                     AS TOT_SEL_QTY
+              , ABRD_BRAND_YN                                   AS ABRD_BRAND_YN
+              , ABRD_BUY_PLACE                                  AS ABRD_BUY_PLACE
+              , DISP_CTGR_NO_DE                                 AS DISP_CTGR_NO_DE
+              , DISP_CTGR1_NO_DE                                AS DISP_CTGR1_NO_DE
+              , DISP_CTGR2_NO_DE                                AS DISP_CTGR2_NO_DE
+              , DISP_CTGR3_NO_DE                                AS DISP_CTGR3_NO_DE
+              , DISP_CTGR4_NO_DE                                AS DISP_CTGR4_NO_DE
+              , DISPLAY_YN                                      AS DISPLAY_YN
+              , PRD_WGHT                                        AS PRD_WGHT
+        FROM
+                PD_ADD_PRD_COMP_MAP_GT G
+              , PD_PRD P
+        WHERE   1=1
+        AND     G.ASIS_COMP_PRD_NO = P.PRD_NO
+        AND     G.ASIS_PRD_NO = #{templatePrdNo}
+    </insert>
+
+    <insert id="insertPdPrdAddHistFROMJoinTabled">
+        INSERT INTO PD_PRD_ADDITION_HIST(
+                PRD_NO
+              , PRD_WGHT
+              , UPDATE_DT
+              , UPDATE_NO
+        )
+        SELECT
+                TOBE_COMP_PRD_NO    AS PRD_NO
+              , PRD_WGHT            AS PRD_WGHT
+              , SYSDATE             AS UPDATE_DT
+              , #{createNo}         AS UPDATE_NO
+        FROM
+                PD_ADD_PRD_COMP_MAP_GT G
+              , PD_PRD P
+        WHERE   1-1
+        AND     G.ASIS_COMP_PRD_NO = P.PRD_NO
+        AND     G.ASIS_PRD_NO = #{templatePrdNo}
+    </insert>
+
+    <select id="getProductAddCompositionList" parameterType="long" resultType="ProductAddCompositionVO">
+        SELECT
+                B.PRD_COMP_NO                                           AS PRD_COMP_NO
+              , B.MAIN_PRD_NO                                           AS MAIN_PRD_NO
+              , B.COMP_PRD_NO                                           AS COMP_PRD_NO
+              , B.COMP_PRD_STCK_NO                                      AS COMP_PRD_STCK_NO
+              , B.EVNT_NO                                               AS EVNT_NO
+              , B.APL_BGN_DY                                            AS APL_BGN_DY
+              , B.APL_END_DY                                            AS APL_END_DY
+              , B.MAIN_PRD_YN                                           AS MAIN_PRD_YN
+              , B.SEL_PRC                                               AS SEL_PRC
+              , B.ADD_COMP_PRC                                          AS ADD_COMP_PRC
+              , B.STCK_QTY                                              AS COMP_PRD_QTY
+              , A.DISP_PRRT_RNK                                         AS DISP_PRRT_RNK
+              , B.PRD_COMP_TYP_CD                                       AS PRD_COMP_TYP_CD
+              , B.SEL_QTY                                               AS SEL_QTY
+              , B.STCK_QTY                                              AS STCK_QTY
+              , B.USE_YN                                                AS USE_YN
+              , TO_CHAR(B.CREATE_DT,'RRRRMMDDHH24MISS')                 AS CREATE_DT
+              , B.CREATE_NO                                             AS CREATE_NO
+              , TO_CHAR(B.UPDATE_DT,'RRRRMMDDHH24MISS')                 AS UPDATE_DT
+              , B.UPDATE_NO                                             AS UPDATE_NO
+              , (
+                    SELECT PRD_NM
+                    FROM PD_PRD
+                    WHERE PRD_NO=B.COMP_PRD_NO
+                )                                                       AS PRD_NM
+              , D.DTLS_COM_NM                                           AS PRD_COMP_TYP
+              , NVL(E.PRD_NO,0)                                         AS GNRL_PRD_NO
+              , C.SEL_STAT_CD                                           AS SEL_STAT_CD
+              , A.ADD_PRD_GRP_NO                                        AS ADD_PRD_GRP_NO
+              , A.ADD_PRD_GRP_NM                                        AS ADD_PRD_GRP_NM
+              , NVL(C.PRD_WGHT, 0)                                      AS PRD_WGHT
+              , C.SELLER_PRD_CD                                         AS SELLER_PRD_CD
+              , NVL(C.SUPL_DTYFR_PRD_CLF_CD,'01')                       AS COMP_PRD_VAT_CD
+              , NVL((
+                    SELECT GBL_DLV_YN
+                    FROM PD_PRD
+                    WHERE  PRD_NO=A.MAIN_PRD_NO
+                ),'N')                                                  AS GBL_DLV_YN
+        FROM
+                PD_ADD_PRD_GRP A
+              , PD_ADD_PRD_COMP B
+              , PD_PRD C
+              , SY_CO_DETAIL D
+              , DP_GNRL_DISP E
+        WHERE   1=1
+        AND     A.MAIN_PRD_NO = #{prdNo}
+        AND     A.MAIN_PRD_NO = B.MAIN_PRD_NO
+        AND     A.ADD_PRD_GRP_NO = B.ADD_PRD_GRP_NO
+        AND     B.COMP_PRD_NO = C.PRD_NO
+        AND     B.PRD_COMP_TYP_CD='02'
+        AND     B.PRD_COMP_TYP_CD = D.DTLS_CD(+)
+        AND     B.COMP_PRD_NO = E.PRD_NO(+)
+        AND     D.GRP_CD(+) = 'PD006'
+        AND     B.USE_YN != 'D'
+        ORDER BY A.ADD_PRD_GRP_NO, B.DISP_PRRT_RNK
+
+    </select>
+
+
+    <delete id="deletePdAddPrdGrp" parameterType="long">
+		DELETE  FROM PD_ADD_PRD_GRP
+		WHERE MAIN_PRD_NO = #{mainPrdNo}
+    </delete>
+
+    <update id="updateSetDelStatePdAddPrdComp" parameterType="long">
+        UPDATE  PD_ADD_PRD_COMP
+        SET     USE_YN = 'D'
+              , ADD_PRD_GRP_NO = 0
+        WHERE   1=1
+        AND     MAIN_PRD_NO = #{prdNo}
+        AND     PRD_COMP_TYP_CD = '02'
+        AND     USE_YN != 'D'
+    </update>
+
+    <insert id="insertPdAddPrdGrp" parameterType="PdAddPrdGrp">
+        INSERT INTO PD_ADD_PRD_GRP (
+                MAIN_PRD_NO
+              , ADD_PRD_GRP_NO
+              , ADD_PRD_GRP_NM
+              , DISP_PRRT_RNK
+              , USE_YN
+              , CREATE_DT
+              , CREATE_NO
+              , UPDATE_DT
+              , UPDATE_NO
+        )
+        VALUES (
+                #{mainPrdNo}
+              , #{addPrdGrpNo}
+              , #{addPrdGrpNm}
+              , #{dispPrrtRnk}
+              , 'Y'
+              , SYSDATE
+              , #{createNo}
+              , SYSDATE
+              , #{updateNo}
+        )
+    </insert>
+
+    <insert id="insertPdPrdAdditionHist" parameterType="PdPrdAdditionHist">
+        INSERT INTO PD_PRD_ADDITION_HIST (
+                PRD_NO
+              , PRD_WGHT
+              , UPDATE_DT
+              , UPDATE_NO
+        )
+        VALUES (
+                #{prdNo}
+              , #{prdWght}
+              , SYSDATE
+              , #{updateNo}
+        )
+    </insert>
+
+    <update id="updateAddPrdComp" parameterType="PdAddPrdComp">
+        UPDATE  PD_ADD_PRD_COMP
+        SET
+                ADD_PRD_GRP_NO  = #{addPrdGrpNo}
+              , SEL_PRC         = #{selPrc}
+              , ADD_COMP_PRC    = #{addCompPrc}
+              , COMP_PRD_QTY    = SEL_QTY+#{stckQty}
+              , STCK_QTY        = #{stckQty}
+              , UPDATE_NO       = #{updateNo}
+              , UPDATE_DT       = SYSDATE
+              , USE_YN          = #{useYn}
+              , CSTM_APL_PRC    = #{cstmAplPrd}
+              , COMP_PRD_NM     = #{compPrdNm}
+              , APL_BGN_DY      = NVL(TO_DATE(#{aplBgnDy},'rrrrmmddhh24miss'), SYSDATE)
+              , APL_END_DY      = NVL(TO_DATE(#{aplEndDy},'rrrrmmddhh24miss'), SYSDATE)
+        <if test="!dispPrrtRnk.equals('0')">
+              , disp_prrt_rnk   = #{dispPrrtRnk}
+        </if>
+        WHERE   PRD_COMP_NO = #{prdCompNo} AND PRD_COMP_TYP_CD = '02'
+    </update>
+
+    <update id="updatePdPrdSelStatCd" parameterType="PdPrd">
+        UPDATE PD_PRD
+        SET    SEL_STAT_CD = #{selStatCd}
+        WHERE  1=1
+        AND    PRD_NO = #{prdNo}
+    </update>
+
+    <update id="updateProductStockQty" parameterType="PdStock">
+        UPDATE  PD_STOCK
+        SET
+                STCK_QTY = #{stckQty}
+              , PRD_STCK_STAT_CD = #{prdStckStatCd}
+        WHERE   1=1
+        AND     STOCK_NO = #{prdStckNo}
+    </update>
+    <select id="getProductAddCompositionListSortByDispPrrtRnk" parameterType="ProductVO" resultType="ProductAddCompositionVO">
+        SELECT
+                RES.*
+              , ROWNUM AS DISP_PRRT_RNK
+        FROM
+        (
+            SELECT
+                    B.PRD_COMP_NO                                           AS PRD_COMP_NO
+                  , B.MAIN_PRD_NO                                           AS MAIN_PRD_NO
+                  , B.COMP_PRD_NO                                           AS COMP_PRD_NO
+                  , B.COMP_PRD_STCK_NO                                      AS COMP_PRD_STCK_NO
+                  , B.EVNT_NO                                               AS EVNT_NO
+                  , B.APL_BGN_DY                                            AS APL_BGN_DY
+                  , B.APL_END_DY                                            AS APL_END_DY
+                  , B.MAIN_PRD_YN                                           AS MAIN_PRD_YN
+                  , B.SEL_PRC                                               AS SEL_PRC
+                  , B.ADD_COMP_PRC                                          AS ADD_COMP_PRC
+                  , B.STCK_QTY                                              AS COMP_PRD_QTY
+                  , A.DISP_PRRT_RNK                                         AS DISP_PRRT_RNK
+                  , B.PRD_COMP_TYP_CD                                       AS PRD_COMP_TYP_CD
+                  , B.SEL_QTY                                               AS SEL_QTY
+                  , B.STCK_QTY                                              AS STCK_QTY
+                  , B.USE_YN                                                AS USE_YN
+                  , TO_CHAR(B.CREATE_DT,'RRRRMMDDHH24MISS')                 AS CREATE_DT
+                  , B.CREATE_NO                                             AS CREATE_NO
+                  , TO_CHAR(B.UPDATE_DT,'RRRRMMDDHH24MISS')                 AS UPDATE_DT
+                  , B.UPDATE_NO                                             AS UPDATE_NO
+                  , (
+                        SELECT PRD_NM
+                        FROM PD_PRD
+                        WHERE PRD_NO=B.COMP_PRD_NO
+                    )                                                       AS PRD_NM
+                  , D.DTLS_COM_NM                                           AS PRD_COMP_TYP
+                  , NVL(E.PRD_NO,0)                                         AS GNRL_PRD_NO
+                  , C.SEL_STAT_CD                                           AS SEL_STAT_CD
+                  , A.ADD_PRD_GRP_NO                                        AS ADD_PRD_GRP_NO
+                  , A.ADD_PRD_GRP_NM                                        AS ADD_PRD_GRP_NM
+                  , NVL(C.PRD_WGHT, 0)                                      AS PRD_WGHT
+                  , C.SELLER_PRD_CD                                         AS SELLER_PRD_CD
+                  , NVL(C.SUPL_DTYFR_PRD_CLF_CD,'01')                       AS COMP_PRD_VAT_CD
+                  , NVL((
+                        SELECT GBL_DLV_YN
+                        FROM PD_PRD
+                        WHERE  PRD_NO=A.MAIN_PRD_NO
+                    ),'N')                                                  AS GBL_DLV_YN
+            FROM
+                    PD_ADD_PRD_GRP A
+                  , PD_ADD_PRD_COMP B
+                  , PD_PRD C
+                  , SY_CO_DETAIL D
+                  , DP_GNRL_DISP E
+            WHERE   1=1
+            AND     A.MAIN_PRD_NO = #{prdNo}
+            AND     A.MAIN_PRD_NO = B.MAIN_PRD_NO
+            AND     A.ADD_PRD_GRP_NO = B.ADD_PRD_GRP_NO
+            AND     B.COMP_PRD_NO = C.PRD_NO
+            AND     B.PRD_COMP_TYP_CD='02'
+            AND     B.PRD_COMP_TYP_CD = D.DTLS_CD(+)
+            AND     B.COMP_PRD_NO = E.PRD_NO(+)
+            AND     D.GRP_CD(+) = 'PD006'
+            AND     B.USE_YN != 'D'
+        ) RES
+      <choose>
+        <when test="dispPrrtRnk == 1">
+        ORDER BY PRD_NM ASC
+        </when>
+        <when test="dispPrrtRnk == 2">
+        ORDER BY PRD_NM DESC
+        </when>
+        <when test="dispPrrtRnk == 3">
+            ORDER BY ADD_COMP_PRC ASC
+        </when>
+        <when test="dispPrrtRnk == 4">
+            ORDER BY ADD_COMP_PRC DESC
+        </when>
+      </choose>
+    </select>
+
+    <insert id="insertProductSummary" parameterType="DpPrdContSummary">
+        INSERT INTO DP_PRD_CONT_SUMMARY (
+                PRD_NO
+              , ABRD_BRAND_YN
+              , TOT_EVL_PNT
+              , AVG_EVL_PNT
+              , EVL_CNT
+              , DISP_CTGR_NO
+              , MAX_DEAL_EVL_SEQ
+              , PRD_QA_CNT
+              , SEMI_REVIEW_CNT
+              , MSTR_PRD_NO
+              , CREATE_DT
+              , CREATE_NO
+              , UPDATE_DT
+              , UPDATE_NO
+              , EVL_PNT_CNT3
+              , EVL_PNT_CNT2
+              , EVL_PNT_CNT1
+        )
+        VALUES (
+                #{prdNo}
+              , #{abrdBrandYn}
+              , 0
+              , 0
+              , 0
+              , #{dispCtgrNo}
+              , 0
+              , 0
+              , 0
+              , 0
+              , SYSDATE
+              , #{createNo}
+              , SYSDATE
+              , #{updateNo}
+              , 0
+              , 0
+              , 0
+        )
+    </insert>
+
+    <insert id="insertProductCoordi" parameterType="ProductCoordiVO">
+		INSERT INTO PD_PRD_COORDI
+        (
+            PRD_NO
+            ,COORDI_PRD_NO
+            ,CREATE_DT
+            ,CREATE_NO
+        )
+        VALUES
+        (
+            #{prdNo}
+            ,#{coordiPrdNo}
+            ,SYSDATE
+            ,#{createNo}
+        )
+    </insert>
+
+    <delete id="deleteProductCoordi" parameterType="long">
+		DELETE FROM PD_PRD_COORDI
+		WHERE PRD_NO = #{prdNo}
+    </delete>
+
+    <select id="getProductStockNo" resultType="long">
+		SELECT SEQ_PD_PRD_STCK.nextVal from dual
+    </select>
+    <insert id="insertPdStock">
+        INSERT INTO PD_STOCK (
+           STOCK_NO,
+           PRD_NO,
+           ADD_PRC,
+           SEL_QTY,
+           STCK_QTY,
+           PRD_STCK_STAT_CD,
+           CREATE_DT,
+           CREATE_NO,
+           UPDATE_DT,
+           UPDATE_NO
+           )
+        VALUES
+        (
+            #{stockNo},
+            #{prdNo},
+            #{addPrc},
+            #{selQty},
+            #{stckQty},
+            #{prdStckStatCd},
+            SYSDATE,
+            #{createNo},
+            SYSDATE,
+            #{updateNo}
+        )
+    </insert>
+
+    <select id="getProductCompositionNo" resultType="long">
+        SELECT SEQ_PD_ADD_PRD_COMP.nextVal from dual
+    </select>
+    <insert id="insertProductComposition" parameterType="ProductAddCompositionVO">
+        INSERT INTO PD_ADD_PRD_COMP (
+            PRD_COMP_NO,
+            MAIN_PRD_NO,
+            COMP_PRD_NO,
+            COMP_PRD_STCK_NO,
+            EVNT_NO,
+            APL_BGN_DY,
+            APL_END_DY,
+            MAIN_PRD_YN,
+            SEL_PRC,
+            ADD_COMP_PRC,
+            COMP_PRD_QTY,
+            DISP_PRRT_RNK,
+            PRD_COMP_TYP_CD,
+            SEL_QTY,
+            STCK_QTY,
+            USE_YN,
+            CREATE_DT,
+            CREATE_NO,
+            UPDATE_DT,
+            UPDATE_NO,
+            ADD_PRD_GRP_NO,
+            CSTM_APL_PRC,
+            COMP_PRD_NM
+           )
+        VALUES (
+            #{prdCompNo},
+            #{mainPrdNo},
+            #{compPrdNo},
+            #{compPrdStckNo},
+            #{evntNo},
+            to_date(#{aplBgnDy},'rrrrmmddhh24miss'),
+            to_date(#{aplEndDy},'rrrrmmddhh24miss'),
+            #{mainPrdYn},
+            #{selPrc},
+            #{addCompPrc},
+            #{compPrdQty},
+            #{dispPrrtRnk},
+            #{prdCompTypCd},
+            #{selQty},
+            #{stckQty},
+            #{useYn},
+            sysdate,
+            #{createNo},
+            sysdate,
+            #{updateNo},
+            #{addPrdGrpNo},
+            #{addCstmAplPrc}*100,
+            #{compPrdNm}
+        )
+    </insert>
+
+    <insert id="insertPdRntlPrd" parameterType="PdRntlPrd">
+        INSERT /* productMapper.insertPdRntlPrd */ INTO PD_RNTL_PRD (
+            PRD_NO
+            ,CST_TERM_CD
+            ,FREE_INST_YN
+            ,CO_CARD_BNFT
+            ,INST_CST_DESC
+            ,FRGFT_DESC
+            ,ETC_INFO
+            ,USE_YN
+            ,CREATE_DT
+            ,CREATE_NO
+            ,UPDATE_DT
+            ,UPDATE_NO
+            ,MIN_RNTL_CST
+            ,MAX_RNTL_CST
+        ) VALUES (
+            #{prdNo}
+            ,#{cstTermCd}
+            ,#{freeInstYn}
+            ,#{coCardBnft}
+            ,#{instCstDesc}
+            ,#{frgftDesc}
+            ,#{etcInfo}
+            ,#{useYn}
+            ,#{createDt}
+            ,#{createNo}
+            ,#{updateDt}
+            ,#{updateNo}
+            ,(SELECT /*+ INDEX(STK IX_PD_STOCK_01) */ NVL(MIN(RNTL_CST),0)
+              FROM PD_STOCK STK
+              WHERE STK.PRD_NO = #{prdNo})
+            ,(SELECT /*+ INDEX(STK IX_PD_STOCK_01) */ NVL(MAX(RNTL_CST),0)
+              FROM PD_STOCK STK
+              WHERE STK.PRD_NO = #{prdNo})
+        )
+    </insert>
+
+    <insert id="insertPdRntlPrdHist" parameterType="PdRntlPrd">
+        INSERT /*  */ INTO  PD_RNTL_PRD_HIST (
+            PRD_NO
+            ,HIST_DT
+            ,CST_TERM_CD
+            ,FREE_INST_YN
+            ,CO_CARD_BNFT
+            ,INST_CST_DESC
+            ,FRGFT_DESC
+            ,ETC_INFO
+            ,USE_YN
+            ,CREATE_DT
+            ,CREATE_NO
+            ,UPDATE_DT
+            ,UPDATE_NO
+            ,MIN_RNTL_CST
+            ,MAX_RNTL_CST
+        )
+        SELECT
+            PRD_NO
+            ,NVL(#{histDt},SYSDATE) HIST_DT
+            ,CST_TERM_CD
+            ,FREE_INST_YN
+            ,CO_CARD_BNFT
+            ,INST_CST_DESC
+            ,FRGFT_DESC
+            ,ETC_INFO
+            ,USE_YN
+            ,SYSDATE AS CREATE_DT
+            ,CREATE_NO
+            ,SYSDATE AS UPDATE_DT
+            ,UPDATE_NO
+            ,MIN_RNTL_CST
+            ,MAX_RNTL_CST
+        FROM PD_RNTL_PRD
+        WHERE PRD_NO = #{prdNo}
+    </insert>
+
+    <select id="getAddCompPrdCount" parameterType="long" resultType="long">
+		SELECT
+				count(1)
+		FROM pd_add_prd_comp
+		WHERE main_prd_no = #{prdNo} and use_yn = 'Y'
+    </select>
+
+    <update id="updatePdPrdAddCompositionProductSellStatus" parameterType="ProductVO">
+        UPDATE
+        PD_PRD
+        SET
+        SEL_PRD_CLF_CD = #{selPrdClfCd},
+        SEL_BGN_DY = TO_DATE(#{selBgnDy}, 'YYYYMMDDHH24MISS'),
+        SEL_END_DY = TO_DATE(#{selEndDy}, 'YYYYMMDDHH24MISS'),
+        SEL_STAT_CD = #{selStatCd},
+        SEL_MTHD_CD = #{selMthdCd},
+        <if test="!(@org.apache.commons.lang.StringUtils@isEmpty(selMnbdNckNmSeq))">
+            SEL_MNBD_NCK_NM_SEQ = #{selMnbdNckNmSeq},
+        </if>
+        UPDATE_DT = SYSDATE
+        WHERE PRD_NO IN (   SELECT COMP_PRD_NO FROM PD_ADD_PRD_COMP
+        WHERE MAIN_PRD_NO = #{prdNo}
+        AND PRD_COMP_TYP_CD = '02'
+        AND USE_YN != 'D' )
+    </update>
+
+    <select id="getChangedStckQtyBundleProduct" resultMap="com.elevenst.terroir.product.registration.common.mapper.VoMapper.productVOMap" parameterType="long">
+        SELECT /* optionDAOMap.xml product.getChangedStckQtyBundleProduct
+        : 마스터 상품의 옵션들을 옵션으로 구성하는 묶음 상품의 변경 될 재고 정보 */
+        /*+ LEADING(COMP PRD GNRL) USE_NL(PRD GNRL) INDEX(PRD PK_PD_PRD) INDEX(GNRL FK2_DP_GNRL_DISP) */
+        PRD.PRD_NO AS prdNo
+        , COMP.STCK_QTY AS prdStckQty
+        , COMP.OPT_TYP_CD as optTypCd
+        , DECODE(COMP.CH_SEL_STAT_CD, GNRL.GNRL_SEL_STAT_CD, DECODE(COMP.CH_SEL_STAT_CD, PRD.SEL_STAT_CD, '', COMP.CH_SEL_STAT_CD), COMP.CH_SEL_STAT_CD) AS selStatCd
+        , PRD.SEL_MTHD_CD AS selMthdCd
+        , to_char(PRD.sel_bgn_dy, 'rrrrmmddhh24miss') AS selBgnDy
+        , to_char(PRD.sel_end_dy, 'rrrrmmddhh24miss') AS selEndDy
+        , PRD.BSN_DEAL_CLF AS bsnDealClf
+        , PRD.SEL_MNBD_NO AS selMnbdNo
+        FROM(SELECT /*+ NO_MERGE */
+        OUTLINE_COMP.PRD_NO
+        , OUTLINE_COMP.STCK_QTY
+        , DECODE(OUTLINE_COMP.OPT_TYP_CD, 1, 'Y', 2, 'Z', 'X') AS OPT_TYP_CD /* X:옵션없음, Y:0원옵션가만 존재, Z:0원이상옵션가존재 리스팅에서 '판매가 ~' 표현하기위함  */
+        , OUTLINE_COMP.CH_SEL_STAT_CD
+        FROM(SELECT
+        INLINE_COMP.PRD_NO
+        , SUM(INLINE_COMP.MIN_STCK_QTY) OVER(PARTITION BY INLINE_COMP.PRD_NO) AS STCK_QTY /*상품별 재고합 */
+        , MAX(CASE WHEN MST_PRD_STCK_STAT_CD = '01'
+        THEN CASE WHEN ADD_PRC = 0 THEN 1 WHEN ADD_PRC <![CDATA[<>]]> 0 THEN 2 ELSE 3 END
+        ELSE 1 END
+        ) OVER(PARTITION BY INLINE_COMP.PRD_NO) AS OPT_TYP_CD                           /*상품별 옵션타입*/
+        , MIN(CASE WHEN MST_PRD_STCK_STAT_CD = '01' AND ADD_PRC = 0 AND MIN_STCK_QTY > 0 THEN '103' ELSE '104' END)
+        OVER(PARTITION BY INLINE_COMP.PRD_NO) AS CH_SEL_STAT_CD
+        , ROW_NUMBER() OVER(PARTITION BY INLINE_COMP.PRD_NO ORDER BY MST_PRD_STCK_STAT_CD DESC) AS RNUM
+        FROM(
+        SELECT /*+ LEADING(A STOCK INFO COMP PRD) USE_NL(STOCK INFO COMP PRD) INDEX(STOCK IX_PD_STOCK_01) INDEX(INFO IX1_PD_STOCK_SET_INFO) INDEX(COMP PK_PD_STOCK) INDEX(PRD IX3_PD_PRD) */
+        STOCK.PRD_NO
+        , STOCK.STOCK_NO
+        , COMP.PRD_NO AS COMP_PRD_NO
+        , COMP.STOCK_NO AS COMP_STOCK_NO
+        , PRD.SEL_STAT_CD
+        , COMP.PRD_STCK_STAT_CD
+        , stock.ADD_PRC
+        , STOCK.SET_TYP_CD
+        , MAX(CASE WHEN PRD.SEL_STAT_CD = '103' AND COMP.PRD_STCK_STAT_CD = '01' THEN '01' ELSE '02' END)
+        OVER(PARTITION BY STOCK.PRD_NO, STOCK.STOCK_NO) AS MST_PRD_STCK_STAT_CD /* 상품,옵션별 옵션 사용함 상태 */
+        , MIN(CASE WHEN PRD.SEL_STAT_CD = '103' AND COMP.PRD_STCK_STAT_CD = '01' THEN TRUNC(COMP.STCK_QTY / INFO.SET_UNIT_QTY) ELSE 0 END)
+        OVER(PARTITION BY STOCK.PRD_NO, STOCK.STOCK_NO) AS MIN_STCK_QTY         /*상품,옵션별 재고 최소값*/
+        , ROW_NUMBER() OVER(PARTITION BY STOCK.PRD_NO, STOCK.STOCK_NO ORDER BY (COMP.STCK_QTY / INFO.SET_UNIT_QTY)) AS RNUM
+        FROM
+        (SELECT /*+ NO_MERGE INDEX(A IX2_PD_STOCK_SET_INFO) */ DISTINCT MST_PRD_NO
+        FROM PD_STOCK_SET_INFO A
+        WHERE COMP_PRD_NO = #{prdNo}) A,
+        PD_STOCK STOCK, PD_STOCK_SET_INFO INFO, PD_STOCK COMP, PD_PRD PRD
+        WHERE
+        STOCK.STOCK_NO = INFO.MST_STCK_NO
+        AND
+        STOCK.PRD_NO = INFO.MST_PRD_NO
+        AND
+        INFO.COMP_STCK_NO = COMP.STOCK_NO
+        AND
+        INFO.COMP_PRD_NO = COMP.PRD_NO
+        AND
+        COMP.PRD_NO = PRD.PRD_NO
+        AND
+        STOCK.PRD_NO = A.MST_PRD_NO
+        ) INLINE_COMP WHERE RNUM = 1
+        ) OUTLINE_COMP WHERE RNUM = 1
+        ) COMP, PD_PRD PRD, DP_GNRL_DISP GNRL
+        WHERE
+        COMP.PRD_NO = PRD.PRD_NO
+        AND
+        PRD.PRD_NO = GNRL.PRD_NO
+        AND
+        PRD.SEL_STAT_CD IN ('103', '104')
+        AND
+        (NOT(COMP.OPT_TYP_CD = GNRL.GNRL_OPT_CD AND COMP.CH_SEL_STAT_CD = GNRL.GNRL_SEL_STAT_CD AND COMP.STCK_QTY = GNRL.GNRL_STCK_QTY)
+        OR COMP.CH_SEL_STAT_CD <![CDATA[<>]]> PRD.SEL_STAT_CD)
+    </select>
+
+    <select id="getChangedStckQtyBundleProductByUnitStock" resultMap="com.elevenst.terroir.product.registration.common.mapper.VoMapper.productVOMap" parameterType="long">
+        SELECT /* optionDAOMap.xml product.getChangedStckQtyBundleProductByUnitStock
+        : 마스터 상품의 옵션을 옵션으로 구성하는 묶음 상품의 변경 될 재고 정보 */
+        /*+ LEADING(COMP PRD GNRL) USE_NL(PRD GNRL) INDEX(PRD PK_PD_PRD) INDEX(GNRL FK2_DP_GNRL_DISP) */
+        PRD.PRD_NO AS prdNo
+        , COMP.STCK_QTY AS prdStckQty
+        , COMP.OPT_TYP_CD as optTypCd
+        , DECODE(COMP.CH_SEL_STAT_CD, GNRL.GNRL_SEL_STAT_CD, DECODE(COMP.CH_SEL_STAT_CD, PRD.SEL_STAT_CD, '', COMP.CH_SEL_STAT_CD), COMP.CH_SEL_STAT_CD) AS selStatCd
+        , PRD.SEL_MTHD_CD AS selMthdCd
+        , to_char(PRD.sel_bgn_dy, 'rrrrmmddhh24miss') AS selBgnDy
+        , to_char(PRD.sel_end_dy, 'rrrrmmddhh24miss') AS selEndDy
+        , PRD.BSN_DEAL_CLF AS bsnDealClf
+        , PRD.SEL_MNBD_NO AS selMnbdNo
+        FROM(SELECT /*+ NO_MERGE */
+        OUTLINE_COMP.PRD_NO
+        , OUTLINE_COMP.STCK_QTY
+        , DECODE(OUTLINE_COMP.OPT_TYP_CD, 1, 'Y', 2, 'Z', 'X') AS OPT_TYP_CD /* X:옵션없음, Y:0원옵션가만 존재, Z:0원이상옵션가존재 리스팅에서 '판매가 ~' 표현하기위함  */
+        , OUTLINE_COMP.CH_SEL_STAT_CD
+        FROM(SELECT
+        INLINE_COMP.PRD_NO
+        , SUM(INLINE_COMP.MIN_STCK_QTY) OVER(PARTITION BY INLINE_COMP.PRD_NO) AS STCK_QTY /*상품별 재고합*/
+        , MAX(CASE WHEN MST_PRD_STCK_STAT_CD = '01'
+        THEN CASE WHEN ADD_PRC = 0 THEN 1 WHEN ADD_PRC <![CDATA[<>]]> 0 THEN 2 ELSE 3 END
+        ELSE 1 END
+        ) OVER(PARTITION BY INLINE_COMP.PRD_NO) AS OPT_TYP_CD                          /* 상품별 옵션타입*/
+        , MIN(CASE WHEN MST_PRD_STCK_STAT_CD = '01' AND ADD_PRC = 0 AND MIN_STCK_QTY > 0 THEN '103' ELSE '104' END)
+        OVER(PARTITION BY INLINE_COMP.PRD_NO) AS CH_SEL_STAT_CD
+        , ROW_NUMBER() OVER(PARTITION BY INLINE_COMP.PRD_NO ORDER BY MST_PRD_STCK_STAT_CD DESC) AS RNUM
+        FROM(
+        SELECT /*+ LEADING(A STOCK INFO COMP PRD) USE_NL(STOCK INFO COMP PRD) INDEX(STOCK IX_PD_STOCK_01) INDEX(INFO IX1_PD_STOCK_SET_INFO) INDEX(COMP PK_PD_STOCK) INDEX(PRD IX3_PD_PRD) */
+        STOCK.PRD_NO
+        , STOCK.STOCK_NO
+        , COMP.PRD_NO AS COMP_PRD_NO
+        , COMP.STOCK_NO AS COMP_STOCK_NO
+        , PRD.SEL_STAT_CD
+        , COMP.PRD_STCK_STAT_CD
+        , stock.ADD_PRC
+        , STOCK.SET_TYP_CD
+        , MAX(CASE WHEN PRD.SEL_STAT_CD = '103' AND COMP.PRD_STCK_STAT_CD = '01' THEN '01' ELSE '02' END)
+        OVER(PARTITION BY STOCK.PRD_NO, STOCK.STOCK_NO) AS MST_PRD_STCK_STAT_CD /* 상품,옵션별 옵션 사용함 상태 */
+        , MIN(CASE WHEN PRD.SEL_STAT_CD = '103' AND COMP.PRD_STCK_STAT_CD = '01' THEN TRUNC(COMP.STCK_QTY / INFO.SET_UNIT_QTY) ELSE 0 END)
+        OVER(PARTITION BY STOCK.PRD_NO, STOCK.STOCK_NO) AS MIN_STCK_QTY         /*상품,옵션별 재고 최소값*/
+        , ROW_NUMBER() OVER(PARTITION BY STOCK.PRD_NO, STOCK.STOCK_NO ORDER BY (COMP.STCK_QTY / INFO.SET_UNIT_QTY)) AS RNUM
+        FROM
+        (SELECT /*+ NO_MERGE INDEX(A IX3_PD_STOCK_SET_INFO) */ DISTINCT MST_PRD_NO
+        FROM PD_STOCK_SET_INFO A WHERE COMP_STCK_NO = #{stockNo}) A,
+        PD_STOCK STOCK, PD_STOCK_SET_INFO INFO, PD_STOCK COMP, PD_PRD PRD
+        WHERE
+        STOCK.STOCK_NO = INFO.MST_STCK_NO
+        AND
+        STOCK.PRD_NO = INFO.MST_PRD_NO
+        AND
+        INFO.COMP_STCK_NO = COMP.STOCK_NO
+        AND
+        INFO.COMP_PRD_NO = COMP.PRD_NO
+        AND
+        COMP.PRD_NO = PRD.PRD_NO
+        AND
+        STOCK.PRD_NO = A.MST_PRD_NO
+        ) INLINE_COMP WHERE RNUM = 1
+        ) OUTLINE_COMP WHERE RNUM = 1
+        ) COMP, PD_PRD PRD, DP_GNRL_DISP GNRL
+        WHERE
+        COMP.PRD_NO = PRD.PRD_NO
+        AND
+        PRD.PRD_NO = GNRL.PRD_NO
+        AND
+        PRD.SEL_STAT_CD IN ('103', '104')
+        AND
+        (NOT(COMP.OPT_TYP_CD = GNRL.GNRL_OPT_CD AND COMP.CH_SEL_STAT_CD = GNRL.GNRL_SEL_STAT_CD AND COMP.STCK_QTY = GNRL.GNRL_STCK_QTY)
+        OR COMP.CH_SEL_STAT_CD <![CDATA[<>]]> PRD.SEL_STAT_CD)
+    </select>
+
+    <!-- 상품 History 정보 입력 -->
+    <update id="insertProductHist" parameterType="PdPrdHist">
+        INSERT INTO pd_prd_hist
+        (
+        hist_apl_bgn_dt,
+        prd_no,
+        mstr_prd_no,
+        sel_mnbd_no,
+        sel_mnbd_nck_nm_seq,
+        prd_auto_prcs_no,
+        prd_nm,
+        advrt_stmt,
+        orgn_typ_cd,
+        orgn_nm,
+        sel_bgn_dy,
+        sel_end_dy,
+        sel_mnbd_clf_cd,
+        sel_mthd_cd,
+        prd_comp_typ_cd,
+        sel_stat_cd,
+        dlv_cn_area_cd,
+        dlv_wy_cd,
+        dlv_cst_inst_basi_cd,
+        dlv_cst,
+        prd_fr_dlv_basi_amt,
+        dlv_cst_pay_typ_cd,
+        rtngd_dlv_cst,
+        exch_dlv_cst,
+        bndl_dlv_cn_yn,
+        today_dlv_cn_yn,
+        appmt_dy_dlv_cn_yn,
+        snd_pln_trm,
+        rcpt_isu_cn_yn,
+        prd_typ_cd,
+        minor_sel_cn_yn,
+        aprv_ness_yn,
+        mnfc_dy,
+        eftv_dy,
+        prd_stat_cd,
+        supl_dtyfr_prd_clf_cd,
+        seller_prd_cd,
+        create_dt,
+        create_no,
+        update_dt,
+        update_no,
+        create_ip,
+        update_ip,
+        un_dlv_cn_yn,
+        sel_prd_clf_cd,
+        disp_ctgr_no_de,
+        display_yn,
+        china_sale_yn,
+        china_sel_prc,
+        low_prc_comp_ex_yn,
+        ctgr_pnt_pre_ex_yn,
+        sel_limit_qty,
+        sel_limit_typ_cd,
+        mstr_prd_match_clf_cd
+        ,PRC_CMP_EXP_YN
+        ,ORGN_TYP_DTLS_CD
+        ,ORGN_DIFFERENT_YN
+        ,CUPN_EX_CD
+        ,mobile_1won_yn
+        ,bckt_ex_yn
+        ,ORD_CN_STEP_CD
+        ,sel_min_limit_qty
+        ,sel_min_limit_typ_cd
+        ,abrd_sizetable_disp_yn
+        ,visit_dlv_yn
+        ,bsn_deal_clf
+        ,dlv_clf
+        ,abrd_cn_dlv_cst
+        ,abrd_in_cd
+        ,prd_wght
+        ,jeju_dlv_cst
+        ,island_dlv_cst
+        ,hide_yn
+        ,fr_prd_nm
+        ,rmaterial_typ_cd
+        ,for_abrd_buy_clf
+        ,hs_code
+        ,om_prd_yn
+        ,svc_area_cd
+        ,rtngd_dlv_cd
+        ,gbl_dlv_yn
+        ,nt_no
+        ,gbl_hs_code_no
+        ,prd_nm_eng
+        ,eng_disp_yn
+        ,info_type_ctgr_no
+        ,lp_cupn_ex_yn
+        ,partner_cupn_ex_yn
+        ,opt_typ_cd
+        ,rfnd_typ_cd
+        ,sel_limit_term
+        ,set_typ_cd
+        ,issue_cupn_expt_cd
+        ,STD_PRD_NM
+        ,MKT_PRD_NM
+        ,STD_PRD_YN
+        ,STD_OPT_GRP_NO
+        )
+        SELECT
+        nvl(to_date(#{histAplEndDt},'rrrrmmddhh24miss'), sysdate),
+        prd_no,
+        mstr_prd_no,
+        sel_mnbd_no,
+        sel_mnbd_nck_nm_seq,
+        prd_auto_prcs_no,
+        prd_nm,
+        advrt_stmt,
+        orgn_typ_cd,
+        orgn_nm,
+        sel_bgn_dy,
+        sel_end_dy,
+        sel_mnbd_clf_cd,
+        sel_mthd_cd,
+        prd_comp_typ_cd,
+        sel_stat_cd,
+        dlv_cn_area_cd,
+        dlv_wy_cd,
+        dlv_cst_inst_basi_cd,
+        dlv_cst,
+        prd_fr_dlv_basi_amt,
+        dlv_cst_pay_typ_cd,
+        rtngd_dlv_cst,
+        exch_dlv_cst,
+        bndl_dlv_cn_yn,
+        today_dlv_cn_yn,
+        appmt_dy_dlv_cn_yn,
+        snd_pln_trm,
+        rcpt_isu_cn_yn,
+        prd_typ_cd,
+        minor_sel_cn_yn,
+        aprv_ness_yn,
+        mnfc_dy,
+        eftv_dy,
+        prd_stat_cd,
+        supl_dtyfr_prd_clf_cd,
+        seller_prd_cd,
+        create_dt,
+        create_no,
+        update_dt,
+        update_no,
+        create_ip,
+        update_ip,
+        un_dlv_cn_yn,
+        sel_prd_clf_cd,
+        disp_ctgr_no_de,
+        display_yn,
+        china_sale_yn,
+        china_sel_prc,
+        low_prc_comp_ex_yn,
+        ctgr_pnt_pre_ex_yn,
+        sel_limit_qty,
+        sel_limit_typ_cd,
+        mstr_prd_match_clf_cd
+        ,PRC_CMP_EXP_YN
+        ,ORGN_TYP_DTLS_CD
+        ,ORGN_DIFFERENT_YN
+        ,CUPN_EX_CD
+        ,mobile_1won_yn
+        ,bckt_ex_yn
+        ,ORD_CN_STEP_CD
+        ,sel_min_limit_qty
+        ,sel_min_limit_typ_cd
+        ,abrd_sizetable_disp_yn
+        ,visit_dlv_yn
+        ,bsn_deal_clf
+        ,dlv_clf
+        ,abrd_cn_dlv_cst
+        ,abrd_in_cd
+        ,prd_wght
+        ,jeju_dlv_cst
+        ,island_dlv_cst
+        ,nvl(hide_yn, 'N') hide_yn
+        ,fr_prd_nm
+        ,rmaterial_typ_cd
+        ,for_abrd_buy_clf
+        ,hs_code
+        ,om_prd_yn
+        ,svc_area_cd
+        ,rtngd_dlv_cd
+        ,gbl_dlv_yn
+        ,nt_no
+        ,gbl_hs_code_no
+        ,prd_nm_eng
+        ,eng_disp_yn
+        ,nvl(info_type_ctgr_no, 0)
+        ,lp_cupn_ex_yn
+        ,partner_cupn_ex_yn
+        ,opt_typ_cd
+        ,rfnd_typ_cd
+        ,sel_limit_term
+        ,set_typ_cd
+        ,issue_cupn_expt_cd
+        ,STD_PRD_NM
+        ,MKT_PRD_NM
+        ,STD_PRD_YN
+        ,STD_OPT_GRP_NO
+        FROM pd_prd
+        WHERE prd_no = #{prdNo}
+        and not exists (select 1 from pd_prd_hist
+        where prd_no=#{prdNo}
+        and hist_apl_bgn_dt = nvl(to_date(#{histAplEndDt},'rrrrmmddhh24miss'), sysdate)
+        )
+        /* productMapper.insertProductHist */
+    </update>
+
+    <!-- 옵션 수정 시 옵션 구분 코드 및 사용기간 수정 -->
+    <update id="updateProductOptionModify" parameterType="PdPrd">
+        UPDATE pd_prd
+        SET
+        UPDATE_DT = SYSDATE
+        ,UPDATE_NO = #{updateNo}
+        ,OPT_TYP_CD = #{optTypCd}
+        <if test="rfndTypCd != null and rfndTypCd != ''">
+            ,RFND_TYP_CD = #{rfndTypCd}
+        </if>
+        <!--<if test="useBgnDy != null and useBgnDy != ''">-->
+            <!--,EFTV_DY = TO_DATE(#{useBgnDy} || ' 000000', 'YYYY/MM/DD HH24MISS')-->
+        <!--</if>-->
+        <!--<if test="useEndDy != null and useEndDy != ''">-->
+            <!--,EFTV_END_DY = TO_DATE(#{useEndDy} || ' 235959', 'YYYY/MM/DD HH24MISS')-->
+        <!--</if>-->
+        WHERE prd_no = #{prdNo}
+        /* productMapper.updateProductOptionModify */
+    </update>
+
+    <!--상품이 존재하는지 확인. -->
+    <select id="isExistFrPrd" resultType="long" parameterType="long">
+        SELECT
+        COUNT(a.fr_prd_no) CNT
+        FROM pd_fr_prd  a
+        WHERE a.fr_prd_no = #{prdNo}
+        /* productMapper.isExistPrd */
+    </select>
+
+    <sql id="getSeriesProductCnt">
+        select /* productDAOMap.xml product.getSeriesProductYn product.getSeriesProductTotCnt*/
+        count(1) as cnt
+        from pd_series_prd
+        where 1=1
+        <if test="seriesNo > 0">
+            and series_no = #seriesNo#
+        </if>
+        <if test="prdNo > 0">
+            and prd_no = #prdNo#
+        </if>
+        <if test="delYn != null and delYn != ''">
+            and del_yn = #delYn#
+        </if>
+    </sql>
+
+    <!-- 시리즈 상품 등록 여부 -->
+    <select id="getSeriesProductYn" resultType="int" parameterType="ProductSeriesVO">
+        <include refid="getSeriesProductCnt" />
+    </select>
+
+    <update id="updateDpPrdContSummary" parameterType="DpPrdContSummary">
+        UPDATE  /* productMapper.xml updateDpPrdContSummary */ DP_PRD_CONT_SUMMARY
+        SET
+            DISP_CTGR_NO = #{dispCtgrNo}
+            ,UPDATE_DT = SYSDATE
+        WHERE
+            PRD_NO = #{prdNo}
+    </update>
+
+    <update id="updateDpPrdSummary" parameterType="DpPrdContSummary">
+        UPDATE  /* productMapper.xml updateDpPrdSummary */ DP_PRD_SUMMARY
+        SET
+            DISP_CTGR_NO = #{dispCtgrNo}
+        WHERE
+        PRD_NO = #{prdNo}
+    </update>
+
+    <update id="updateTrDealEvl" parameterType="DpPrdContSummary">
+        UPDATE  /* productMapper.xml updateTrDealEvl */ TR_DEAL_EVL
+        SET
+            DISP_CTGR_NO_DE = #{dispCtgrNo}
+        WHERE
+        PRD_NO = #{prdNo}
+    </update>
+
+    <update id="updateDpContAplCtgr" parameterType="DpPrdContSummary">
+        UPDATE  /* productMapper.xml updateDpContAplCtgr */ DP_CONT_APL_CTGR
+        SET
+            DISP_CTGR_NO = FN_PD_SELL_GET_DISP_CTGR('01', '1', #{dispCtgrNo})
+        WHERE CONT_NO IN (SELECT CONT_NO FROM DP_SEMI_EXPRT WHERE PRD_NO = #{prdNo})
+    </update>
+
+    <update id="updateDpSemiExprt" parameterType="DpPrdContSummary">
+        UPDATE  /* productMapper.xml updateDpSemiExprt */ DP_SEMI_EXPRT
+        SET
+            APL_DISP_CTGR1_NO_DE = FN_PD_SELL_GET_DISP_CTGR('01', '1', #{dispCtgrNo})
+            ,APL_DISP_CTGR2_NO_DE = FN_PD_SELL_GET_DISP_CTGR('01', '2', #{dispCtgrNo})
+        WHERE PRD_NO = #{prdNo}
+    </update>
+
+
+    <!-- 상품전시영역 정보를  등록한다  -->
+    <insert id="insertPdPrdSvcArea" parameterType="PdPrdSvcArea">
+        INSERT INTO /* productMapper.xml insertPdPrdSvcArea 비정규화로 PIN번호 서비스는 SVC_AREA_CD를 '00'으로 한다 */
+        PD_PRD_SVC_AREA (PRD_NO, SVC_AREA_CD, SEL_MNBD_NO, PRD_TYP_CD, SHOP_NO, CERT_DOWN_YN, TOWN_SEL_LMT_DY, ALL_BRANCH_USE_YN, CERT_TYPE)
+        VALUES (#{prdNo}, NVL(#{svcAreaCd}, '00'), #{selMnbdNo}, #{prdTypCd}, #{shopNo}, #{certDownYn}, #{townSelLmtDy}, #{allBranchUseYn}, #{certType})
+    </insert>
+
+
+    <!-- 상품전시영역 정보를  수정한다  -->
+    <update id="updatePdPrdSvcArea" parameterType="PdPrdSvcArea">
+        UPDATE /* productMapper.xml updatePdPrdSvcArea */ PD_PRD_SVC_AREA
+        SET SVC_AREA_CD = NVL(#{svcAreaCd}, '00')
+            ,SEL_MNBD_NO = #{selMnbdNo}
+            ,PRD_TYP_CD = #{prdTypCd}
+            ,SHOP_NO = #{shopNo}
+            ,TOWN_SEL_LMT_DY = #{townSelLmtDy}
+        WHERE prd_no = #{prdNo}
+    </update>
+
+    <!-- 상품전시영역 정보를  삭제한다  -->
+    <delete id="deleteProductDispArea" parameterType="long">
+        /* productDAOMap.xml id="product.deleteProductDispArea" 이경택 2012.01.12 */
+        DELETE pd_prd_svc_area
+        WHERE prd_no = #{prdNo}
+    </delete>
+
+    <!-- 카테고리에 등록할 수 있는 상품 유형 정보 조회. -->
+    <select id="getProductTypeInfoList" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+        <![CDATA[
+        SELECT
+               C.PRD_TYP_CD
+              ,C.PRD_TYP_NM
+              ,DECODE(A.PRD_TYP_CD, '09',
+                        DECODE(B.CTGR_TYP_CD, '09',
+                            DECODE(A.SVC_CTGR_TYP_CD, '01', 'Y', 'N'), 'N'), 'Y') REG_YN
+              ,CASE
+              	WHEN c.prd_typ_cd = '11'
+              		THEN (select '11' from sb_mart where mem_no = #{memNo} AND ROWNUM <= 1)
+              	WHEN c.prd_typ_cd = '28'
+              		THEN '28'
+              	ELSE null
+              END AS SELLER_AUTH
+              ,CASE
+              	WHEN c.prd_typ_cd = '11'
+              		THEN (select '11' from sb_mart where mem_no = #{memNo} AND ROWNUM <= 1)
+              	WHEN c.prd_typ_cd = '28'
+              		THEN '28'
+              	ELSE null
+              END AS FRESH_SELLER_AUTH
+              ,NVL(
+				    (SELECT 'Y' FROM
+				    (
+				        SELECT DISP_CTGR_NO
+				        FROM   DP_DISP_CTGR CTGR
+				        WHERE  LEVEL >= 2
+				        AND DISP_CTGR_TYP_CD = '01'
+				        AND DISP_CTGR_STAT_CD = '03'
+				        START WITH DISP_CTGR_NO = #{dispCtgrNo}
+				        CONNECT BY PRIOR HGRNK_CTGR_NO = DISP_CTGR_NO
+				    ) CTGR, PD_SELLER_AUTH AUTH
+				    WHERE CTGR.DISP_CTGR_NO = TO_NUMBER(AUTH.AUTH_OBJ_NO)
+				    AND AUTH.SEL_MNBD_NO = 0
+				    AND AUTH.AUTH_TYP_CD = '03'
+				    AND AUTH.USE_YN ='Y'
+				    AND ROWNUM <= 1
+				), 'N') AS FRESH_YN
+			  ,NVL(
+				    (SELECT 'Y' FROM
+				    (
+				        SELECT DISP_CTGR_NO
+				        FROM   DP_DISP_CTGR CTGR
+				        WHERE  LEVEL >= 2
+				        AND DISP_CTGR_TYP_CD = '01'
+				        AND DISP_CTGR_STAT_CD = '03'
+				        START WITH DISP_CTGR_NO = #{dispCtgrNo}
+				        CONNECT BY PRIOR HGRNK_CTGR_NO = DISP_CTGR_NO
+				    ) CTGR, PD_SELLER_AUTH AUTH
+				    WHERE CTGR.DISP_CTGR_NO = TO_NUMBER(AUTH.AUTH_OBJ_NO)
+				    AND AUTH.SEL_MNBD_NO = 0
+				    AND AUTH.AUTH_TYP_CD = '02'
+				    AND AUTH.USE_YN ='Y'
+				    AND ROWNUM <= 1
+				), 'N') AS MART_YN
+	]]>
+        FROM  DP_DISP_CTGR A
+        ,PD_PRD_TYP_CTGR_MAP B
+        ,PD_PRD_TYP_INFO C
+        WHERE NVL(A.PRD_TYP_CD, '01') = B.CTGR_TYP_CD
+        AND   B.PRD_TYP_CD = C.PRD_TYP_CD
+        AND   A.DISP_CTGR_NO = #{dispCtgrNo}
+        AND   A.USE_YN = 'Y'
+        AND   B.USE_YN = 'Y'
+        AND   C.USE_YN = 'Y'
+        <if test="urlType == 'PO'">
+            AND	  B.PRD_TYP_CD NOT IN ('11', '28', '29', '30')
+        </if>
+        <if test="urlType != 'PO'">
+            AND
+            (
+            (
+            C.PRD_TYP_CD = '28'
+            AND EXISTS (
+            SELECT 1
+            FROM PD_SELLER_AUTH AUTH, (
+            SELECT DISP_CTGR_NO
+            FROM   DP_DISP_CTGR CTG
+            WHERE  LEVEL >= 2
+            AND DISP_CTGR_TYP_CD = '01'
+            AND DISP_CTGR_STAT_CD = '03'
+            START WITH DISP_CTGR_NO = #{dispCtgrNo}
+            CONNECT BY PRIOR HGRNK_CTGR_NO = DISP_CTGR_NO
+            ) CTG
+            WHERE  CTG.DISP_CTGR_NO = TO_NUMBER(AUTH.AUTH_OBJ_NO)
+            AND    AUTH.SEL_MNBD_NO = 0
+            AND    AUTH.AUTH_TYP_CD IN ('02', '03')
+            AND    AUTH.USE_YN ='Y'
+            )
+            )
+            OR
+            (
+            C.PRD_TYP_CD NOT IN ('11', '28', '29', '30')
+            )
+            OR
+            (
+            C.PRD_TYP_CD = '11'
+            AND EXISTS (
+            <![CDATA[
+        			SELECT 1 FROM SB_MART WHERE MEM_NO = #{memNo} AND ROWNUM <= 1
+				]]>
+            )
+            )
+            OR
+            (
+            EXISTS (
+            SELECT 1
+            FROM PD_SELLER_AUTH
+            WHERE SEL_MNBD_NO = #{memNo}
+            AND   AUTH_TYP_CD = '01'
+            AND   AUTH_OBJ_NO = C.PRD_TYP_CD
+            AND   OBJ_CLF_CD = '07'
+            AND   SEL_REG_CD = '05'
+            AND   USE_YN = 'Y'
+            )
+            )
+            )
+        </if>
+        ORDER BY C.DISP_RNK
+        /* productMapper.getProductTypeInfoList */
+    </select>
+
+    <!-- 상품 관련 정책 정보 조회 -->
+    <select id="getProductLimitInfo" parameterType="ProductOptLimitVO" resultType="ProductOptLimitVO">
+        SELECT
+        /*+ INDEX(A PK_PD_PRD_LIMIT) */
+        A.PRD_NM_LEN_LMT AS prdNmLenLmtDefault
+        <if test="optLmtObjNo gt 0">
+            <![CDATA[
+				, NVL((
+					SELECT
+						PRD_NM_LEN_LMT
+					FROM (
+						SELECT /*+ LEADING(B A) USE_NL(A) INDEX(A PK_PD_PRD_LIMIT) */
+							A.PRD_NM_LEN_LMT
+							, ROW_NUMBER() OVER(ORDER BY B.LVL DESC) AS RNUM
+						FROM PD_PRD_LIMIT A, (
+												SELECT /*+ NO_MERGE INDEX(CTGR IX1_DP_DISP_CTGR) */ CTGR.DISP_CTGR_NO, 4 - LEVEL AS LVL
+												FROM DP_DISP_CTGR CTGR
+												CONNECT BY PRIOR CTGR.HGRNK_CTGR_NO = CTGR.DISP_CTGR_NO START WITH DISP_CTGR_NO = #{optLmtObjNo}
+											) B
+						WHERE A.LMT_OBJ_NO = B.DISP_CTGR_NO
+							AND A.LMT_CLF_CD = '01'
+							AND NVL(A.PRD_NM_LEN_LMT, 0) > 0
+					)
+					WHERE RNUM = 1
+				), 0) AS prdNmLenLmt
+			]]>
+        </if>
+        <if test="optLmtObjNo lte 0">
+            , 0 AS prdNmLenLmt
+        </if>
+        FROM PD_PRD_LIMIT A
+        WHERE A.LMT_OBJ_NO = 0
+        AND A.LMT_CLF_CD = '06'
+        AND A.DISP_CTGR_NO = 0
+        /* productMapper.getProductLimitInfo */
+    </select>
+
+    <select id="getProductNameMultiLang" resultType="ProductNameMultiLangVO" parameterType="ProductNameMultiLangVO">
+        SELECT
+        /*+ INDEX(A PK_PD_PRD_MTLGL) */
+        SELLER_TRSLT_PRD_NM as sellerTrsltPrdNm,
+        MCHN_TRSLT_PRD_NM as mchnTrsltPrdNm,
+        MTLGL_CLF_CD as mtlglLangClfCd,
+        TRSLT_YN as trsltYn
+        FROM PD_PRD_MTLGL
+        WHERE PRD_NO = #{prdNo}
+        /* productMapper.getProductNameMultiLang */
+    </select>
+
+    <!-- 기획사 정보를 등록한다. (현금영수증,카드영수증에서 사용)-->
+    <insert id="insertPdPrdAgency" parameterType="PdPrdAgency">
+        INSERT /* productMapper insertPdPrdAgency */
+        INTO PD_PRD_AGENCY
+        (
+            PRD_NO
+            ,AGENCY_BSNS_NO
+            ,BSNS_BGN_DY
+            ,AGENCY_NM
+            ,AGENCY_BSNS_ST
+            ,AGENCY_ITM
+            ,RPTV_NM
+            ,RPTV_TLPHN_NO
+            ,RPTV_EMAIL_ADDR
+            ,ENP_PLC_ADDR
+            ,USE_YN
+            ,CREATE_NO
+        ) VALUES (
+            #{prdNo}
+            ,#{agencyBsnsNo}
+            ,sysdate
+            ,#{agencyNm}
+            ,#{agencyBsnsSt}
+            ,#{agencyItm}
+            ,#{rptvNm}
+            ,#{rptvTlphnNo}
+            ,#{rptvEmailAddr}
+            ,#{enpPlcAddr}
+            ,'Y'
+            ,#{createNo}
+        )
+    </insert>
+
+
+
+    <!-- 기획사 정보를 가져온다. (현금영수증,카드영수증,상품수정 에서 사용) -->
+    <select id="getProductAgency" parameterType="long" resultType="AgencyVO">
+        SELECT /* productMapper.xml getProductAgency */
+            prd_no AS prdNo,
+            agency_bsns_no AS agencyBsnsNo,
+            bsns_bgn_dy AS bsnsBgnDy,
+            agency_nm AS agencyNm,
+            agency_bsns_st AS agencyBsnsSt,
+            agency_itm AS agencyItm,
+            rptv_nm AS rptvNm,
+            rptv_tlphn_no AS rptvTlphnNo,
+            rptv_email_addr AS rptvEmailAddr,
+            enp_plc_addr AS EnpPlcAddr,
+            use_yn AS useYn,
+            create_no AS createNo
+        FROM PD_PRD_AGENCY
+        WHERE PRD_NO = #{prdNo}
+        AND USE_YN = 'Y'
+    </select>
+
+    <!-- 기등록된 기획사가 있는지 확인한다. -->
+    <select id="checkProductAgency" parameterType="long" resultType="long">
+        SELECT /* productMapper.xml checkProductAgency */
+            COUNT(prd_no)
+        FROM PD_PRD_AGENCY
+        WHERE prd_no = #{prdNo}
+        AND use_yn = 'Y'
+    </select>
+
+    <!-- 기등록된 기획사가 있다면 사용여부는 N -->
+    <update id="disableProductAgency" parameterType="long" >
+        UPDATE /* productMapper.xml disableProductAgency */
+            PD_PRD_AGENCY
+        SET USE_YN = 'N'
+        WHERE PRD_NO = #{prdNo}
+        AND USE_YN = 'Y'
+    </update>
+
+    <!-- 소호 상품 유무 조회 -->
+    <select id="checkSohoPrd" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT
+        SEL.SHP_APL_OBJ,
+        CTGR.SHP_APL_OBJ
+        FROM   DP_SHP_MSTR_MAP SEL ,
+        DP_SHP_MSTR_MAP CTGR
+        WHERE  SEL.SHP_APL_OBJ = #{selMnbdNo}
+        AND    SEL.SHP_APL_TYP_CD = '02'
+        AND    CTGR.SHP_APL_TYP_CD = '01'
+        AND    SEL.USE_YN = 'Y'
+        AND    CTGR.USE_YN = 'Y'
+        AND    CTGR.SHP_APL_OBJ IN
+        (
+        SELECT DISP_CTGR_NO
+        FROM   DP_DISP_CTGR
+        WHERE  USE_YN = 'Y'
+        AND    DISP_CTGR_STAT_CD = '03'
+        START WITH DISP_CTGR_NO = #{dispCtgrNo}
+        CONNECT BY PRIOR HGRNK_CTGR_NO = DISP_CTGR_NO
+        )
+        /* productMapper.checkSohoPrd */
+    </select>
+
+    <select id="getPrdOptTypCd" resultType="String" parameterType="long">
+        select
+        opt_typ_cd
+        from
+        pd_prd
+        where
+        prd_no = #{prdNo}
+        /* productMapper.getPrdOptTypCd */
+    </select>
+
+    <!-- 상품무게변경히스토리 -->
+    <select id="getProductWghtHist" parameterType="long" resultType="java.util.HashMap">
+        SELECT NVL(PRD_WGHT,0)||'g' PRDWGHT,
+        DECODE((SELECT MEM_NM||'('||MEM_ID||')'
+        FROM   MB_MEM
+        WHERE  MEM_NO = a.UPDATE_NO), '', (SELECT EMP_NM||'('||EMP_ID||')'
+        FROM   SY_EMP
+        WHERE  EMP_NO = a.UPDATE_NO), (SELECT MEM_NM||'('||MEM_ID||')'
+        FROM   MB_MEM
+        WHERE  MEM_NO = a.UPDATE_NO)) AS UPDATE_ID ,
+        TO_CHAR(A.UPDATE_DT, 'YYYY/MM/DD HH24:MI:SS') AS UPDATEDT
+        FROM   PD_PRD_HIST A
+        WHERE  A.PRD_NO = #{prdNo}
+        ORDER BY A.UPDATE_DT ASC
+        /* productMapper.getProductWghtHist */
+    </select>
+
+    <!-- 상품의 판매주체 번호를 읽어온다. -->
+    <select id="getProductSelMnbdNo" resultType="long" parameterType="long">
+        SELECT
+        sel_mnbd_no
+        FROM pd_prd
+        WHERE prd_no = #{prdNo}
+        /* productMapper.getProductSelMnbdNo */
+    </select>
+
+    <!-- 임시저장 정보를 등록한다. -->
+    <insert id="insertPdPrdTempSave" parameterType="PdPrdTempSave">
+        INSERT INTO PD_PRD_TEMP_SAVE (SELLER_NO, TEMP_SAVE_SEQ, TEMP_SAVE_JSON, CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO)
+        VALUES(#{sellerNo}, (SELECT /*+ INDEX(A PK_PD_PRD_TEMP_SAVE) */ NVL(MAX(TEMP_SAVE_SEQ)+1, 1) FROM PD_PRD_TEMP_SAVE A WHERE SELLER_NO = #{sellerNo}), #{tempSaveJson}, SYSDATE, #{createNo}, SYSDATE, #{updateNo})
+        /* productMapper.insertPdPrdRegGt */
+    </insert>
+
+    <!-- 임시저장 정보를 수정한다. -->
+    <update id="updatePdPrdTempSave" parameterType="PdPrdTempSave">
+        UPDATE /*+ INDEX(T PK_PD_PRD_TEMP_SAVE) */ PD_PRD_TEMP_SAVE T SET TEMP_SAVE_JSON = #{tempSaveJson}, UPDATE_DT = SYSDATE, UPDATE_NO = #{updateNo}
+        WHERE TEMP_SAVE_SEQ = #{tempSaveSeq}
+        AND SELLER_NO = #{sellerNo}
+        /* productMapper.updatePdPrdRegGt */
+    </update>
+
+    <!-- 임시저장 정보를 삭제한다. -->
+    <delete id="deletePdPrdTempSave" parameterType="PdPrdTempSave">
+        DELETE /*+ INDEX(T PK_PD_PRD_TEMP_SAVE) */ FROM PD_PRD_TEMP_SAVE T
+        WHERE TEMP_SAVE_SEQ = #{tempSaveSeq}
+        AND SELLER_NO = #{sellerNo}
+        /* productMapper.deletePdPrdRegGt */
+    </delete>
+
+    <!-- 임시저장 정보를 조회한다. -->
+    <select id="selectPdPrdTempSave" parameterType="PdPrdTempSave" resultType="PdPrdTempSave">
+      SELECT A.* FROM (
+        SELECT /*+ INDEX_DESC(A IX1_PD_PRD_TEMP_SAVE) */ SELLER_NO, TEMP_SAVE_SEQ, TEMP_SAVE_JSON, TO_CHAR(CREATE_DT, 'YYYY/MM/DD HH24:MI:SS') AS CREATE_DT, CREATE_NO, TO_CHAR(UPDATE_DT, 'YYYY/MM/DD HH24:MI:SS') AS UPDATE_DT, UPDATE_NO
+        FROM PD_PRD_TEMP_SAVE A
+        WHERE SELLER_NO = #{sellerNo}
+        ORDER BY UPDATE_DT DESC
+      ) A
+      WHERE ROWNUM &lt;= 40
+      /* productMapper.selectPdPrdRegGt */
+    </select>
+
+    <!-- 추가상품구성 수정 -->
+    <update id="updateProductComposition" parameterType="ProductAddCompositionVO">
+        UPDATE /* productMapper.xml updateProductComposition */
+            pd_add_prd_comp
+        SET
+            add_prd_grp_no = #{addPrdGrpNo}
+            ,sel_prc = #{selPrc}
+            ,add_comp_prc = #{addCompPrc}
+            ,comp_prd_qty = sel_qty + #{stckQty}
+            ,stck_qty = #{stckQty}
+            ,update_no = #{updateNo}
+            ,update_dt = sysdate
+            ,use_yn = #{useYn}
+            ,CSTM_APL_PRC = #{addCstmAplPrc} * 100
+            ,comp_prd_nm = #{compPrdNm}
+        <if test="aplBgnDy != null and aplBgnDy != ''">
+            ,apl_bgn_dy = to_date(#{aplBgnDy},'rrrrmmddhh24miss')
+        </if>
+        <if test="aplEndDy != null and aplEndDy != ''">
+            ,apl_end_dy = to_date(#{aplEndDy},'rrrrmmddhh24miss')
+        </if>
+        <if test="dispPrrtRnk != 0">
+            ,disp_prrt_rnk = #{dispPrrtRnk}
+        </if>
+        WHERE
+            prd_comp_no = #{prdCompNo}
+        AND prd_comp_typ_cd = '02'
+    </update>
+
+    <update id="insertPdPrdItm" parameterType="ProductItemVO">
+        INSERT /* productMapper.xml insertPdPrdItm */ INTO pd_prd_itm (
+            prd_itm_no,
+            prd_no,
+            svc_bgn_dy,
+            svc_end_dy,
+            use_yn,
+            create_dt,
+            create_no,
+            update_dt,
+            update_no,
+            disp_itm_no,
+            display_term_clf_cd,
+            itm_sel_mnbd_no,
+            itm_premium_yn,
+            cupn_iss_cn_yn
+        ) values (
+            SEQ_PD_PRD_ITM.nextVal
+            ,#{prdNo}
+            ,to_date(SUBSTR(#{svcBgnDy},0,8)||'000000','YYYYMMDDHH24MISS')
+            ,to_date(SUBSTR(#{svcEndDy},0,8)||'235959','YYYYMMDDHH24MISS')
+            ,#{useYn}
+            ,sysdate
+            ,#{createNo}
+            ,sysdate
+            ,#{updateNo}
+            ,#{dispItmNo}
+            ,#{displayTermClfCd}
+            ,#{selMnbdNo}
+            ,#{premiumYn}
+            ,(
+                SELECT cupn_iss_cn_yn from dp_disp_itm where disp_itm_no = #dispItmNo# and use_yn = 'Y' and sysdate between apl_bgn_dt and apl_end_dt
+            )
+        )
+    </update>
+
+    <update id="insertPdStdPrdAttrComp" parameterType="PdStdPrdAttrComp">
+        INSERT 	/* productMapper.xml insertPdStdPrdAttrComp */
+        INTO PD_STD_PRD_ATTR_COMP (
+            PRD_NO,
+            STD_ATTR_COMP_NO,
+            STD_ATTR_VALUE_NM,
+            ATTR_CLF_CD,
+            CTLG_ATTR_NO,
+            CTLG_ATTR_VALUE_NO,
+            CREATE_DT,
+            CREATE_NO,
+            UPDATE_DT,
+            UPDATE_NO
+        )
+        VALUES (
+            #{prdNo},
+            ( SELECT nvl(MAX(STD_ATTR_COMP_NO),0)+1 FROM PD_STD_PRD_ATTR_COMP WHERE PRD_NO = #{prdNo} ) ,
+            #{stdAttrValueNm},
+            #{attrClfCd},
+            #{ctlgAttrNo},
+            decode(#{ctlgAttrValueNo},0,null,#{ctlgAttrValueNo}),
+            sysdate,
+            #{createNo},
+            sysdate,
+            #{updateNo}
+        )
+    </update>
+
+    <delete id="deletePdStdPrdAttrComp" parameterType="long" >
+        DELETE 	/* productMapper.xml deletePdStdPrdAttrComp */
+        /*+ INDEX(A PK_PD_STD_PRD_ATTR_COMP) */
+        FROM PD_STD_PRD_ATTR_COMP A
+        WHERE PRD_NO = #{prdNo}
+    </delete>
+    
+    <select id="getSearchTagName" parameterType="String" resultType="java.util.HashMap">
+        SELECT /* productMapper.xml getSearchTagName */
+		       /*+ GATHER_PLAN_STATISTICS */
+		       /*+ LEADING(MSTR) */
+		       MSTR.TAG_NO
+		     , MSTR.TAG_NM
+		FROM   DP_TAG_MSTR MSTR
+		WHERE  MSTR.USE_YN = 'Y'
+        AND    UPPER(MSTR.TAG_NM) LIKE #{searchTag} || '%'
+        ORDER BY MSTR.CREATE_DT DESC, MSTR.TAG_NM
+    </select>
+
+    <select id="getSearchProductList" parameterType="ProductSearchVO" resultType="ProductSearchVO">
+        SELECT /* productSearchDAOMap.xml product.getSearchProductList : 상품을 검색해서 다른 정보로 넣기위한 목록 조회 */
+        LST.*
+        FROM (
+        <if test="searchType==null or searchType==''">
+            SELECT /*+ LEADING(GNRL PRD) USE_NL(PRD) INDEX_DESC(GNRL IX10_DP_GNRL_DISP) INDEX(PRD PK_PD_PRD) */
+                    PRD.PRD_NO as prdNo
+                    , PRD.PRD_NM as prdNm
+                    , PRD.SEL_STAT_CD as selStatCd
+                    , PRD.CREATE_DT as createDt
+                    , PRD.UPDATE_DT as updateDt
+                    , ROWNUM RNUM
+            FROM PD_PRD PRD, DP_GNRL_DISP GNRL
+            WHERE PRD.PRD_NO = GNRL.PRD_NO
+            AND GNRL.GNRL_SEL_STAT_CD IN ('103', '104', '105')
+            AND NVL(GNRL_OM_PRD_YN , 'Y') = 'Y'
+            AND NVL(GNRL.GNRL_HIDE_YN, 'N') = 'N'
+            AND GNRL.GNRL_SEL_MNBD_NO = #{selMnbdNo}
+            AND GNRL.GNRL_BSN_DEAL_CLF = #{bsnDealClf}
+            AND (GNRL.GNRL_SVC_AREA_CD IS NULL OR GNRL.GNRL_SVC_AREA_CD <![CDATA[ <> ]]> '03')
+            <if test="stdPrdYn != null and stdPrdYn.equals('Y'.toString())">
+                AND GNRL.STD_PRD_YN = 'Y'
+            </if>
+        </if>
+        <if test="searchType!=null and searchType!=''">
+            SELECT
+                PRD.PRD_NO as prdNo
+                , PRD.PRD_NM as prdNm
+                , PRD.SEL_STAT_CD as selStatCd
+                , PRD.CREATE_DT as createDt
+                , PRD.UPDATE_DT as updateDt
+                , ROWNUM RNUM
+            FROM PD_PRD PRD
+            WHERE PRD.SEL_MNBD_NO = #{selMnbdNo}
+            AND PRD.BSN_DEAL_CLF = #{bsnDealClf}
+            AND PRD.DISP_CTGR_NO_DE > 0
+            AND PRD.SEL_STAT_CD IN ('103','104','105')
+            AND NVL(PRD.OM_PRD_YN , 'Y') = 'Y'
+            AND NVL(PRD.HIDE_YN, 'N') = 'N'
+            AND (PRD.SVC_AREA_CD IS NULL OR PRD.SVC_AREA_CD <![CDATA[ <> ]]> '03')
+            <if test="stdPrdYn != null and stdPrdYn.equals('Y'.toString())">
+             AND   PRD.STD_PRD_YN = 'Y'
+            </if>
+            <if test = "prdNo > 0">
+                AND    PRD.PRD_NO = #{prdNo}
+            </if>
+            <if test = "prdNm !='' and prdNm !=null">
+                AND UPPER(PRD.PRD_NM) LIKE '%' || upper(#{prdNm}) || '%'
+            </if>
+        </if>
+        ) LST
+        <![CDATA[
+		WHERE RNUM BETWEEN #{start} AND #{end}-1
+	]]>
+    </select>
+
+    <select id="getAddPrdNoInputTypeCount" parameterType="ProductAddCompositionVO" resultType="long">
+        SELECT /* productMapper.xml getAddPrdNoInputTypeCount */
+            COUNT(*)
+        FROM
+            PD_ADD_PRD_COMP A
+            ,PD_PRD B
+        WHERE
+            A.PRD_COMP_NO = #{prdCompNo}
+        AND A.COMP_PRD_NO = #{compPrdNo}
+        AND A.MAIN_PRD_NO = #{mainPrdNo}
+        AND A.COMP_PRD_NO = B.PRD_NO
+        AND 0 = (SELECT COUNT(*)
+                FROM DP_GNRL_DISP G
+                WHERE G.PRD_NO = #{compPrdNo})
+    </select>
+
+    <!-- 전시아이템개편 수정 -->
+    <select id="getProductItemList" resultType="ProductItemVO" parameterType="long">
+        SELECT
+        b.prd_itm_no,
+        b.prd_no,
+        to_char(b.svc_bgn_dy,'yyyymmdd') as svc_bgn_dy ,
+        to_char(b.svc_end_dy,'yyyymmdd') as svc_end_dy,
+        b.use_yn,
+        b.create_dt,
+        b.create_no,
+        b.update_dt,
+        b.update_no,
+        b.disp_itm_no,
+        to_char(b.svc_end_dy,'HH24') as svcEndHH24,
+        nvl(b.display_term_clf_cd,'') as display_term_clf_cd,
+        decode(b.display_term_clf_cd, null, 'Y','N') as old_disp_item_yn,
+        (select disp_fee
+        from dp_disp_itm_prc a
+        where a.disp_itm_no = b.disp_itm_no
+        and a.display_term_clf_cd = b.display_term_clf_cd
+        and a.sel_mthd_cd = (select sel_mthd_cd from pd_prd where prd_no = #{prdNo})
+        ) as disp_fee,
+        (select fee_itm_no
+        from dp_disp_itm_prc a
+        where a.disp_itm_no = b.disp_itm_no
+        and a.display_term_clf_cd = b.display_term_clf_cd
+        and a.sel_mthd_cd = (select sel_mthd_cd from pd_prd where prd_no = #{prdNo})
+        ) as new_fee_itm_no,
+        case when sysdate between b.svc_bgn_dy and b.svc_end_dy then 'Y'
+        else 'N' end as add_extend_yn, /*추가연장여부-추가 또는 등록/수정가능을 구분*/
+        (select disp_itm_nm from dp_disp_itm where disp_itm_no = b.disp_itm_no and use_yn='Y') as disp_itm_nm,
+        to_char(trunc(svc_end_dy)-trunc(sysdate)) as itm_remain,
+        c.disp_itm_typ_cd,
+        c.premium_yn,
+        c.gif_yn,
+        case when sysdate > b.svc_end_dy then 'Y'
+        else 'N' end as expired_yn
+        FROM  pd_prd_itm  b
+        , dp_disp_itm c
+        WHERE b.disp_itm_no = c.disp_itm_no
+        AND b.prd_itm_no in (SELECT max(prd_itm_no) /* 중복건제외 */
+        FROM pd_prd_itm
+        WHERE prd_no = #{prdNo}
+        GROUP BY DISP_ITM_NO)
+        AND c.use_yn = 'Y'
+        /* productMapper.getProductItemList */
+    </select>
+
+    <!-- 상품 추가상품구성 정보  pd_add_prd_comp 를  조회한다.
+     SO : 상품번호로 전체 데이터 조회
+     Mobile SO : 상품번호를 통해 페이징을 사용한다. start와 limit는 0 이상인경우가 셋팅됨 -->
+    <select id="getAddProductInformationList" resultType="ProductAddCompositionVO" parameterType="ProductAddCompositionVO">
+        SELECT *
+        FROM (
+        SELECT s.*
+        , count(*) over() AS total_count
+        , rownum AS no
+        FROM (
+        SELECT
+        b.prd_comp_no,
+        b.main_prd_no,
+        b.comp_prd_no,
+        b.comp_prd_stck_no,
+        b.evnt_no,
+        b.apl_bgn_dy,
+        b.apl_end_dy,
+        b.main_prd_yn,
+        b.sel_prc,
+        b.add_comp_prc,
+        b.stck_qty AS comp_prd_qty,
+        a.disp_prrt_rnk,
+        b.prd_comp_typ_cd,
+        b.sel_qty,
+        b.stck_qty,
+        b.use_yn,
+        to_char(b.create_dt,'rrrrmmddhh24miss') create_dt,
+        b.create_no,
+        to_char(b.update_dt,'rrrrmmddhh24miss') update_dt,
+        b.update_no,
+        c.prd_nm as  prd_nm,
+        (select dtls_com_nm from sy_co_detail where dtls_cd=b.prd_comp_typ_cd  and grp_cd = 'PD006') as prd_comp_typ,
+        0 as gnrl_prd_no,
+        c.sel_stat_cd,
+        a.ADD_PRD_GRP_NO,
+        a.ADD_PRD_GRP_NM,
+        nvl(c.PRD_WGHT, 0) as PRD_WGHT,
+        nvl(b.CSTM_APL_PRC,0)/100 CSTM_APL_PRC,
+        nvl(c.SUPL_DTYFR_PRD_CLF_CD,'01') comp_prd_vat_cd,
+        nvl(c.gbl_dlv_yn, 'N') gbl_Dlv_Yn
+        FROM pd_add_prd_grp a, pd_add_prd_comp b, pd_prd c
+        WHERE a.main_prd_no = #{mainPrdNo}
+        and a.main_prd_no = b.main_prd_no
+        and a.ADD_PRD_GRP_NO = b.ADD_PRD_GRP_NO
+        and b.comp_prd_no = c.prd_no
+        and b.prd_comp_typ_cd='02'
+        and b.use_yn != 'D'
+        order by a.ADD_PRD_GRP_NO, b.DISP_PRRT_RNK
+        ) s
+        <if test="limit >= 0 and start >= 0">
+          WHERE ROWNUM <![CDATA[ <= ]]> #{start} + #{limit} + 1
+        </if>
+        )
+        <if test="limit >= 0 and start >= 0">
+          WHERE no <![CDATA[ > ]]> #{start} AND no <![CDATA[ <= ]]> #{start} + #{limit}
+        </if>
+        /* productMapper.getAddProductInformationList */
+    </select>
+
+    <!-- 이벤트상품설정 여부 확인 -->
+    <select id="getEventProductYn" resultType="int" parameterType="long">
+        SELECT
+        count(*)
+        from 	PD_PRD_LIMIT_ORD ord
+        where 	ord.LIMIT_TYP_CD='05'
+        and 	TO_CHAR(ord.LIMIT_END_DT ,'YYYYMMDDHH24MISS') <![CDATA[  >= ]]> TO_CHAR(sysdate ,'YYYYMMDDHH24MISS')
+        and 	prd_no = #{prdNo}
+        /* productMapper.getEventProductYn */
+    </select>
+
+    <select id="getRntlInfo" resultType="RentalVO" parameterType="long">
+        <![CDATA[
+				select
+				aa.* ,
+				case when rntl_opt_item_no =1 then
+				(select /*+ INDEX(STK IX_PD_STOCK_01) */ OPT_VALUE_NM1 from pd_stock STK where prd_no = aa.prdno and rntl_cst = aa.rntlCst and rownum =1)
+				when rntl_opt_item_no =2 then
+				(select /*+ INDEX(STK IX_PD_STOCK_01) */ OPT_VALUE_NM2 from pd_stock STK where prd_no = aa.prdno and rntl_cst = aa.rntlCst and rownum =1)
+				when rntl_opt_item_no =3 then
+				(select /*+ INDEX(STK IX_PD_STOCK_01) */ OPT_VALUE_NM3 from pd_stock STK where prd_no = aa.prdno and rntl_cst = aa.rntlCst and rownum =1)
+				when rntl_opt_item_no =4 then
+				(select /*+ INDEX(STK IX_PD_STOCK_01) */ OPT_VALUE_NM4 from pd_stock STK where prd_no = aa.prdno and rntl_cst = aa.rntlCst and rownum =1)
+				when rntl_opt_item_no =5 then
+				(select /*+ INDEX(STK IX_PD_STOCK_01) */ OPT_VALUE_NM5 from pd_stock STK where prd_no = aa.prdno and rntl_cst = aa.rntlCst and rownum =1)
+				end rntlTermValue
+				from (
+					select /*+ LEADING(A B) USE_NL(B) INDEX(A PK_PD_RNTL_PRD) INDEX(B PK_SY_CO_DETAIL) */
+						A.PRD_NO prdNo,
+						A.FREE_INST_YN freeInstYn,
+						A.CO_CARD_BNFT coCardBnft,
+						A.INST_CST_DESC instCstDesc,
+						A.FRGFT_DESC frgftDesc,
+						A.ETC_INFO etcInfo,
+						A.USE_YN useSpecialRentalYn,
+						A.CST_TERM_CD cstTermCd,
+						A.USE_YN useYn,
+						NVL(A.MIN_RNTL_CST, 0) minRntlCst,
+						NVL(A.MAX_RNTL_CST, 0) maxRntlCst,
+						(SELECT /*+ INDEX(STK IX_PD_STOCK_01) */ NVL(MIN(RNTL_CST),0)
+		                 FROM PD_STOCK STK
+		                 WHERE STK.PRD_NO = A.PRD_NO ) rntlCst,
+						B.DTLS_COM_NM AS rntlTermStr,
+						B.CD_VAL1 as rntlCstUntStr,
+						(SELECT /*+ INDEX(ITM PK_PD_OPT_ITEM) */ MAX(OPT_ITEM_NO)
+		                 FROM PD_OPT_ITEM ITM
+		                 WHERE ITM.PRD_NO = A.PRD_NO
+		                 AND OPT_CLF_CD !=  '03') rntl_opt_item_no
+					from PD_RNTL_PRD A , SY_CO_DETAIL B
+
+					where A.prd_no = #{prdNo}
+					  AND A.CST_TERM_CD = B.DTLS_CD
+					  AND B.GRP_CD = 'PD212'
+			) aa
+	]]>
+        /* productMapper.getRntlInfo */
+    </select>
+
+    <select id="getPdPartnerPrdRt" resultType="ProductVO" parameterType="ProductVO">
+        select
+        PRD_NO prdNo,
+        PARTNER_CD skMemberPartnerCd,
+        DSC_RT skMemberDscRt
+        from    PD_PARTNER_PRD_RT
+        where   use_yn = 'Y'
+        and   prd_no = #{prdNo}
+        and   partner_cd = #{skMemberPartnerCd}
+        and	rownum = 1
+        /* productMapper.getPdPartnerPrdRt */
+    </select>
+
+    <!-- 국가 리스트 조회 -->
+    <select id="getNationList" parameterType="HashMap" resultType="HashMap">
+        SELECT ntNo, ntKorNm, ntEngNm, ntShortNm, createDt,  createNo, updateDt, updateNo FROM (
+        SELECT
+        NT_NO as ntNo
+        , NT_KOR_NM as ntKorNm
+        , NT_ENG_NM as ntEngNm
+        , NT_SHORT_NM as ntShortNm
+        , CREATE_DT as createDt
+        , CREATE_NO as createNo
+        , UPDATE_DT as updateDt
+        , UPDATE_NO as updateNo
+        FROM   SY_NATION
+        WHERE 1=1
+        <if test="ntNo > 0">
+            AND NT_NO = #{ntNo}
+        </if>
+        <if test="ntShortNm != null and ntShortNm != ''">
+            AND NT_SHORT_NM = UPPER(#{ntShortNm})
+            AND ROWNUM = 1
+        </if>
+        )
+        <choose>
+            <when test="orderBy != null and orderBy != ''">
+                <choose>
+                    <when test="orderBy == 'NT_ENG_NM'">
+                        ORDER BY ntEngNm
+                    </when>
+                    <when test="orderBy == 'NT_SHORT_NM'">
+                        ORDER BY ntShortNm
+                    </when>
+                    <otherwise>
+                        ORDER BY ntKorNm
+                    </otherwise>
+                </choose>
+            </when>
+            <otherwise>
+                ORDER BY ntKorNm
+            </otherwise>
+        </choose>
+        /* productMapper.getNationList */
+    </select>
+
+    <!-- 태그 정보 조회 -->
+    <select id="getProductTagList" parameterType="long" resultType="ProductTagVO">
+        SELECT
+        PRD_NO as prdNo
+        , TAG_NM as tagNm
+        , CREATE_DT as createDt
+        , CREATE_NO as creaetNo
+        FROM
+        PD_PRD_TAG
+        WHERE
+        PRD_NO = #{prdNo}
+        /* productMapper.getProductTagList */
+    </select>
+
+    <select id="getApproveDt" resultType="String" parameterType="long">
+        SELECT /* productDAOMap.xml  product.getApproveDt */
+        /*+ INDEX(A PK_PD_PRD_STAT_HIST) */
+        TO_CHAR(Min(A.APL_BGN_DT),'YYYYMMDD') as updateDt
+        FROM pd_prd_stat_hist A
+        WHERE A.prd_stat_cd != '101'
+        AND A.prd_no = #{prdNo}
+        /* productMapper.getApproveDt */
+    </select>
+
+    <select id="getProductMobileFee" resultType="ProductMobileFeeVO" parameterType="long">
+        SELECT A.PRD_MP_FEE_NO,
+        A.PRD_NO,
+        A.MP_FEE_NO,
+        A.CONTRACT_TERM_CD,
+        A.MAKT_PRC,
+        A.REP_FEE_YN,
+        A.PRRT_RNK,
+        B.GRP_NM,
+        B.MP_FEE,
+        B.MP_FEE_NM
+        FROM PD_PRD_MOBILE_FEE A, PD_MOBILE_FEE B
+        WHERE PRD_NO = #{prdNo}
+        AND A.MP_FEE_NO = B.MP_FEE_NO
+        ORDER BY PRRT_RNK ASC
+        /* productMapper.getProductMobileFee */
+    </select>
+
+    <select id="getKeywdPrdExtFilterList" parameterType="HashMap" resultType="KeywdVO">
+        SELECT /* productMapper.getKeywdPrdExtFilterList [상품등록/수정 - 상품키워드 필터 목록-상품명금칙어] */
+            T1.DISP_CTGR_NO AS dispCtgrNo
+            , T1.KEYWD AS keywdNm
+        FROM TS_TNS_PRD_KEYWD T1
+        WHERE T1.GUBUN = '06'
+        AND T1.USE_YN = 'Y'
+        AND NVL(T1.EXCEPTION_YN,'N') = 'N'
+        AND T1.DISP_CTGR_NO IN (SELECT DISP_CTGR_NO FROM DP_DISP_CTGR
+                                CONNECT BY PRIOR HGRNK_CTGR_NO = DISP_CTGR_NO
+                                START WITH DISP_CTGR_NO = #{dispCtgrNo})
+        AND INSTR(#{content},T1.KEYWD,1) > 0
+
+        AND NOT EXISTS(SELECT 1
+                        FROM TS_TNS_PRD_KEYWD T2
+                        WHERE T1.KEYWD = T2.KEYWD
+                        AND T2.GUBUN = '06'
+                        AND T2.USE_YN = 'Y'
+                        AND T2.DISP_CTGR_NO IN (SELECT DISP_CTGR_NO FROM DP_DISP_CTGR
+                                                CONNECT BY PRIOR HGRNK_CTGR_NO = DISP_CTGR_NO
+                                                START WITH DISP_CTGR_NO = #{dispCtgrNo})
+                        AND INSTR(#content#,T2.KEYWD,1) > 0
+                        AND T2.EXCEPTION_YN = 'Y'
+                        )
+    </select>
+    
+    <select id="getKeywdPrdFilterList" parameterType="long" resultType="KeywdVO">
+		select /* productMapper.getKeywdPrdFilterList */
+		    dispCtgrNo, keywd as keywdNm
+        from
+		(
+            SELECT
+                    /*+ LEADING(B T) USE_NL(B T) INDEX(T IX1_TS_TNS_PRD_KEYWD) */
+                    T.DISP_CTGR_NO dispCtgrNo
+                    ,T.KEYWD keywd
+            FROM 	TS_TNS_PRD_KEYWD T, ( SELECT	/*+ INDEX(IA IDX1_DP_DISP_CTGR) */
+                                                    DISP_CTGR_NO
+                                             FROM	DP_DISP_CTGR IA
+                                             WHERE	DISP_CTGR_CD LIKE (
+                                                         SELECT /*+ INDEX(IB DISP_CTGR_NO) */
+                                                              DISP_CTGR_CD || '%'
+                                                         FROM DP_DISP_CTGR IB
+                                                         WHERE DISP_CTGR_NO = FN_PD_SELL_GET_DISP_CTGR('01', 1, #{dispCtgrNo} )
+                                                    )
+                                         ) B
+            WHERE 	T.USE_YN='Y'
+            AND     T.GUBUN &lt;&gt; '06'
+                AND T.DISP_CTGR_NO =  B.DISP_CTGR_NO
+            UNION ALL
+            SELECT
+                    DISP_CTGR_NO dispCtgrNo
+                    ,KEYWD keywd
+            FROM	TS_TNS_PRD_KEYWD
+            WHERE	USE_YN='Y'
+            AND     GUBUN &lt;&gt; '06'
+                AND DISP_CTGR_NO = 0
+		)  aa
+		where
+		not exists(
+		    select 'x' from
+		        (
+		        SELECT	/*+ LEADING(B T) USE_NL(B T) INDEX(T IX1_TS_TNS_PRD_KEYWD) */
+		                    T.DISP_CTGR_NO dispCtgrNo
+		                    ,T.KEYWD keywd
+		            FROM 	TS_TNS_PRD_KEYWD T, ( SELECT	/*+ INDEX(IA IDX1_DP_DISP_CTGR) */
+		                                                DISP_CTGR_NO
+		                                         FROM	DP_DISP_CTGR IA
+		                                         WHERE	DISP_CTGR_CD LIKE (
+		                                                     SELECT /*+ INDEX(IB DISP_CTGR_NO) */
+		                                                          DISP_CTGR_CD || '%'
+		                                                     FROM DP_DISP_CTGR IB
+		                                                     WHERE DISP_CTGR_NO = FN_PD_SELL_GET_DISP_CTGR('01', 1, #{dispCtgrNo} )
+		                                                )
+		                                     ) B
+		            WHERE 	T.USE_YN='Y'
+		            AND     T.GUBUN &lt;&gt; '06'
+		                AND T.EXCEPTION_YN = 'Y'
+		                AND T.DISP_CTGR_NO = B.DISP_CTGR_NO
+		        ) bb
+		    where bb.keywd = aa.keywd
+		    and bb.dispCtgrNo in (
+				SELECT DISP_CTGR_NO
+			    FROM DP_DISP_CTGR
+			    CONNECT BY DISP_CTGR_NO = PRIOR HGRNK_CTGR_NO
+			    START WITH DISP_CTGR_NO = #{dispCtgrNo}
+			    )
+		    )
+    </select>
+
+    <!--  상품 정보 및 회원정보 를  조회한다 -->
+    <select id="getProductMember" parameterType="long" resultMap="com.elevenst.terroir.product.registration.common.mapper.VoMapper.productVOMap">
+        SELECT
+        a.prd_no              AS prdNo,
+        a.sel_mnbd_no       AS selMnbdNo,
+        a.prd_nm            	AS prdNm,
+        a.sel_mthd_cd        AS selMthdCd,
+        a.bsn_deal_clf		AS bsnDealClf,
+        (SELECT dtls_com_nm FROM SY_CO_DETAIL WHERE grp_cd = 'PD012' AND dtls_cd = a.sel_mthd_cd) AS selMthdNm,
+        a.sel_stat_cd      	AS selStatCd,
+        to_char(a.create_dt , 'YYYY"년 "MON" "fmDD"일"')	AS createDt,
+        to_char(a.sel_bgn_dy,'rrrrmmddhh24miss') AS selBgnDy,
+        to_char(a.sel_end_dy,'rrrrmmddhh24miss') AS selEndDy,
+        b.mem_id AS memId,
+        b.mem_nm AS memNm,
+        b.e_mail ||'@'|| CASE b.e_mailaddr_cd WHEN '01' THEN b.drct_mailaddr
+        ELSE (SELECT dtls_com_nm FROM SY_CO_DETAIL
+        WHERE grp_cd = 'SY001'
+        AND dtls_cd = b.e_mailaddr_cd) END AS memEmail
+        , a.set_typ_cd AS setTypCd
+        , NVL(a.dlv_clf, '02') AS dlvClf
+        FROM   pd_prd a
+        , mb_mem b
+        WHERE  a.prd_no = #{prdNo}
+        AND    a.sel_mnbd_no = b.mem_no
+        /* productMapper.getProductMember */
+    </select>
+
+
+
+    <insert id="insertProductTag" parameterType="ProductTagVO">
+        INSERT INTO PD_PRD_TAG(PRD_NO, TAG_NM, CREATE_DT, CREATE_NO)
+        VALUES (#{prdNo}, #{tagNm}, SYSDATE, #{createNo})
+    </insert>
+
+    <delete id="deleteProductTag" parameterType="long">
+        DELETE FROM PD_PRD_TAG WHERE PRD_NO = #{prdNo}
+    </delete>
+
+    <select id="checkSupportMobileEdit" parameterType="long" resultType="long">
+        SELECT COUNT(PRD_NO) AS CNT
+        FROM PD_PRD PRD, DP_DISP_CTGR CTGR
+        WHERE PRD.PRD_TYP_CD = '01'
+        AND SEL_MTHD_CD = '01'
+        AND PRD_STAT_CD IN  ('01','03')
+        AND BSN_DEAL_CLF = '01'
+        AND PRD_NO = #{prdNo}
+        AND PRD.GBL_DLV_YN != 'Y'
+        AND PRD.DISP_CTGR_NO_DE = CTGR.DISP_CTGR_NO
+        AND CTGR.BCKT_EX_YN = 'N'
+        AND CTGR.REGL_DLV_YN = 'N'
+        AND NOT EXISTS (SELECT SEL_MNBD_NO
+                        FROM PD_SELLER_AUTH
+                        WHERE AUTH_TYP_CD = '19'
+                        AND AUTH_OBJ_NO = PRD.DISP_CTGR1_NO_DE
+                        AND SEL_MNBD_NO = 0
+                        AND OBJ_CLF_CD = 'L')
+        AND NOT EXISTS (SELECT SEL_MNBD_NO
+                        FROM PD_SELLER_AUTH
+                        WHERE AUTH_TYP_CD = '19'
+                        AND AUTH_OBJ_NO = PRD.DISP_CTGR2_NO_DE
+                        AND SEL_MNBD_NO = 0
+                        AND OBJ_CLF_CD = 'M')
+        AND NOT EXISTS (SELECT SEL_MNBD_NO
+                        FROM PD_SELLER_AUTH
+                        WHERE AUTH_TYP_CD = '19'
+                        AND AUTH_OBJ_NO = PRD.DISP_CTGR3_NO_DE
+                        AND SEL_MNBD_NO = 0
+                        AND OBJ_CLF_CD = 'S')
+        AND NOT EXISTS (SELECT SEL_MNBD_NO
+                        FROM PD_SELLER_AUTH
+                        WHERE AUTH_TYP_CD = '19'
+                        AND AUTH_OBJ_NO = PRD.DISP_CTGR_NO_DE
+                        AND SEL_MNBD_NO = 0
+                        AND OBJ_CLF_CD = 'D')
+    </select>
+</mapper>

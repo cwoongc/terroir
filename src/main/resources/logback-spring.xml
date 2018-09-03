@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+    <property resource="logback.properties"/>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5p] [Thread:%thread] [%C.%M.%L] - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGGING_HOME}/${LOGGING_FILENAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGGING_HOME}/${LOGGING_FILENAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+ 
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5p] [Thread:%thread] [%C.%M.%L] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <springProfile name="prod">
+        <property name="LOG_LEVEL" value="info"/>
+        <logger name="skt.tmall" level="info"/>
+    </springProfile>
+    <springProfile name="!prod">
+        <property name="LOG_LEVEL" value="debug"/>
+        <logger name="org.springframework" level="info"/>
+        <logger name="jdbc.sqlonly" level="info"/>
+        <logger name="com.elevenst" level="debug"/>
+        <logger name="org.mybatis" level="info"/>
+        <logger name="org.apache.ibatis.io" level="info"/>
+        <logger name="springfox.documentation" level="info"/>
+    </springProfile>
+
+    <root level="${LOG_LEVEL}">
+		<appender-ref ref="console"/>
+        <springProfile name="!local">
+            <appender-ref ref="file"/>
+        </springProfile>
+    </root>
+</configuration>

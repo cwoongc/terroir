@@ -1,0 +1,54 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.pln_prd.mapper.PlanProductMapper">
+
+    <insert id="insertPlanProduct" parameterType="PdPlnPrd">
+        INSERT /* planProudctMapper.insertPlanProduct */  INTO pd_pln_prd (
+        prd_no,
+        wrhs_pln_dy,
+        wrhs_dy,
+        create_dt,
+        create_no,
+        update_dt,
+        update_no)
+        VALUES (
+        #{prdNo},
+        #{wrhsPlnDy},
+        #{wrhsDy},
+        sysdate,
+        #{createNo},
+        sysdate,
+        #{updateNo}
+        )
+    </insert>
+
+    <update id="updatePlanProduct" parameterType="PdPlnPrd">
+        UPDATE  /* planProudctMapper.updatePlanProudct */ pd_pln_prd
+        SET wrhs_pln_dy  = TO_DATE(#{wrhsPlnDy},'yyyymmddhh24miss') ,
+            update_dt = TO_DATE(#{updateDt},'yyyymmddhh24miss') ,
+            update_no = #{updateNo}
+        WHERE prd_no = #{prdNo}
+    </update>
+
+
+    <delete id="deletePlanProduct" parameterType="long">
+        DELETE  /* planProudctMapper.deletePlanProduct */ FROM pd_pln_prd
+        WHERE prd_no = #{prdNo}
+    </delete>
+
+    <select id="getPlanProduct" parameterType="long" resultType="PdPlnPrd">
+        SELECT
+        prd_no,
+        wrhs_pln_dy,
+        wrhs_dy,
+        create_dt,
+        create_no,
+        update_dt,
+        update_no
+        FROM pd_pln_prd
+        WHERE prd_no = #{prdNo}
+    </select>
+
+
+</mapper>

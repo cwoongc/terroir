@@ -1,0 +1,410 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.template.mapper.TemplateMapper">
+
+    <!--상품정보템플릿의 시퀀스를 가져온다 -->
+    <select id="getProductInformationTemplateSeq" resultType="long">
+        SELECT /* templateDAOMap.xml 하영존 2007.08.30 6 */
+        seq_pd_prd_info_tmplt.NEXTVAL
+        FROM dual
+    </select>
+
+    <!--상품정보템플릿 정보를  입력한다 -->
+    <update id="insertProductInformationTemplate" parameterType="PdPrdInfoTmplt">
+        INSERT /* templateDAOMap.xml 하영존 2007.08.30 7 */ INTO pd_prd_info_tmplt (
+        prd_info_tmplt_no
+        , mem_no
+        , prd_info_tmplt_nm
+        , prd_info_tmplt_clf_cd
+        , use_yn
+        , create_dt
+        , create_no
+        , update_dt
+        , update_no
+        ) VALUES (
+        #{prdInfoTmpltNo}
+        , #{memNo}
+        , #{prdInfoTmpltNm}
+        , #{prdInfoTmpltClfCd}
+        , 'Y'
+        , SYSDATE
+        , #{createNo}
+        , SYSDATE
+        , #{updateNo}
+        )
+    </update>
+
+    <!--판매정보템플릿 정보를  입력한다 -->
+    <update id="insertSellInformation" parameterType="PdSelInfo">
+        INSERT /* templateMapper.xml insertSellInformation */ INTO pd_sel_info (
+        prd_info_tmplt_no
+        , dlv_cn_area_cd
+        , dlv_wy_cd
+        , dlv_cst_pay_typ_cd
+        , dlv_cst
+        , prd_fr_dlv_basi_amt
+        , rtngd_dlv_cst
+        , exch_dlv_cst
+        , bndl_dlv_cn_yn
+        , today_dlv_cn_yn
+        , appmt_dy_dlv_cn_yn
+        , snd_pln_trm
+        , rcpt_isu_cn_yn
+        , create_dt
+        , create_no
+        , update_dt
+        , update_no
+        , dlv_cst_inst_basi_cd
+        , un_dlv_cn_yn
+        , dlv_cst_info_cd
+        , visit_dlv_yn
+        , dlv_clf
+        , abrd_cn_dlv_cst
+        , abrd_in_cd
+        , prd_wght
+        , jeju_dlv_cst
+        , island_dlv_cst
+        , rtngd_dlv_cd
+        ) VALUES (
+        #{prdInfoTmpltNo}
+        , #{dlvCnAreaCd}
+        , #{dlvWyCd}
+        , #{dlvCstPayTypCd}
+        , #{dlvCst}
+        , #{frDlvBasiAmt}
+        , #{rtngdDlvCst}
+        , #{exchDlvCst}
+        , #{bndlDlvCnYn}
+        , #{todayDlvCnYn}
+        , #{appmtDyDlvCnYn}
+        , #{sndPlnTrm}
+        , #{rcptIsuCnYn}
+        , SYSDATE
+        , #{createNo}
+        , SYSDATE
+        , #{updateNo}
+        , #{dlvCstInstBasiCd}
+        , #{unDlvCnYn}
+        , #{dlvCstInfoCd}
+        , #{visitDlvYn}
+        , #{dlvClf}
+        , #{abrdCnDlvCst}
+        , #{abrdInCd}
+        , #{prdWght}
+        , #{jejuDlvCst}
+        , #{islandDlvCst}
+        , #{rtngdDlvCd}
+        )
+    </update>
+
+    <update id="insertOrdBasicDeliCost" parameterType="PdPrdLstOrdBasiDlvCst">
+        INSERT /* templateMapper.xml insertOrdBasicDeliCost */ INTO pd_prd_lst_ord_basi_dlv_cst
+        (
+        dlv_cst_inst_no,
+        prd_info_tmplt_no,
+        dlv_cst_inst_obj_clf_cd,
+        ord_bgn_qty,
+        ord_end_qty,
+        dlv_cst,
+        create_dt,
+        create_no
+        ) VALUES (
+        SEQ_PRD_LST_ORD_BASI_DLV_CST.nextVal,
+        #{prdInfoTmpltNo},
+        #{dlvCstInstObjClfCd},
+        #{ordBgnQty},
+        #{ordEndQty},
+        #{dlvCst},
+        sysdate,
+        #{createNo}
+        )
+    </update>
+
+    <update id="insertProductDesc" parameterType="pdPrdLstDesc">
+        INSERT /* templateMapper.xml insertProductDesc */ INTO pd_prd_lst_desc
+        (
+        prd_desc_no,
+        prd_desc_obj_no,
+        prd_desc_obj_clf_cd,
+        prd_desc_typ_cd,
+        prd_desc_cont_vc,
+        prd_desc_cont_clob,
+        clob_typ_yn,
+        create_dt,
+        create_no
+        ) VALUES (
+        SEQ_PD_PRD_LST_DESC.nextVal,
+        #{prdDescObjNo},
+        #{prdDescObjClfCd},
+        #{prdDescTypCd},
+        #{prdDescContVc},
+        #{prdDescContClob},
+        #{clobTypYn},
+        sysdate,
+        #{createNo}
+        )
+    </update>
+
+    <!--  물품대장 출고지/교환/반품지  정보를  입력한다 -->
+    <update id="insertInventoryProductAddress" parameterType="PdPrdLstTgowPlcExchRtngd">
+        INSERT /* templateMapper.xml insertInventoryProductAddress */ INTO pd_prd_lst_tgow_plc_exch_rtngd (
+        prd_lst_addr_no,
+        prd_addr_obj_no,
+        prd_addr_obj_clf_cd,
+        mem_no,
+        addr_seq,
+        prd_addr_clf_cd,
+        create_dt,
+        create_no,
+        update_dt,
+        update_no,
+        mb_addr_location
+        )
+        VALUES (
+        SEQ_PRDLST_TGOW_PLC_EXCH_RTNGD.nextVal,
+        #{prdAddrObjNo},
+        #{prdAddrObjClfCd},
+        #{memNo},
+        #{addrSeq},
+        #{prdAddrClfCd},
+        sysdate,
+        #{createNo},
+        sysdate,
+        #{createNo},
+        #{mbAddrLocation}
+        )
+    </update>
+
+    <!-- 물품대장 추가구성품목 저장한다. -->
+    <insert id="insertInventoryAddProductComposition" parameterType="PdPrdLstAddPrdComp">
+        INSERT /* templateMapper.xml insertInventoryAddProductComposition */ INTO pd_prd_lst_add_prd_comp
+        (
+        prd_comp_no,
+        prd_comp_obj_no,
+        prd_comp_obj_clf_cd,
+        comp_prd_no,
+        comp_prd_stck_no,
+        main_prd_yn,
+        sel_prc,
+        add_comp_prc,
+        comp_prd_qty,
+        disp_prrt_rnk,
+        prd_comp_typ_cd,
+        sel_qty,
+        use_yn,
+        create_dt,
+        create_no,
+        comp_prd_nm
+        )VALUES(
+        SEQ_PD_PRD_LST_ADD_PRD_COMP.nextval,
+        #{prdCompObjNo},
+        #{prdCompObjClfCd},
+        #{compPrdNo},
+        #{compPrdStckNo},
+        #{mainPrdYn},
+        #{selPrc},
+        #{addCompPrc},
+        #{compPrdQty},
+        #{dispPrrtRnk},
+        #{prdCompTypCd},
+        #{selQty},
+        #{useYn},
+        sysdate,
+        #{createNo},
+        #{compPrdNm}
+        )
+    </insert>
+    <select id="getProductInformationTemplateAllList" resultType="PrdInfoTmplVO" parameterType="PrdInfoTmplVO">
+        SELECT    /* templateMapper.xml 하영존 2007.08.30 4 */
+        prd_info_tmplt_no as prdInfoTmpltNo
+        , prd_info_tmplt_nm as prdInfoTmpltNm
+        FROM pd_prd_info_tmplt
+        WHERE use_yn = 'Y'
+        and mem_no = #{memNo}
+        and prd_info_tmplt_clf_cd = #{prdInfoTmpltClfCd}
+        ORDER BY prd_info_tmplt_nm
+    </select>
+
+    <select id="getProductInformationTemplate" resultType="prdInfoTmplVO" parameterType="ProductInformationTemplateVO">
+        SELECT  /* templateDAOMap.xml 하영존 2007.08.30 1 */
+				prd_info_tmplt_no 		as prdInfoTmpltNo
+				, prd_info_tmplt_nm			as prdInfoTmpltNm
+				, prd_info_tmplt_clf_cd 	as prdInfoTmpltClfCd
+				, TO_CHAR(create_dt, 'YYYYMMDD') as createDt
+		  FROM pd_prd_info_tmplt
+		 WHERE use_yn = 'Y'
+		   AND prd_info_tmplt_no = #{prdInfoTmpltNo}
+    </select>
+
+    <!--판매정보템플릿 상세정보를 가져온다 -->
+    <select id="getSellInformationTemplateDetail" resultType="SellInformationVO" parameterType="ProductInformationTemplateVO">
+        SELECT /* templateMapper.xml 하영존 2007.08.30 2 */
+        prd_info_tmplt_no 				as prdInfoTmpltNo
+        , dlv_cn_area_cd 				as dlvCnAreaCd
+        , dlv_wy_cd 					as dlvWyCd
+        , dlv_cst_pay_typ_cd			as dlvCstPayTypCd
+        , dlv_cst						as dlvCst
+        , nvl(prd_fr_dlv_basi_amt,0)    as frDlvBasiAmt
+        , rtngd_dlv_cst					as rtngdDlvCst
+        , exch_dlv_cst					as exchDlvCst
+        , bndl_dlv_cn_yn				as bndlDlvCnYn
+        , today_dlv_cn_yn				as todayDlvCnYn
+        , appmt_dy_dlv_cn_yn			as appmtDyDlvCnYn
+        , snd_pln_trm					as sndPlnTrm
+        , rcpt_isu_cn_yn				as rcptIsuCnYn
+        , create_dt						as createDt
+        , create_no						as createNo
+        , update_dt						as updateDt
+        , update_no						as updateNo
+        , dlv_cst_inst_basi_cd			as dlvCstInstBasiCd
+        , un_dlv_cn_yn					as unDlvCnYn
+        , dlv_cst_info_cd 				as dlvCstInfoCd
+        , visit_dlv_yn					as visitDlvYn
+        , nvl(dlv_clf, '02')			as dlvClf
+        , nvl(abrd_cn_dlv_cst, 0)		as abrdCnDlvCst
+        , nvl(abrd_in_cd, '')			as abrdInCd
+        , nvl(prd_wght, 0) 				as prdWght
+        , nvl(jeju_dlv_cst, 0)         as jejuDlvCst
+        , nvl(island_dlv_cst, 0)       as islandDlvCst
+        , rtngd_dlv_cd                 as rtngdDlvCd
+        FROM pd_sel_info
+        WHERE prd_info_tmplt_no = #{prdInfoTmpltNo}
+    </select>
+
+    <!-- 수량별 배송비리스트 조회 -->
+    <select id="getOrderBasiDeliverCostVOList" parameterType="InventoryOrderBasicDeliverCostVO" resultType="InventoryOrderBasicDeliverCostVO">
+        select /* productInventoryDAOMap.xml 김현태 2007.08.30 26 */
+        dlv_cst_inst_no as dlvCstInstNo,
+        prd_info_tmplt_no as prdInfoTmpltNo,
+        dlv_cst_inst_obj_clf_cd as dlvCstInstObjCd,
+        ord_bgn_qty as ordBgnQty,
+        ord_end_qty as ordEndQty,
+        dlv_cst as dlvCst,
+        create_dt as createDt,
+        create_no as createNo
+        from
+          pd_prd_lst_ord_basi_dlv_cst
+        where
+            prd_info_tmplt_no = #{prdInfoTmpltNo}
+            and dlv_cst_inst_obj_clf_cd = #{dlvCstInstObjClfCd}
+            order by dlv_cst_inst_no asc
+    </select>
+
+    <!-- 1:1 문의 리스트 조회 -->
+    <select id="getProductDescVOList" parameterType="InventoryProductDescVO" resultType="InventoryProductDescVO">
+        SELECT /* templateMaeer.xml 김현태 2007.08.30 27 */
+            prd_desc_no 				as prdDescNo,
+            prd_desc_obj_no 			as prdDescObjNo,
+            prd_desc_obj_clf_cd 		as prdDescObjClfCd,
+            prd_desc_typ_cd 			as prdDescTypCd,
+            prd_desc_cont_vc 			as prdDescContVc,
+            prd_desc_cont_clob 			as prdDescContClob,
+            clob_typ_yn 				as clobTypYn
+        FROM
+            pd_prd_lst_desc
+        WHERE
+            prd_desc_obj_no = #{prdDescObjNo}
+            and prd_desc_obj_clf_cd = #{prdDescObjClfCd}
+    </select>
+
+    <!-- 주소체계변경 -->
+    <!-- 입력된 출고지, 교환반품지 주소가 국내주소인지 해외주소인지 조회한다. -->
+    <select id="getAddrLocation" resultType="String" parameterType="InventoryProductAddressVO">
+        SELECT /* templateMapper.xml 황정연 2009.01.15 65 */
+        mb_addr_location
+        FROM pd_prd_lst_tgow_plc_exch_rtngd
+        WHERE PRD_ADDR_OBJ_NO = #{prdAddrObjNo}
+        AND PRD_ADDR_CLF_CD = #{prdAddrClfCd}
+        AND PRD_ADDR_OBJ_CLF_CD = #{prdAddrObjClfCd}
+    </select>
+
+    <!-- 물품대장 출고지/교환/반품지주소 정보(국내)를 조회한다 -->
+    <select id="getInventoryProductAddress01List" resultType="InventoryProductAddressVO" parameterType="InventoryProductAddressVO">
+        SELECT /* templateMapper.xml 김현태 2007.08.30 65 */ prd_lst_addr_no as prdLstAddrNo,
+        a.prd_addr_obj_no as prdAddrObjNo,
+        a.prd_addr_obj_clf_cd as prdAddrObjClfCd,
+        a.mem_no as memNo,
+        a.addr_seq as addrSeq,
+        a.prd_addr_clf_cd as prdAddrClfCd,
+        TO_CHAR (a.create_dt, 'YYYYMMDD') as createDt,
+        nvl(a.create_no, 0) as createNo,
+        TO_CHAR (a.update_dt, 'YYYYMMDD') as updateDt,
+        nvl(a.update_no, 0) as updateNo,
+        (case when (t1.ADDR_TYP_CD = '02' and t1.BUILD_MNG_NO IS NOT NULL)
+        then (SELECT RTRIM(T2.SIDO_NM||' '||T2.SIGUNGU_NM||' '||T2.UEUPMYON_NM||' '||T2.ROAD_NM||' '||T2.BUILD_MAIN_NO||DECODE(T2.BUILD_SUB_NO, 0, '', '-'||T2.BUILD_SUB_NO)) ||
+        case when (T2.LAW_DONG_NM IS NULL and T2.SIGUNGU_BUILD_NM IS NULL)
+        then ' '
+        when T2.LAW_DONG_NM IS NULL THEN ' ('||T2.SIGUNGU_BUILD_NM||') '
+        when T2.SIGUNGU_BUILD_NM IS NULL THEN ' ('||T2.LAW_DONG_NM||') '
+        else ' ('||T2.LAW_DONG_NM||','||T2.SIGUNGU_BUILD_NM||') '
+        end AS ADDR
+        FROM  sy_road_addr T2
+        WHERE  T2.BUILD_MNG_NO = t1.BUILD_MNG_NO) || t1.dtls_addr
+        else (SELECT RTRIM(T2.sido_nm||' '||T2.sigungu_nm||' '||T2.ueupmyon_nm||' '||T2.rhyee_nm ||' '||T2.dosoe_nm ||' '||T2.bld_nm)||' '||t1.dtls_addr AS ADDR
+        FROM   SY_MAIL_NO T2
+        WHERE T2.MAIL_NO = t1.MAIL_NO
+        AND     T2.MAIL_NO_SEQ = t1.MAIL_NO_SEQ)
+        end) as addr,
+        a.mb_addr_location as mbAddrLocation,
+        nvl(t1.itg_addr_seq, 0) as itgAddrSeq
+        FROM   pd_prd_lst_tgow_plc_exch_rtngd a, mb_addr t1
+        WHERE  a.prd_addr_obj_no = #{prdAddrObjNo}
+        AND    a.prd_addr_obj_clf_cd = #{prdAddrObjClfCd}
+        AND    a.addr_seq = t1.addr_seq
+        AND    a.mem_no = t1.mem_no
+        AND    a.prd_addr_clf_cd = #{prdAddrClfCd}
+    </select>
+
+    <!-- 물품대장 출고지/교환/반품지주소 정보(해외)를 조회한다 -->
+    <select id="getInventoryProductAddress02List" resultType="InventoryProductAddressVO" parameterType="InventoryProductAddressVO">
+        SELECT /* templateMapper.xml 김현태 2007.08.30 65 */prd_lst_addr_no as prdLstAddrNo,
+        a.prd_addr_obj_no as prdAddrObjNo,
+        a.prd_addr_obj_clf_cd as prdAddrObjClfCd,
+        a.mem_no as memNo,
+        a.addr_seq as addrSeq,
+        a.prd_addr_clf_cd as prdAddrClfCd,
+        TO_CHAR (a.create_dt, 'YYYYMMDD') as createDt,
+        nvl(a.create_no, 0) as createNo,
+        TO_CHAR (a.update_dt, 'YYYYMMDD') as updateDt,
+        nvl(a.update_no, 0) as updateNo,
+        T1.addr2 || ' ' || T1.addr1 || ', ' || T1.city || ', ' || T1.state || ', ' || T1.zip_code || ' '
+        || (SELECT DTLS_COM_NM FROM SY_CO_DETAIL WHERE GRP_CD = 'MB047' AND DTLS_CD = T1.COUNTRY_CD) as addr,
+        a.mb_addr_location as mbAddrLocation,
+        nvl(t1.itg_addr_seq, 0) as itgAddrSeq,
+        CASE WHEN t1.COUNTRY_CD = 'US' THEN NVL(t2.free_pickup_yn, 'N')
+        ELSE 'N'
+        END freePickupYn
+        FROM pd_prd_lst_tgow_plc_exch_rtngd a,
+        mb_global_addr t1,
+        mb_global_zip_code t2
+        WHERE a.prd_addr_obj_no = #{prdAddrObjNo}
+        AND a.prd_addr_obj_clf_cd = #{prdAddrObjClfCd}
+        AND a.addr_seq = t1.addr_seq
+        and a.mem_no = t1.mem_no
+        and t1.zip_code = t2.zip_code(+)
+        and a.prd_addr_clf_cd = #{prdAddrClfCd}
+    </select>
+
+    <select id="getAddrBasiDlvCstTxt" resultType="string" parameterType="ProductSellerBasiDeliveryCostVO">
+        SELECT /* templateMapper.xml getAddrBasiDlvCstTxt */
+        /*+ no_filtering */ MAX(LTRIM (SYS_CONNECT_BY_PATH (DECODE(TO_CHAR(NVL(dlv_cst, 0), 'fm999,999,999,990')||'원', '0원', '무료', TO_CHAR(NVL(dlv_cst, 0), 'fm999,999,999,990')||'원') || '@' || addr_dlv_text, '/'), '/')) addr_basi_dlv_cst_text
+        FROM (
+        SELECT
+        ROW_NUMBER () OVER (PARTITION BY sel_mnbd_no order by dlv_cst_inst_no) rnum
+        ,sel_mnbd_no
+        ,case when (ord_bgn_amt = 0 AND ord_end_amt <![CDATA[ < ]]> 999999999999 ) then TO_CHAR(NVL(ord_end_amt, 0), 'fm999,999,999,990')||'원 미만 구매'
+        when (ord_bgn_amt > 0 AND ord_end_amt <![CDATA[ < ]]> 999999999999 ) AND  ( ord_bgn_amt != ord_end_amt) then TO_CHAR(NVL(ord_bgn_amt, 0), 'fm999,999,999,990')||'원 이상 ~ '||TO_CHAR(NVL(ord_end_amt, 0), 'fm999,999,999,990')||'원 미만 구매'
+        when (ord_bgn_amt > 0 AND ord_end_amt = 999999999999 ) then TO_CHAR(NVL(ord_bgn_amt, 0), 'fm999,999,999,990')||'원 이상 구매'
+        end as addr_dlv_text
+        ,dlv_cst
+        FROM  pd_addr_basi_dlv_cst
+        WHERE sel_mnbd_no = #{selMnbdNo}
+        and addr_seq = #{addrSeq}
+        and mb_addr_location = #{mbAddrLocation}
+        ORDER BY dlv_cst_inst_no
+        )
+        START WITH rnum = 1
+        CONNECT BY PRIOR rnum = rnum - 1
+    </select>
+</mapper>

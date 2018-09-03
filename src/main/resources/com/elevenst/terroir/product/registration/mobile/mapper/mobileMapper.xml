@@ -1,0 +1,161 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.mobile.mapper.MobileMapper">
+    <!-- 상품 휴대폰 요금제 삭제 -->
+    <delete id="deleteProductMobileFee" parameterType="PdPrdMobileFee">
+        DELETE FROM pd_prd_mobile_fee /* mobileMapper.xml deleteProductMobileFee*/
+        WHERE prd_no = #{prdNo}
+        <if test ="prdMpFeeNo != 0">
+            AND prd_Mp_Fee_No = #{prdMpFeeNo}
+        </if>
+    </delete>
+
+    <!-- 상품 휴대폰 요금제 등록 -->
+    <update id="insertProductMobileFee" parameterType="PdPrdMobileFee">
+        INSERT INTO pd_prd_mobile_fee /* mobileMapper.xml insertProductMobileFee*/
+        (
+        prd_mp_fee_no
+        ,prd_no
+        ,mp_fee_no
+        ,contract_term_cd
+        ,makt_prc
+        ,rep_fee_yn
+        ,prrt_rnk
+        ,create_dt
+        ,create_no
+        ,update_dt
+        ,update_no
+        )
+        values (
+        SEQ_PD_PRD_MOBILE_FEE.NEXTVAL
+        ,#{prdNo}
+        ,#{mpFeeNo}
+        ,#{contractTermCd}
+        ,#{maktPrc}
+        ,#{repFeeYn}
+        ,#{prrtRnk}
+        ,sysdate
+        ,#{createNo}
+        ,sysdate
+        ,#{createNo}
+        )
+    </update>
+
+    <!-- 상품 휴대폰 요금제 이력 등록 -->
+    <update id="insertProductMobileFeeHistory" parameterType="PdPrdMobileFee">
+        INSERT INTO pd_prd_mobile_fee_hist /* mobileMapper.xml insertProductMobileFeeHistory */
+        (
+        prd_mp_fee_no
+        ,hist_apl_bgn_dt
+        ,prd_no
+        ,mp_fee_no
+        ,contract_term_cd
+        ,makt_prc
+        ,rep_fee_yn
+        ,prrt_rnk
+        ,create_dt
+        ,create_no
+        ,update_dt
+        ,update_no
+        )
+        SELECT
+        prd_mp_fee_no
+        ,to_date(#{histAplBgnDt},'yyyymmddhh24miss')
+        ,prd_no
+        ,mp_fee_no
+        ,contract_term_cd
+        ,makt_prc
+        ,rep_fee_yn
+        ,prrt_rnk
+        ,create_dt
+        ,create_no
+        ,update_dt
+        ,update_no
+        FROM pd_prd_mobile_fee
+        WHERE prd_no = #{prdNo}
+    </update>
+
+    <!-- 휴대폰 요금제 목록 조회 -->
+    <select id="searchMobileFee" resultType="PdPrdMobileFee" parameterType="MobileFeeSearchParamVO">
+    SELECT /* mobileMapper.xml searchMobileFeeResult */ *
+    FROM (
+    SELECT T.*, ROWNUM RNUM FROM
+    (
+    SELECT
+    ST.*
+    ,COUNT (*) OVER () totalCount
+    FROM
+    (
+    SELECT
+    a.mp_fee_no
+    ,a.disp_ctgr_no
+    ,sf_getname_dp_disp_ctgr(a.disp_ctgr_no,4) as disp_ctgr_path
+    ,a.grp_nm
+    ,a.mp_fee_nm
+    ,a.mp_fee
+    ,a.use_yn
+    ,a.create_no
+    ,b.disp_ctgr_nm
+    ,c.emp_nm as create_nm
+    FROM
+    pd_mobile_fee a
+    ,dp_disp_ctgr b
+    ,sy_emp c
+    WHERE a.disp_ctgr_no = b.disp_ctgr_no
+    AND   a.create_no = c.emp_no
+    <if test="searchCategory !=null and searchCategory!=''">
+        <if test ="searchClsf.equals('01')">
+            AND b.disp_ctgr_nm like #{searchCategory} || '%'
+        </if>
+        <if test ="searchClsf.equals('02')">
+            AND b.disp_ctgr_no = #{searchCategory}
+        </if>
+    </if>
+    <if test ="createId">
+        AND c.emp_id = #{createId}
+    </if>
+    <if test="grpNm!=null and grpNm!=''">
+        AND a.grp_nm like '%' || #{grpNm} || '%'
+    </if>
+    <if test="useYn!=null and useYn!=''">
+        AND a.use_yn = #{useYn}
+    </if>
+    <if test="mpFeeNo!='0'">
+        AND a.mp_fee_no= #{mpFeeNo}
+    </if>
+
+    ) ST
+    ORDER BY disp_ctgr_no, grp_nm, mp_fee_nm
+    ) T
+    WHERE ROWNUM <![CDATA[ <= ]]> #{end}
+    )
+    WHERE RNUM <![CDATA[ > ]]> #{start}
+    AND RNUM <![CDATA[ <= ]]> #{end}
+    </select>
+
+    <!-- 그룹 목록 조회 -->
+    <select id="mobileGetGroupList" resultType="java.util.HashMap" parameterType="long">
+        SELECT
+        grp_nm AS GRP_NM
+        FROM   pd_mobile_fee a
+        WHERE  a.disp_ctgr_no = #{dispCtgrNo}
+        AND    a.use_yn = 'Y'
+        GROUP BY grp_nm
+        /* mobileMapper.mobileGetGroupList */
+    </select>
+
+    <!-- 요금제 목록 조회 -->
+    <select id="getMobileFeeNameList" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+        SELECT
+        mp_fee_no AS MP_FEE_NO
+        ,mp_fee_nm AS MP_FEE_NM
+        ,mp_fee AS MP_FEE
+        FROM   pd_mobile_fee a
+        WHERE  a.disp_ctgr_no = #{dispCtgrNo}
+        AND    a.grp_nm = #{grpNm}
+        AND    a.use_yn = 'Y'
+        /* mobileMapper.getMobileFeeNameList */
+    </select>
+
+</mapper>

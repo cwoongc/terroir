@@ -1,0 +1,90 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.product.mapper.ProductCombMapper">
+
+    <!-- 스마트 매칭(결합)된 상품 존재 여부 -->
+    <select id="getExistsMatchedPrd" resultType="ProductCombPrdVO" parameterType="ProductCombMstrVO">
+        SELECT /* productCombMapper.getExistsMatchedPrd */
+        MSTR_OBJ_NO AS mstrObjNo
+        , MSTR_OBJ_TYPE AS mstrObjType
+        , COMB_TYP_CD AS combTypCd
+        , MSTR_YN AS mstrYn
+        , COMP_PRD_NO AS prdNo
+        , USE_YN AS useYn
+        FROM
+        (SELECT MSTR_OBJ_NO, MSTR_OBJ_TYPE, COMB_TYP_CD, 'Y' AS MSTR_YN
+        , MSTR_OBJ_NO AS COMP_PRD_NO, USE_YN
+        FROM PD_COMb_MSTR_OBJ
+        WHERE MSTR_OBJ_NO IN (#{mstrObjNo}
+        <if test="productCombPrdVOList != null and productCombPrdVOList.size > 0">
+            ,
+            <foreach item="productCombPrdVOList" collection="productCombPrdVOList" separator=","> #{productCombPrdVOList.prdNo} </foreach>
+        </if>
+        )
+        AND MSTR_OBJ_TYPE = #{mstrObjType} AND COMB_TYP_CD = #{combTypCd}
+        UNION
+        SELECT /*+ INDEX(COMP IX1_PD_COMB_COMP_PRD) */ MSTR_OBJ_NO, MSTR_OBJ_TYPE, COMB_TYP_CD, 'N' AS MSTR_YN
+        , COMP_PRD_NO, (SELECT USE_YN FROM PD_COMb_MSTR_OBJ
+        WHERE MSTR_OBJ_NO = COMP.MSTR_OBJ_NO AND MSTR_OBJ_TYPE = COMP.MSTR_OBJ_TYPE AND COMB_TYP_CD = COMP.COMB_TYP_CD) AS USE_YN
+        FROM PD_COMB_COMP_PRD COMP
+        WHERE COMP_PRD_NO IN (#{mstrObjNo}
+        <if test="productCombPrdVOList != null and productCombPrdVOList.size >0">
+            ,
+            <foreach item="productCombPrdVOList" collection="productCombPrdVOList" separator=","> #{productCombPrdVOList.prdNo} </foreach>
+        </if>
+        )
+        AND MSTR_OBJ_TYPE = #{mstrObjType} AND COMB_TYP_CD = #{combTypCd}
+        ) TBL
+    </select>
+
+    <!-- 스마트매칭 가능한 상품인지 판별 -->
+    <select id="getCntMatchableStatPrd" resultType="int" parameterType="ProductCombMstrVO">
+        SELECT /* productCombMapper.getCntMatchableStatPrd */
+        COUNT(*) CNT
+        FROM
+        PD_STOCK STCK
+        WHERE
+        PRD_NO IN ( #{mstrObjNo}
+        <if test="productCombPrdVOList != null and productCombPrdVOList.size > 0">
+            ,
+            <foreach item="productCombPrdVOList" collection="productCombPrdVOList" separator=","> #{productCombPrdVOList.prdNo} </foreach>
+        </if>
+        )
+        AND EXISTS (
+        SELECT 1 FROM PD_OPT_ITEM WHERE OPT_CLF_CD = '03' AND PRD_NO = STCK.PRD_NO
+        UNION SELECT 1 FROM PD_OPT_VALUE WHERE PRD_NO = STCK.PRD_NO AND ROWNUM <![CDATA[ <= ]]> 2 GROUP BY PRD_NO HAVING COUNT(1) > 1
+        )
+    </select>
+
+    <!-- 스마트 매칭 구성 정보 삭제 -->
+    <delete id="deleteCombPrd" parameterType="ProductCombPrdVO">
+        DELETE FROM /* productCombMapper.deleteCombPrd */
+        PD_COMB_COMP_PRD
+        WHERE
+        MSTR_OBJ_NO = #{mstrObjNo}
+        AND
+        MSTR_OBJ_TYPE = #{mstrObjType}
+        AND
+        COMB_TYP_CD = #{combTypCd}
+        AND
+        COMP_PRD_NO = #{prdNo}
+    </delete>
+
+    <!-- 스마트 매칭 마스터 사용여부 수정 -->
+    <update id="updateUseYnCombMstr" parameterType="ProductCombMstrVO">
+        UPDATE /* productCombMapper.updateUseYnCombMstr */
+        PD_COMb_MSTR_OBJ
+        SET
+        USE_YN = #{useYn}
+        , UPDATE_DT = SYSDATE
+        , UPDATE_NO = #{updateNo}
+        WHERE
+        MSTR_OBJ_NO = #{mstrObjNo}
+        AND
+        MSTR_OBJ_TYPE = #{mstrObjType}
+        AND
+        COMB_TYP_CD = #{combTypCd}
+    </update>
+
+</mapper>

@@ -1,0 +1,1375 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.deal.mapper.DealMapper">
+
+    <resultMap id="appliedPrdInfoMap" type="ProductEvtVO">
+        <result property="eventNo"								column="EVENT_NO" />
+        <result property="eventPricePegVO.cupnDscMthdCd"		column="CUPN_DSC_MTHD_CD" />
+        <result property="eventPricePegVO.dscAmt"				column="DSC_AMT" />
+        <result property="eventPricePegVO.dscRt" 				column="DSC_RT" />
+        <result property="eventPricePegVO.dlvCstInstBasiCd"		column="EVT_DLV_CST_INST_BASI_CD" />
+        <result property="eventPricePegVO.dlvCst"				column="EVT_DLV_CST" />
+        <result property="eventPricePegVO.dlvCstPayTypCd"  		column="EVT_DLV_CST_PAY_TYP_CD"/>
+        <result property="eventPricePegVO.dlvBasiAmt"  			column="EVT_DLV_BASI_AMT"/>
+        <result property="eventPricePegVO.dlvCstInfoCd"			column="EVT_DLV_CST_INFO_CD"/>
+        <result property="eventPricePegVO.reqPrcBaseCd"			column="REQ_PRC_BASE_CD"/>
+        <result property="eventPricePegVO.drctCnfmReqYn"		column="DRCT_CNFM_REQ_YN"/>
+        <result property="eventPricePegVO.baseDataTxt"			column="BASE_DATA_TXT"/>
+        <result property="eventPricePegVO.baseDataImg"			column="BASE_DATA_IMG"/>
+        <result property="eventPricePegVO.etcBaseDataImg"		column="ETC_BASE_DATA_IMG"/>
+        <result property="eventPricePegVO.rqstQty"      		column="RQST_QTY" />
+        <result property="eventPricePegVO.mdNo"      			column="MD_NO"/>
+        <result property="mdNm"      							column="MD_NM"/>
+        <result property="eventPricePegVO.eventBgnDt"			column="EVENT_BGN_DT"/>
+        <result property="eventPricePegVO.eventEndDt"			column="EVENT_END_DT"/>
+        <result property="eventPricePegVO.fullEventBgnDt"		column="FULL_EVENT_BGN_DT" />
+        <result property="eventPricePegVO.remark"				column="REMARK"/>
+        <result property="eventPricePegVO.prdNo" 				column="PRD_NO"/>
+        <result property="productVO.prdNm" 						column="PRD_NM"/>
+        <result property="productVO.selMnbdNo" 					column="SEL_MNBD_NO"/>
+        <result property="productVO.selMthdCd" 					column="SEL_MTHD_CD"/>
+        <result property="productVO.selStatCd" 					column="SEL_STAT_CD"/>
+        <result property="productVO.mobile1WonYn"  			column="MOBILE_1WON_YN"/>
+        <result property="fnPdDscInfo"								column="FN_PD_DSC_INFO"/>
+        <result property="stdFeeSkDeal"							column="STD_FEE_SK_DEAL" />
+        <result property="productVO.dispCtgrNo"				column="DISP_CTGR_NO_DE"/>
+        <result property="productVO.dlvCst" 						column="DLV_CST" />
+        <result property="productVO.prdTypCd" 					column="PRD_TYP_CD"/>
+        <result property="productVO.dlvCstInstBasiCd" 			column="DLV_CST_INST_BASI_CD"/>
+        <result property="productVO.selInstallCashDlvCstDetail" column="INSTALL_CASH_DLV_CST_DETAIL"/>
+        <result property="productVO.dlvCstPayTypCd" 			column="DLV_CST_PAY_TYP_CD"/>
+        <result property="productVO.frCtrCd" 					column="FR_CTR_CD"/>
+        <result property="productVO.dlvCstInstBasiNm"			column="DLV_CST_INST_BASI_NM"/>
+        <result property="productVO.dlvCstInfoCd"				column="DLV_CST_INFO_CD"/>
+        <result property="productVO.dlvBasiAmt"					column="DLV_BASI_AMT"/>
+        <result property="productVO.dlvWyCd"		 			column="DLV_WY_CD"/>
+        <result property="productVO.islandDlvCst"				column="ISLAND_DLV_CST" />
+        <result property="productVO.jejuDlvCst"					column="JEJU_DLV_CST"/>
+        <result property="productVO.frImpCharge"				column="FR_IMP_CHARGE"/>
+        <result property="productVO.bsnDealClf"					column="BSN_DEAL_CLF"/>
+        <result property="productVO.mobile1WonYn"			column="MOBILE_1WON_YN"/>
+        <result property="productVO.bookClfCd"					column="BOOK_CLF_CD"/>
+        <result property="productVO.maktPrc"					column="MAKT_PRC" />
+        <result property="productVO.dlvClf"					column="DLV_CLF" />
+        <result property="selPrc"										column="SEL_PRC"/>
+        <result property="eventPricePegVO.aprvStatCd"			column="APRV_STAT_CD"/>
+        <result property="eventPricePegVO.prdAddStatCd"		column="PRD_ADD_STAT_CD" />
+        <result property="eventPricePegVO.bndlDlvCnYn"		column="BNDL_DLV_CN_YN"/>
+        <result property="dispCtgr1No"								column="DISP_CTGR1_NO_DE"/>
+        <result property="dispCtgr2No"								column="DISP_CTGR2_NO_DE"/>
+        <result property="eventPricePegVO.createDt"			column="CREATE_DT"/>
+        <result property="eventPricePegVO.payAgreeYn"		column="PAY_AGREE_YN"/>
+        <result property="eventPricePegVO.selPrc"				column="SKD_SEL_PRC" />
+        <result property="eventPricePegVO.postSelStatCd"		column="POST_SEL_STAT_CD"/>
+        <result property="eventPricePegVO.eventPrdNm"			column="EVENT_PRD_NM"/>
+        <result property="eventPricePegVO.incrPayAgreeYn"		column="INCR_PAY_AGREE_YN"/>
+        <result property="eventPricePegVO.hgrnkSelPrc"			column="HGRNK_SEL_PRC" />
+        <result property="eventPricePegVO.postRollbackYn"		column="POST_ROLLBACK_YN"/>
+        <result property="poSellerYn"								column="PO_SELLER_YN"/>
+        <result property="oneHourBgnPre"							column="ONE_HOUR_BGN_PRE" />
+        <result property="eventPricePegVO.selQty"			column="sel_qty" />
+        <result property="eventPricePegVO.ptnrPrmtYn"						column="PTNR_PRMT_YN" />
+        <result property="bssCont1"								column="BSS_CONT1"/>
+        <result property="bssCont2"								column="BSS_CONT2"/>
+        <result property="bssCont3"								column="BSS_CONT3"/>
+        <result property="bssCont4"								column="BSS_CONT4"/>
+        <result property="bssCont5"								column="BSS_CONT5"/>
+        <result property="prolAfMntnYn"								column="PROL_AF_MNTN_YN"/>
+        <result property="eventPricePegVO.eventTmtrCd"				column="EVENT_TMTR_CD"/>
+        <result property="productVO.ptnrPrdClfCd"					column="PTNR_PRD_CLF_CD"/>
+    </resultMap>
+
+    <select id="getAplPrdInfo" resultMap="appliedPrdInfoMap" parameterType="ProductEvtVO">
+        WITH
+        V_EVENT_PRD_NM AS (SELECT /*+ INLINE INDEX_DESC(A IX1_PD_EVENT_PRC_APRV) */ EVENT_PRD_NM
+        FROM   PD_EVENT_PRC_APRV A
+        WHERE  PRD_NO = #{prdNo}
+        AND    EVENT_PRD_NM IS NOT NULL
+        AND    ROWNUM &lt;= 1
+        ORDER BY EVENT_END_DT DESC),
+        V_PLC_ADDR AS
+        (
+        SELECT /*+ INLINE */ PRD_NO, MEM_NO, ADDR_SEQ, MB_ADDR_LOCATION, FR_CTR_CD
+        FROM PD_PRD_TGOW_PLC_EXCH_RTNGD
+        WHERE PRD_NO = #{prdNo}
+        AND PRD_ADDR_CLF_CD = '01'
+        AND ROWNUM = 1
+        ),
+        V_DLV_INST_PRD AS
+        (
+        SELECT /*+ INLINE NO_FILTERING */
+        PRD_NO
+        , MAX(
+        LTRIM(
+        SYS_CONNECT_BY_PATH(
+        DECODE(TO_CHAR(NVL(DLV_CST, 0), 'fm999,999,999,990')||'원','0원','무료', TO_CHAR(NVL(DLV_CST,0), 'fm999,999,999,990')||'원')
+        || ' (' || QTY_TEXT || ')',	' /	')
+        , ' / ')
+        ) AS DLV_CST_INST_TEXT
+        FROM (
+        SELECT
+        ROW_NUMBER () OVER (PARTITION BY PRD_NO ORDER BY DLV_CST_INST_NO) RNUM
+        , DLV_CST_INST_NO
+        , PRD_NO
+        , CASE
+        WHEN (ORD_BGN_QTY >= 0 AND ORD_END_QTY > 0 AND ORD_END_QTY <![CDATA[ < ]]> 999999999 ) AND (ORD_BGN_QTY=ORD_END_QTY)  THEN TO_CHAR(NVL(ORD_END_QTY,0), 'fm999,999,999,990')||'개'
+        WHEN (ORD_BGN_QTY >= 0 AND ORD_END_QTY > 0 AND ORD_END_QTY <![CDATA[ < ]]> 999999999 ) AND (ORD_BGN_QTY!=ORD_END_QTY) THEN TO_CHAR(NVL(ORD_BGN_QTY,0), 'fm999,999,999,990')||'개~'||TO_CHAR(NVL(ORD_END_QTY,0), 'fm999,999,999,990')||'개'
+        WHEN (ORD_BGN_QTY > 0 AND ORD_END_QTY > 0 AND ORD_END_QTY >= 999999999 )  THEN TO_CHAR(NVL(ORD_BGN_QTY,0), 'fm999,999,999,990')||'개~'||'이상'
+        WHEN (ORD_BGN_QTY > 0 AND (ORD_END_QTY = 0 OR ORD_END_QTY IS NULL))  THEN TO_CHAR(NVL(ORD_BGN_QTY,0), 'fm999,999,999,990')||'개~'
+        WHEN ((ORD_BGN_QTY = 0 OR ORD_BGN_QTY IS NULL) AND ORD_END_QTY > 0 AND ORD_END_QTY <![CDATA[ < ]]> 999999999)  THEN '~'||TO_CHAR(NVL(ORD_END_QTY,0), 'fm999,999,999,990')||'개'
+        WHEN ((ORD_BGN_QTY = 0 OR ORD_BGN_QTY IS NULL) AND ORD_END_QTY > 0 AND ORD_END_QTY >= 999999999)  THEN '~'||'이상'
+        END AS QTY_TEXT
+        , DLV_CST
+        FROM
+        PD_ORD_QTY_BASI_DLV_CST
+        WHERE
+        PRD_NO = #{prdNo}
+        ORDER BY
+        DLV_CST_INST_NO
+        )
+        START WITH RNUM = 1
+        CONNECT BY PRIOR RNUM = RNUM - 1
+        GROUP BY PRD_NO
+        ),
+        V_SELLER_DLV_INST_PRD AS
+        (
+        SELECT
+        /*+ INLINE NO_FILTERING */ SEL_MNBD_NO
+        , MAX(
+        LTRIM(
+        SYS_CONNECT_BY_PATH(
+        DECODE(TO_CHAR(NVL(DLV_CST, 0), 'fm999,999,999,990')||'원', '0원', '무료', TO_CHAR(NVL(DLV_CST, 0), 'fm999,999,999,990')||'원')
+        || '@' || SELLER_DLV_TEXT, '/')
+        , '/')
+        ) AS DLV_CST_INST_TEXT
+        FROM (
+        SELECT
+        ROW_NUMBER () OVER (PARTITION BY SEL_MNBD_NO ORDER BY DLV_CST_INST_NO) RNUM
+        , SEL_MNBD_NO
+        , CASE
+        WHEN (ORD_BGN_AMT = 0 AND ORD_END_AMT <![CDATA[ < ]]> 999999999999 ) THEN TO_CHAR(NVL(ORD_END_AMT, 0), 'fm999,999,999,990')||'원 미만 구매'
+        WHEN (ORD_BGN_AMT > 0 AND ORD_END_AMT <![CDATA[ < ]]> 999999999999 ) AND  ( ORD_BGN_AMT != ORD_END_AMT) THEN TO_CHAR(NVL(ORD_BGN_AMT, 0), 'fm999,999,999,990')||'원 이상 ~ '||TO_CHAR(NVL(ORD_END_AMT, 0), 'fm999,999,999,990')||'원 미만 구매'
+        WHEN (ORD_BGN_AMT > 0 AND ORD_END_AMT = 999999999999 ) then TO_CHAR(NVL(ORD_BGN_AMT, 0), 'fm999,999,999,990')||'원 이상 구매'
+        END AS SELLER_DLV_TEXT
+        , DLV_CST
+        FROM PD_SELLER_BASI_DLV_CST
+        WHERE SEL_MNBD_NO = (select SEL_MNBD_NO from PD_PRD where PRD_NO = #{prdNo})
+        ORDER BY DLV_CST_INST_NO
+        )
+        START WITH RNUM = 1
+        CONNECT BY PRIOR RNUM = RNUM - 1
+        GROUP BY SEL_MNBD_NO
+        )
+        SELECT /*+ LEADING(EVT PRD ADDR DLV SDLV EVTDTL PRD_OTHERS) USE_NL(EVT PRD ADDR DLV SDLV EVTDTL PRD_OTHERS) INDEX(PRD_OTHERS PK_PD_PRD_OTHERS) */
+        EVT.EVENT_NO
+        , TO_CHAR(EVT.CREATE_DT, 'yyyyMMdd') AS CREATE_DT
+        , EVT.CUPN_DSC_MTHD_CD
+        , EVT.DSC_AMT
+        , EVT.DSC_RT
+        , EVT.DLV_CST_INST_BASI_CD AS EVT_DLV_CST_INST_BASI_CD
+        , EVT.DLV_CST AS EVT_DLV_CST
+        , EVT.DLV_CST_PAY_TYP_CD AS EVT_DLV_CST_PAY_TYP_CD
+        , EVT.DLV_BASI_AMT AS EVT_DLV_BASI_AMT
+        , EVT.DLV_CST_INFO_CD AS EVT_DLV_CST_INFO_CD
+        , EVT.RQST_QTY
+        , nvl((select sel_qty from dp_deal_prd where event_no = evt.event_no and prd_no = prd.prd_no), 0) as sel_qty
+        , EVT.MD_NO
+        , (SELECT EMP_NM FROM SY_EMP WHERE EMP_NO = EVT.MD_NO) AS MD_NM
+        , TO_CHAR(EVT.EVENT_BGN_DT, 'YYYY/MM/DD') AS EVENT_BGN_DT
+        , TO_CHAR(EVT.EVENT_END_DT, 'YYYY/MM/DD') AS EVENT_END_DT
+        , EVENT_BGN_DT AS FULL_EVENT_BGN_DT
+        , EVT.REMARK
+        , EVT.REQ_PRC_BASE_CD
+        , EVT.DRCT_CNFM_REQ_YN
+        , EVT.BASE_DATA_TXT
+        , EVT.BASE_DATA_IMG
+        , EVT.ETC_BASE_DATA_IMG
+        , PRD.SEL_MNBD_NO
+        , PRD.PRD_NO
+        , PRD.PRD_NM
+        , PRD.SEL_MTHD_CD
+        , PRD.SEL_STAT_CD
+        , PRD.MOBILE_1WON_YN
+        , FN_PD_DSC_DATA ( PRD.PRD_NO, PRD.SEL_MNBD_NO, PRD.DISP_CTGR1_NO_DE, PRD.DISP_CTGR2_NO_DE, PRD.DISP_CTGR3_NO_DE, PRD.DISP_CTGR_NO_DE,
+        PRD.CUPN_EX_CD, (SELECT NVL(CTGR_CUPN_EX_YN, 'N') FROM DP_DISP_CTGR WHERE DISP_CTGR_NO = PRD.DISP_CTGR_NO_DE), PRD.CTGR_PNT_PRE_EX_YN,
+        PRD.SEL_MTHD_CD, NVL((SELECT 'Y' FROM PD_PRD_ITM PI WHERE PI.USE_YN = 'Y' AND SYSDATE BETWEEN PI.SVC_BGN_DY AND PI.SVC_END_DY
+        AND PI.PRD_NO = PRD.PRD_NO AND PI.ITM_PREMIUM_YN = 'Y' AND ROWNUM = 1), 'N')
+        ) AS FN_PD_DSC_INFO
+        , NVL(CASE WHEN EVT.APRV_STAT_CD IN ('07', '08', '09')
+        THEN
+        CASE
+        WHEN NVL( (SELECT APRV_STAT_CD
+        FROM SE_FEE_APRV_ITM
+        WHERE FEE_KD_CD = '03'
+        AND FEE_TYP_CD = '03101'
+        AND SEL_FEE_APL_OBJ_CLF_CD = '02'
+        AND SEL_MTHD_CD = DECODE(PRD.SEL_MTHD_CD, '04', '01', PRD.SEL_MTHD_CD)
+        AND SEL_FEE_APL_OBJ_NO = TO_CHAR(PRD.PRD_NO)
+        AND APL_BGN_DY >= EVT.EVENT_BGN_DT
+        AND APL_END_DY <![CDATA[<=]]> EVT.EVENT_END_DT
+        )
+        , '03') = '03'
+        THEN (
+        SELECT MIN(FEE)
+        FROM SE_FEE_ITM
+        WHERE FEE_KD_CD = '03'
+        AND FEE_TYP_CD = '03101'
+        AND SEL_FEE_APL_OBJ_CLF_CD = '02'
+        AND SEL_MTHD_CD = DECODE(PRD.SEL_MTHD_CD, '04', '01', PRD.SEL_MTHD_CD)
+        AND SEL_FEE_APL_OBJ_NO = TO_CHAR(PRD.PRD_NO)
+        AND DISP_CTGR_NO = PRD.DISP_CTGR2_NO_DE
+        AND APL_BGN_DY <![CDATA[<=]]> EVT.EVENT_BGN_DT
+        AND APL_END_DY >= EVT.EVENT_END_DT
+        )
+        ELSE (
+        SELECT /*+ NO_EXPAND INDEX_DESC(SE_FEE_APRV_BASIS IX2_SE_FEE_APRV_BASIS) */  MIN(FEE) OVER (PARTITION BY SEL_FEE_APL_OBJ_CLF_CD ORDER BY SEL_FEE_APL_OBJ_CLF_CD DESC) FEE
+        FROM SE_FEE_APRV_BASIS
+        WHERE FEE_KD_CD = '06'
+        AND FEE_TYP_CD = '03101'
+        AND (SEL_FEE_APL_OBJ_CLF_CD = '01' and DISP_CTGR_NO = PRD.DISP_CTGR2_NO_DE
+        or SEL_FEE_APL_OBJ_CLF_CD = '03' and SEL_FEE_APL_OBJ_NO = TO_CHAR(PRD.SEL_MNBD_NO))
+        AND SEL_MTHD_CD = DECODE(PRD.SEL_MTHD_CD, '04', '01', PRD.SEL_MTHD_CD)
+        AND SYSDATE BETWEEN APL_BGN_DY AND APL_END_DY
+        AND rownum=1
+        )
+        END
+        ELSE (
+        SELECT /*+ NO_EXPAND INDEX_DESC(SE_FEE_APRV_BASIS IX2_SE_FEE_APRV_BASIS) */ MIN(FEE) OVER (PARTITION BY SEL_FEE_APL_OBJ_CLF_CD ORDER BY SEL_FEE_APL_OBJ_CLF_CD DESC) FEE
+        FROM SE_FEE_APRV_BASIS
+        WHERE FEE_KD_CD = '06'
+        AND FEE_TYP_CD = '03101'
+        AND (SEL_FEE_APL_OBJ_CLF_CD = '01' and DISP_CTGR_NO = PRD.DISP_CTGR2_NO_DE
+        or SEL_FEE_APL_OBJ_CLF_CD = '03' and    SEL_FEE_APL_OBJ_NO = TO_CHAR(PRD.SEL_MNBD_NO))
+        AND SEL_MTHD_CD = DECODE(PRD.SEL_MTHD_CD, '04', '01', PRD.SEL_MTHD_CD)
+        AND SYSDATE BETWEEN APL_BGN_DY AND APL_END_DY
+        AND rownum=1
+        )
+        END, 0) AS STD_FEE_SK_DEAL
+        , PRD.DISP_CTGR_NO_DE
+        , PRD.DLV_CST
+        , PRD.PRD_TYP_CD
+        , PRD.DLV_CST_INST_BASI_CD
+        , (SELECT MAX(PRD_DESC_CONT_VC) FROM PD_PRD_DESC WHERE PRD_NO = PRD.PRD_NO AND PRD_DESC_TYP_CD = '10') AS INSTALL_CASH_DLV_CST_DETAIL
+        , PRD.DLV_CST_PAY_TYP_CD
+        , DECODE(ADDR.MB_ADDR_LOCATION, '02', ADDR.FR_CTR_CD, '') AS FR_CTR_CD
+        , CASE PRD.DLV_CST_INST_BASI_CD WHEN '01' THEN '무료'
+        WHEN '02' THEN TO_CHAR(NVL(PRD.DLV_CST,0), 'fm999,999,999,990')||'원'
+        WHEN '03' THEN TO_CHAR(NVL(PRD.DLV_CST,0), 'fm999,999,999,990')||'원(이 상품 '||TO_CHAR(NVL(PRD.PRD_FR_DLV_BASI_AMT,0), 'fm999,999,999,990')||'원 이상 주문 시 무료)'
+        WHEN '04' THEN DLV.DLV_CST_INST_TEXT
+        WHEN '05' THEN TO_CHAR(NVL(PRD.DLV_CST,0), 'fm999,999,999,990')||'원'
+        WHEN '07' THEN SDLV.DLV_CST_INST_TEXT
+        WHEN '08' THEN FN_ADDR_DLV_CST_INST_BASI_NM(PRD.SEL_MNBD_NO, ADDR.ADDR_SEQ, ADDR.MB_ADDR_LOCATION)
+        WHEN '09' THEN FN_ADDR_DLV_CST_INST_BASI_NM(ADDR.MEM_NO, ADDR.ADDR_SEQ, ADDR.MB_ADDR_LOCATION)
+        WHEN '12' THEN TO_CHAR(NVL(PRD.DLV_CST,0), 'fm999,999,999,990')||'원(NOW배송 상품 '||TO_CHAR(NVL(PRD.PRD_FR_DLV_BASI_AMT,0), 'fm999,999,999,990')||'원 이상 주문 시 무료)'
+        ELSE ''
+        END AS DLV_CST_INST_BASI_NM
+        , PRD.DLV_CST_INFO_CD
+        , DECODE(PRD.DLV_CST_INST_BASI_CD,'01',0,'02',0,'03',NVL(PRD.PRD_FR_DLV_BASI_AMT,0),'04',0,'05',0,'07',0,'12',NVL(PRD.PRD_FR_DLV_BASI_AMT,0),0) DLV_BASI_AMT
+        , PRD.DLV_WY_CD
+        , PRD.JEJU_DLV_CST
+        , PRD.ISLAND_DLV_CST
+        , CASE WHEN PRD.HS_CODE IS NOT NULL THEN FN_PD_FR_IMP_CHARGE(PRD.PRD_NO) ELSE 0 END AS FR_IMP_CHARGE
+        , (SELECT SEL_PRC FROM PD_PRD_PRC WHERE PRD_NO = PRD.PRD_NO) AS SEL_PRC
+        , (SELECT MAKT_PRC FROM PD_PRD_PRC WHERE PRD_NO = PRD.PRD_NO) AS MAKT_PRC
+        , EVT.APRV_STAT_CD
+        , EVT.PRD_ADD_STAT_CD
+        , EVT.BNDL_DLV_CN_YN
+        , PRD.BSN_DEAL_CLF
+        , PRD.MOBILE_1WON_YN
+        , PRD.DISP_CTGR1_NO_DE
+        , PRD.DISP_CTGR2_NO_DE
+        , EVT.PAY_AGREE_YN
+        , EVT.SEL_PRC AS SKD_SEL_PRC
+        , EVT.POST_SEL_STAT_CD
+        , NVL(EVT.POST_ROLLBACK_YN, 'Y') AS POST_ROLLBACK_YN
+        , NVL((SELECT 'Y'
+        FROM  MB_MEM B
+        WHERE PRD.SEL_MNBD_NO = B.MEM_NO
+        AND B.MEM_TYP_CD IN ('04','05')),'N') AS PO_SELLER_YN
+        , NVL((SELECT COUNT(1)
+        FROM PD_EVENT_PRC_APRV APRV
+        WHERE APRV.APRV_STAT_CD = '07'
+        AND SYSDATE <![CDATA[>]]> (TO_DATE((TO_CHAR(EVT.EVENT_BGN_DT -1/24, 'yyyy/mm/dd hh24:mi:ss')),'yyyy/mm/dd hh24:mi:ss'))
+        AND APRV.EVENT_NO = EVT.EVENT_NO
+        AND APRV.PRD_NO = PRD.PRD_NO),0) AS ONE_HOUR_BGN_PRE
+        , (SELECT BOOK_CLF_CD FROM DP_DISP_CTGR WHERE DISP_CTGR_NO = PRD.DISP_CTGR2_NO_DE) AS BOOK_CLF_CD
+        , CASE WHEN EVT.EVENT_PRD_NM IS NULL THEN
+        (SELECT EVENT_PRD_NM FROM V_EVENT_PRD_NM)
+        ELSE EVT.EVENT_PRD_NM
+        END AS EVENT_PRD_NM
+        , NVL(EVT.INCR_PAY_AGREE_YN, 'N') AS INCR_PAY_AGREE_YN
+        , NVL((SELECT SEL_PRC FROM PD_EVENT_PRC_APRV WHERE EVENT_NO = EVT.HGRNK_EVENT_NO),0) AS HGRNK_SEL_PRC
+        , EVT.PTNR_PRMT_YN
+        , EVTDTL.BSS_CONT1
+        , EVTDTL.BSS_CONT2
+        , EVTDTL.BSS_CONT3
+        , EVTDTL.BSS_CONT4
+        , EVTDTL.BSS_CONT5
+        , EVT.PROL_AF_MNTN_YN
+        , EVT.EVENT_TMTR_CD
+        , PRD.DLV_CLF
+        , PRD_OTHERS.PTNR_PRD_CLF_CD
+        FROM PD_EVENT_PRC_APRV EVT,
+        PD_PRD PRD,
+        V_PLC_ADDR ADDR,
+        V_DLV_INST_PRD DLV,
+        V_SELLER_DLV_INST_PRD SDLV,
+        PD_EVENT_PRC_APRV_DTL EVTDTL,
+        PD_PRD_OTHERS PRD_OTHERS
+        WHERE EVT.EVENT_NO = #{eventNo}
+        <if test="selMnbdNo != '0'">
+            AND PRD.SEL_MNBD_NO = #{selMnbdNo}
+        </if>
+        AND EVT.PRD_NO = PRD.PRD_NO
+        AND EVT.EVENT_NO = EVTDTL.EVENT_NO(+)
+        AND PRD.PRD_NO = ADDR.PRD_NO(+)
+        AND PRD.PRD_NO = DLV.PRD_NO(+)
+        AND PRD.SEL_MNBD_NO = SDLV.SEL_MNBD_NO(+)
+        AND PRD.PRD_NO = PRD_OTHERS.PRD_NO(+)
+        <if test="aprvStatCd != null and aprvStatCd != ''">
+            AND APRV_STAT_CD = #{aprvStatCd}
+        </if>
+        /* productEvtDAOMAP.xml evt.getAplPrdInfo 쇼킹딜 신청 정보 */
+    </select>
+
+    <select id="getShockingDealPrd" resultType="ProductVO" parameterType="long">
+        SELECT
+        /*+ LEADING(EPA DDP) USE_NL(DDP) INDEX_DESC(EPA IX1_PD_EVENT_PRC_APRV) INDEX(DDP PK_DP_DEAL_PRD)*/
+        EPA.PRD_NO AS prdNo
+        ,EPA.RQST_QTY AS lmtQty
+        ,NVL(DDP.SEL_QTY,0) AS selQty
+        ,(CASE
+        WHEN EPA.EVENT_BGN_DT <![CDATA[<=]]> SYSDATE
+        THEN 'Y'
+        ELSE 'N'
+        END) AS shockDealBuyYn
+        ,TO_CHAR(EPA.EVENT_BGN_DT, 'MON DD YYYY HH24:MI:SS','NLS_DATE_LANGUAGE=AMERICAN') AS dispBgnDy
+        ,TO_CHAR(EPA.EVENT_END_DT, 'MON DD YYYY HH24:MI:SS','NLS_DATE_LANGUAGE=AMERICAN') AS dispEndDy
+        , (SELECT BSN_DEAL_CLF FROM PD_PRD WHERE PRD_NO = #{prdNo}) AS bsnDealClf
+        ,DDP.ADD_DISP_CTGR1_NO AS dispCtgr1NoDe
+        ,NVL(DDP.CMLT_SEL_QTY,0) AS cmltSelQty
+        FROM
+        PD_EVENT_PRC_APRV EPA
+        ,DP_DEAL_PRD DDP
+        WHERE
+        APRV_STAT_CD = '07'
+        AND PRD_ADD_STAT_CD = '02'
+        AND USE_YN = 'Y'
+        AND EPA.EVENT_NO = DDP.EVENT_NO (+)
+        AND EPA.EVENT_BGN_DT <![CDATA[<=]]> (SYSDATE + 1/72)
+        AND EPA.EVENT_END_DT > SYSDATE
+        AND EPA.PRD_NO = #{prdNo}
+        AND ROWNUM <![CDATA[<=]]> 1
+        /* product.getShockingDealPrd 최영백 2013.12.22 */
+    </select>
+    <select id="evtGetPrdPrcCupnDlvInfo" resultType="ProductVO" parameterType="ProductVO">
+        SELECT  /*+ ordered use_nl(a b c) */
+        a.PRD_NO as prdNo
+        , b.SEL_PRC as "priveVO.selPrc"
+        , a.DLV_CST_INST_BASI_CD as "baseVO.dlvCstInstBasiCd"
+        , a.DLV_CST as "baseVO.dlvCst"
+        , a.DLV_CST_PAY_TYP_CD as "baseVO.dlvCstPayTypCd"
+        , a.BNDL_DLV_CN_YN as "baseVO.bndlDlvCnYn"
+        , a.DLV_CST_INFO_CD as "baseVO.dlvCstInfoCd"
+        , c.cupn_dsc_mthd_cd as "priceVO.cupnDscMthdCd"
+        , c.dsc_amt as "priceVO.dscAmt"
+        , c.dsc_rt as "priceVO.dscRt"
+        , to_char(c.iss_cn_bgn_dt, 'YYYYMMDDHH24MISS') as "priceVO.issCnBgnDt"
+        , to_char(c.iss_cn_end_dt, 'YYYYMMDDHH24MISS') as "priceVO.issCnEndDt"
+        , a.DISP_CTGR_NO_DE as dispCtgrNo
+        , a.PRD_NM as prdNm
+        FROM    PD_PRD a
+        , PD_PRD_PRC b
+        , (   SELECT cupn_eftv_obj_no, cupn_dsc_mthd_cd, dsc_amt, dsc_rt, iss_cn_bgn_dt, iss_cn_end_dt
+        FROM   (SELECT /*+ ordered use_nl(a b) */
+        a.cupn_eftv_obj_no, b.cupn_dsc_mthd_cd, b.dsc_amt, b.dsc_rt, b.iss_cn_bgn_dt, b.iss_cn_end_dt,
+        ROW_NUMBER() OVER(PARTITION BY b.cupn_iss_mnbd_clf_cd ORDER BY b.cupn_no DESC) RNK
+        FROM   mt_cupn_apl_excld_rng a,
+        mt_cupn b
+        WHERE  a.cupn_eftv_obj_no = #{prdNo}
+        AND    a.cupn_eftv_obj_clf_cd ='02'
+        AND    a.use_yn = 'Y'
+        AND    a.cupn_iss_stat_cd_de = '03'
+        AND    a.cupn_disp_cd = '01' /* pcs 쿠폰 아닌 즉시할인쿠폰만 */
+        AND    a.cupn_no = b.cupn_no
+        AND    b.cupn_iss_mnbd_clf_cd = '02' /* 발급주체구분코드(SO)              */
+        AND    b.cupn_kd_cd = '01' /* 쿠폰종류 : 상품할인       */
+        AND    b.cupn_iss_wy_cd = '03' /* 발급방법 : 즉시할인쿠폰      */
+        AND    b.cupn_iss_stat_cd = '03' /* 쿠폰상태 : 발행                                                    */
+        AND    b.cupn_typ_cd != '125' /* PCS쿠폰 제외         */
+        AND    sysdate between b.iss_cn_bgn_dt and b.iss_cn_end_dt
+        AND    (b.rst_qty = -1 or b.rst_qty <![CDATA[ > ]]> 0) ) x
+        WHERE  x.RNK = 1
+        ) c
+        WHERE   a.prd_no = #{prdNo}
+        AND   a.prd_no = b.prd_no
+        AND   b.use_yn = 'Y'
+        and   b.prd_no = c.cupn_eftv_obj_no(+)
+        AND   rownum <![CDATA[ <= ]]> 1
+        /*productEvtDAOMAP.xml evt.checkPrdPrcCupnDlvUpdate 김성준 */
+    </select>
+
+
+
+    <!-- 조합형의 옵션 아이템 상품옵션값 리스트를 가져온다.(쇼킹딜 상품정보) -->
+    <select id="getEventProductOptMixValueList" parameterType="HashMap" resultType="pdOptValue">
+        SELECT DISTINCT prd_no AS prdNo,
+        event_no AS eventNo,
+        <if test='stockClmnPos == "1"'>
+            opt_item_no1 AS optItemNo, opt_value_no1 AS optValueNo, opt_value_nm1 AS optValueNm,
+        </if>
+        <if test='stockClmnPos == "2"'>
+            opt_item_no2 AS optItemNo, opt_value_no2 AS optValueNo, opt_value_nm2 AS optValueNm,
+        </if>
+        <if test='stockClmnPos == "3"'>
+            opt_item_no3 AS optItemNo, opt_value_no3 AS optValueNo, opt_value_nm3 AS optValueNm,
+        </if>
+        <if test='stockClmnPos == "4"'>
+            opt_item_no4 AS optItemNo, opt_value_no4 AS optValueNo, opt_value_nm4 AS optValueNm,
+        </if>
+        <if test='stockClmnPos == "5"'>
+            opt_item_no5 AS optItemNo, opt_value_no5 AS optValueNo, opt_value_nm5 AS optValueNm,
+        </if>
+        '' AS prdStckStatCd,
+        0  AS addPrc
+        FROM   pd_event_rqst_stock
+        WHERE  prd_no = #{prdNo}
+        AND	event_no = #{eventNo}
+        <if test='stockClmnPos == "1"'>
+            AND    OPT_ITEM_NO1 = #{optItemNo}
+        </if>
+        <if test='stockClmnPos == "2"'>
+            AND    OPT_ITEM_NO2 = #{optItemNo}
+        </if>
+        <if test='stockClmnPos == "3"'>
+            AND    OPT_ITEM_NO3 = #{optItemNo}
+        </if>
+        <if test='stockClmnPos == "4"'>
+            AND    OPT_ITEM_NO4 = #{optItemNo}
+        </if>
+        <if test='stockClmnPos == "5"'>
+            AND    OPT_ITEM_NO5 = #{optItemNo}
+        </if>
+
+        <if test='stockClmnPos == "1"'>
+            ORDER BY OPT_VALUE_NO1
+        </if>
+        <if test='stockClmnPos == "2"'>
+            ORDER BY OPT_VALUE_NO2
+        </if>
+        <if test='stockClmnPos == "3"'>
+            ORDER BY OPT_VALUE_NO3
+        </if>
+        <if test='stockClmnPos == "4"'>
+            ORDER BY OPT_VALUE_NO4
+        </if>
+        <if test='stockClmnPos == "5"'>
+            ORDER BY OPT_VALUE_NO5
+        </if>
+        /* dealMapper.getEventProductOptMixValueList */
+    </select>
+
+    <!-- 조합형의 옵션 아이템 상품옵션값 리스트를 가져온다.(쇼킹딜 종료후 상품정보) -->
+    <select id="getEventProductOptMixValueOrgList" parameterType="HashMap" resultType="pdOptValue">
+        SELECT DISTINCT prd_no AS prdNo,
+        event_no AS eventNo,
+        <if test='stockClmnPos == "1"'>
+            opt_item_no1 AS optItemNo, opt_value_no1 AS optValueNo, opt_value_nm1 AS optValueNm,
+        </if>
+        <if test='stockClmnPos == "2"'>
+            opt_item_no2 AS optItemNo, opt_value_no2 AS optValueNo, opt_value_nm2 AS optValueNm,
+        </if>
+        <if test='stockClmnPos == "3"'>
+            opt_item_no3 AS optItemNo, opt_value_no3 AS optValueNo, opt_value_nm3 AS optValueNm,
+        </if>
+        <if test='stockClmnPos == "4"'>
+            opt_item_no4 AS optItemNo, opt_value_no4 AS optValueNo, opt_value_nm4 AS optValueNm,
+        </if>
+        <if test='stockClmnPos == "5"'>
+            opt_item_no5 AS optItemNo, opt_value_no5 AS optValueNo, opt_value_nm5 AS optValueNm,
+        </if>
+        '' AS prdStckStatCd,
+        0  AS addPrc
+        FROM   pd_event_org_stock
+        WHERE  prd_no = #{prdNo}
+        AND	event_no = #{eventNo}
+        <if test='stockClmnPos == "1"'>
+            AND    OPT_ITEM_NO1 = #{optItemNo}
+        </if>
+        <if test='stockClmnPos == "2"'>
+            AND    OPT_ITEM_NO2 = #{optItemNo}
+        </if>
+        <if test='stockClmnPos == "3"'>
+            AND    OPT_ITEM_NO3 = #{optItemNo}
+        </if>
+        <if test='stockClmnPos == "4"'>
+            AND    OPT_ITEM_NO4 = #{optItemNo}
+        </if>
+        <if test='stockClmnPos == "5"'>
+            AND    OPT_ITEM_NO5 = #{optItemNo}
+        </if>
+        <if test='stockClmnPos == "1"'>
+            ORDER BY OPT_VALUE_NO1
+        </if>
+        <if test='stockClmnPos == "2"'>
+            ORDER BY OPT_VALUE_NO2
+        </if>
+        <if test='stockClmnPos == "3"'>
+            ORDER BY OPT_VALUE_NO3
+        </if>
+        <if test='stockClmnPos == "4"'>
+            ORDER BY OPT_VALUE_NO4
+        </if>
+        <if test='stockClmnPos == "5"'>
+            ORDER BY OPT_VALUE_NO5
+        </if>
+        /* dealMapper.getEventProductOptMixValueOrgList */
+    </select>
+
+    <!-- 쇼킹딜 상품 옵션 신청 정보 -->
+    <select id="getEventProductOptItemLst" parameterType="PdOptItemVO" resultType="PdOptItemVO">
+        SELECT
+        PRD_NO
+        ,EVENT_NO
+        ,OPT_CLF_CD
+        ,OPT_ITEM_NO
+        ,OPT_ITEM_NM
+        ,STOCK_CLMN_POS
+        ,TO_CHAR(CREATE_DT, 'YYYY/MM/DD HH24:MI:SS') as createDt
+        ,CREATE_NO
+        ,nvl(TO_CHAR(UPDATE_DT, 'YYYY/MM/DD HH24:MI:SS'), '') as updateDt
+        ,nvl(UPDATE_NO, 0)
+        ,PRD_EXPOSE_CLF_CD
+        ,STAT_CD
+        ,OPT_TYP_CD
+        FROM pd_event_rqst_opt_item a
+        WHERE prd_no = #{prdNo}
+        AND event_no = #{eventNo}
+        ORDER BY OPT_CLF_CD, STOCK_CLMN_POS
+        /* dealMapper.getEventProductOptItemLst */
+    </select>
+
+    <select id="getEventProductOptItemOrgLst" parameterType="PdOptItemVO" resultType="PdOptItemVO">
+        SELECT
+        PRD_NO
+        ,EVENT_NO
+        ,OPT_CLF_CD
+        ,OPT_ITEM_NO
+        ,OPT_ITEM_NM
+        ,STOCK_CLMN_POS
+        ,TO_CHAR(CREATE_DT, 'YYYY/MM/DD HH24:MI:SS') as createDt
+        ,CREATE_NO
+        ,nvl(TO_CHAR(UPDATE_DT, 'YYYY/MM/DD HH24:MI:SS'), '') as updateDt
+        ,nvl(UPDATE_NO, 0)
+        ,PRD_EXPOSE_CLF_CD
+        ,STAT_CD
+        ,OPT_TYP_CD
+        FROM pd_event_org_opt_item a
+        WHERE prd_no = #{prdNo}
+        AND event_no = #{eventNo}
+        ORDER BY OPT_CLF_CD, STOCK_CLMN_POS
+        /* dealMapper.getEventProductOptItemOrgLst */
+    </select>
+
+    <!-- 계산형 옵션 정보 조회  -->
+    <select id="getEvtOptCalcList" parameterType="PdEventRqstCalc" resultType="PdEventRqstCalc">
+        SELECT /*+ INDEX(A IX1_PD_EVENT_RQST_CALC) */
+        EVENT_NO, PRD_NO, OPT_ITEM_NO, OPT_ITEM_NM, OPT_ITEM_MIN_VALUE, OPT_ITEM_MAX_VALUE,
+        OPT_UNIT_PRC, OPT_UNIT_CD, OPT_SEL_UNIT, CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO
+        FROM PD_EVENT_RQST_CALC A
+        WHERE PRD_NO = #{prdNo}
+        <if test="eventNo != null and !eventNo.equals('-1')">
+            AND EVENT_NO = #{eventNo}
+        </if>
+        /* dealMapper.getEvtOptCalcList */
+    </select>
+
+    <!-- 쇼킹딜 현재 사용중인 옵션 정보 : 옵션 적용시 기존 재고 정보 비교시에만 사용 ****************** -->
+    <select id="getExistEventProductStockLst"  parameterType="ProductStockVO" resultType="ProductStockVO">
+        SELECT
+        stock_no                    as stockNo
+        , prd_no                    as prdNo
+        , event_no					as eventNo
+        , NVL(opt_item_no1, 0)      as optItemNo1
+        , NVL(opt_value_no1, 0)     as optValueNo1
+        , opt_value_nm1             as optValueNm1
+        , CASE
+        WHEN NVL(opt_item_no1,0) > 0 THEN  (SELECT opt_item_nm FROM pd_event_rqst_opt_item WHERE prd_no = #{prdNo} AND event_no = #{eventNo} AND opt_item_no = opt_item_no1)
+        ELSE ''
+        END                       as optItemNm1
+        , CASE
+        WHEN NVL(opt_item_no1,0) > 0 THEN  (SELECT opt_clf_cd FROM pd_event_rqst_opt_item WHERE prd_no = #{prdNo} AND event_no = #{eventNo} AND opt_item_no = opt_item_no1)
+        ELSE ''
+        END                       as optClfCd1
+        , NVL(opt_item_no2, 0)      as optItemNo2
+        , NVL(opt_value_no2, 0)     as optValueNo2
+        , opt_value_nm2             as optValueNm2
+        , CASE
+        WHEN NVL(opt_item_no2,0) > 0 THEN  (SELECT opt_item_nm FROM pd_event_rqst_opt_item WHERE prd_no = #{prdNo} AND event_no = #{eventNo} AND opt_item_no = opt_item_no2)
+        ELSE ''
+        END                       as optItemNm2
+        , CASE
+        WHEN NVL(opt_item_no2,0) > 0 THEN  (SELECT opt_clf_cd FROM pd_event_rqst_opt_item WHERE prd_no = #{prdNo} AND event_no = #{eventNo} AND opt_item_no = opt_item_no2)
+        ELSE ''
+        END                       as optClfCd2
+        , NVL(opt_item_no3, 0)      as optItemNo3
+        , NVL(opt_value_no3, 0)     as optValueNo3
+        , opt_value_nm3             as optValueNm3
+        , CASE
+        WHEN NVL(opt_item_no3,0) > 0 THEN  (SELECT opt_item_nm FROM pd_event_rqst_opt_item WHERE prd_no = #{prdNo} AND event_no = #{eventNo} AND opt_item_no = opt_item_no3)
+        ELSE ''
+        END                       as optItemNm3
+        , CASE
+        WHEN NVL(opt_item_no3,0) > 0 THEN  (SELECT opt_clf_cd FROM pd_event_rqst_opt_item WHERE prd_no = #{prdNo} AND event_no = #{eventNo} AND opt_item_no = opt_item_no3)
+        ELSE ''
+        END                       as optClfCd3
+        , NVL(opt_item_no4, 0)      as optItemNo4
+        , NVL(opt_value_no4, 0)     as optValueNo4
+        , opt_value_nm4             as optValueNm4
+        , CASE
+        WHEN NVL(opt_item_no4,0) > 0 THEN  (SELECT opt_item_nm FROM pd_event_rqst_opt_item WHERE prd_no = #{prdNo} AND event_no = #{eventNo} AND opt_item_no = opt_item_no4)
+        ELSE ''
+        END                       as optItemNm4
+        , CASE
+        WHEN NVL(opt_item_no4,0) > 0 THEN  (SELECT opt_clf_cd FROM pd_event_rqst_opt_item WHERE prd_no = #{prdNo} AND event_no = #{eventNo} AND opt_item_no = opt_item_no4)
+        ELSE ''
+        END                       as optClfCd4
+        , NVL(opt_item_no5, 0)      as optItemNo5
+        , NVL(opt_value_no5, 0)     as optValueNo5
+        , opt_value_nm5             as optValueNm5
+        , CASE
+        WHEN NVL(opt_item_no5,0) > 0 THEN  (SELECT opt_item_nm FROM pd_event_rqst_opt_item WHERE prd_no = #{prdNo} AND event_no = #{eventNo} AND opt_item_no = opt_item_no5)
+        ELSE ''
+        END                       as optItemNm5
+        , CASE
+        WHEN NVL(opt_item_no5,0) > 0 THEN  (SELECT opt_clf_cd FROM pd_event_rqst_opt_item WHERE prd_no = #{prdNo} AND event_no = #{eventNo} AND opt_item_no = opt_item_no5)
+        ELSE ''
+        END                       as optClfCd5
+        , PRD_STCK_STAT_CD          as prdStckStatCd
+        , nvl(ADD_PRC, 0) as addPrc
+        , nvl(STCK_QTY, 0) as stckQty
+        , TO_CHAR(CREATE_DT, 'YYYY/MM/DD HH24:MI:SS') as createDt
+        , CREATE_NO as createNo
+        , NVL(TO_CHAR(UPDATE_DT, 'YYYY/MM/DD HH24:MI:SS'), SYSDATE) as updateDt
+        , NVL(UPDATE_NO, CREATE_NO) as updateNo
+        , nvl(REAL_STCK_QTY, 0) as realStckQty
+        , nvl(RESV_STCK_QTY, 0) as resvStckQty
+        , nvl(BAR_CODE, '') as barCode
+        , nvl(TEMP_STCK_QTY, 0) as tempStckQty
+        , nvl(DFCT_STCK_QTY, 0) as dfctStckQty
+        , nvl(REG_RNK, 0) as regRnk
+        , nvl(OPT_WGHT, 0) as optWght
+        , '' as chgType
+        , nvl(SEL_QTY, 0) as selQty
+        FROM	pd_event_rqst_stock
+        WHERE	prd_no = #{prdNo}
+        AND   event_no = #{eventNo}
+        AND	prd_stck_stat_cd in ('01','02')
+        ORDER BY stock_no
+        /* dealMapper.getExistEventProductStockLst */
+    </select>
+
+    <select id="getProductEventOptValueLstNew"  parameterType="HashMap" resultType="PdOptValueVO">
+        SELECT
+        PRD_NO  					as   prdNo
+        ,OPT_ITEM_NO				as   optItemNo
+        ,OPT_VALUE_NO				as   optValueNo
+        ,OPT_VALUE_NM				as   optValueNm
+        ,PRD_STCK_STAT_CD			as   prdStckStatCd
+        ,0							as   addPrc
+        ,nvl(OPT_VALUE_SEQ,0)		as	 optValueSeq
+        ,create_dt	as createDtDate
+        FROM pd_event_rqst_opt_value
+        WHERE prd_no = #{prdNo}
+        AND opt_item_no = #{optItemNo}
+        AND event_no = #{eventNo}
+        ORDER BY REG_RNK, OPT_VALUE_NO
+        /* dealMapper.getProductEventOptValueLstNew */
+    </select>
+
+    <!-- 옵션명별 옵션값 개수를 가져온다. -->
+    <select id="getOptionValueGroupInfoForDeal" parameterType="ProductStockVO" resultType="ProductStockVO">
+        SELECT /*+ LEADING(A B) USE_NL(B) */
+        A.OPT_ITEM_NM , COUNT(B.EVENT_NO) totalCount
+        FROM PD_EVENT_RQST_OPT_ITEM A , PD_EVENT_RQST_OPT_VALUE B
+        WHERE 1=1
+        AND A.EVENT_NO = #{eventNo}
+        AND A.EVENT_NO = B.EVENT_NO
+        AND A.OPT_ITEM_NO = B.OPT_ITEM_NO
+        AND A.PRD_NO = B.PRD_NO
+        GROUP BY A.OPT_ITEM_NO, A.OPT_ITEM_NM
+        ORDER BY MAX(A.STOCK_CLMN_POS) ASC
+        /* dealMapper.getOptionValueGroupInfoForDeal */
+    </select>
+
+    <!-- 옵션 값별 하위 개수 목록 조회 (쇼킹딜) -->
+    <select id="getProductOptValueSubCntListForDeal" parameterType="ProductStockVO" resultType="ProductStockVO">
+        SELECT
+        /*+ INDEX(A PK_PD_EVENT_RQST_STOCK) */
+        A.OPT_VALUE_NM1 AS optValueNm1
+        , (
+        SELECT /*+ INDEX(B PK_PD_EVENT_RQST_STOCK) */
+        COUNT(DISTINCT B.OPT_VALUE_NM2)
+        FROM PD_EVENT_RQST_STOCK B
+        WHERE B.PRD_NO = #{prdNo}
+        AND B.EVENT_NO = #{eventNo}
+        AND A.OPT_ITEM_NO1 = B.OPT_ITEM_NO1
+        AND A.OPT_VALUE_NO1 = B.OPT_VALUE_NO1
+        ) AS optValueCnt1
+        <if test="optItemCnt > 2">
+            , A.OPT_VALUE_NM2 AS optValueNm2
+            , (
+            SELECT /*+ INDEX(B PK_PD_EVENT_RQST_STOCK) */
+            COUNT(DISTINCT B.OPT_VALUE_NM3)
+            FROM PD_EVENT_RQST_STOCK B
+            WHERE B.PRD_NO = #{prdNo}
+            AND B.EVENT_NO = #{eventNo}
+            AND A.OPT_ITEM_NO1 = B.OPT_ITEM_NO1
+            AND A.OPT_VALUE_NO1 = B.OPT_VALUE_NO1
+            AND A.OPT_ITEM_NO2 = B.OPT_ITEM_NO2
+            AND A.OPT_VALUE_NO2 = B.OPT_VALUE_NO2
+            ) AS optValueCnt2
+        </if>
+
+        <if test="optItemCnt > 3">
+            , A.OPT_VALUE_NM3 AS optValueNm3
+            , (
+            SELECT /*+ INDEX(B PK_PD_EVENT_RQST_STOCK) */
+            COUNT(DISTINCT B.OPT_VALUE_NM4)
+            FROM PD_EVENT_RQST_STOCK B
+            WHERE B.PRD_NO = #{prdNo}
+            AND B.EVENT_NO = #{eventNo}
+            AND A.OPT_ITEM_NO1 = B.OPT_ITEM_NO1
+            AND A.OPT_VALUE_NO1 = B.OPT_VALUE_NO1
+            AND A.OPT_ITEM_NO2 = B.OPT_ITEM_NO2
+            AND A.OPT_VALUE_NO2 = B.OPT_VALUE_NO2
+            AND A.OPT_ITEM_NO3 = B.OPT_ITEM_NO3
+            AND A.OPT_VALUE_NO3 = B.OPT_VALUE_NO3
+            ) AS optValueCnt3
+        </if>
+
+        <if test="optItemCnt > 4">
+            , A.OPT_VALUE_NM4 AS optValueNm4
+            , (
+            SELECT /*+ INDEX(B PK_PD_EVENT_RQST_STOCK) */
+            COUNT(DISTINCT B.OPT_VALUE_NM5)
+            FROM PD_EVENT_RQST_STOCK B
+            WHERE B.PRD_NO = #{prdNo}
+            AND B.EVENT_NO = #{eventNo}
+            AND A.OPT_ITEM_NO1 = B.OPT_ITEM_NO1
+            AND A.OPT_VALUE_NO1 = B.OPT_VALUE_NO1
+            AND A.OPT_ITEM_NO2 = B.OPT_ITEM_NO2
+            AND A.OPT_VALUE_NO2 = B.OPT_VALUE_NO2
+            AND A.OPT_ITEM_NO3 = B.OPT_ITEM_NO3
+            AND A.OPT_VALUE_NO3 = B.OPT_VALUE_NO3
+            AND A.OPT_ITEM_NO4 = B.OPT_ITEM_NO4
+            AND A.OPT_VALUE_NO4 = B.OPT_VALUE_NO4
+            ) AS optValueCnt4
+        </if>
+        FROM PD_EVENT_RQST_STOCK A
+        WHERE A.PRD_NO = #{prdNo}
+        AND A.EVENT_NO = #{eventNo}
+        GROUP BY A.OPT_ITEM_NO1, A.OPT_VALUE_NO1, A.OPT_VALUE_NM1
+        <if test="optItemCnt > 2">
+            , A.OPT_ITEM_NO2, A.OPT_VALUE_NO2, A.OPT_VALUE_NM2
+        </if>
+        <if test="optItemCnt > 3">
+            , A.OPT_ITEM_NO3, A.OPT_VALUE_NO3, A.OPT_VALUE_NM3
+        </if>
+        <if test="optItemCnt > 4">
+            , A.OPT_ITEM_NO4, A.OPT_VALUE_NO4, A.OPT_VALUE_NM4
+        </if>
+        ORDER BY A.OPT_VALUE_NO1
+        <if test="optItemCnt > 2">
+            , A.OPT_VALUE_NO2
+        </if>
+        <if test="optItemCnt > 3">
+            , A.OPT_VALUE_NO3
+        </if>
+        <if test="optItemCnt > 4">
+            , A.OPT_VALUE_NO4
+        </if>
+        /* dealMapper.getProductOptValueSubCntListForDeal */
+    </select>
+
+    <!-- 선택형 옵션수 체크  -->
+    <select id="getOptionClfTypeCntForDeal" parameterType="HashMap" resultType="int">
+        /* dealMapper.getOptionClfTypeCntForDeal */
+        select
+        count(1) selOptCnt
+        from    pd_event_rqst_opt_item a
+        where   a.event_no = #{eventNo}
+        and   a.opt_clf_cd = #{optClfCd}
+    </select>
+
+    <!-- 상품번호와 재고번호를 재고가 있는지 확인하기 위해 사용함 -->
+    <select id="getPdStockExistCntForDeal" parameterType="Hashmap" resultType="int">
+        SELECT COUNT(*) as stockCnt
+        FROM PD_EVENT_RQST_STOCK
+        WHERE EVENT_NO  = #{eventNo}
+        <if test="stockNo != null and stockNo != ''">
+            AND stock_no  = #{stockNo}
+        </if>
+        <if test="viewRownum == null || viewRownum == ''">
+            AND ROWNUM <![CDATA[<=]]> 1
+        </if>
+        /* dealMapper.getPdStockExistCntForDeal */
+    </select>
+
+    <!-- 진행중인 판촉이벤트가 있는건수 (쇼킹딜 상품정보) -->
+    <select id="getEventProductStckCnt" parameterType="ProductVO" resultType="long">
+        /* dealMapper.getEventProductStckCnt */
+        SELECT NVL(sum(stck_qty),0)
+        FROM  pd_event_rqst_stock
+        WHERE prd_no = #{prdNo}
+        AND event_no = #{priceVO.eventNo}
+        AND prd_stck_stat_cd = '01'
+    </select>
+
+    <!-- 진행중인 판촉이벤트가 있는건수 (쇼킹딜 상품정보) -->
+    <select id="getRollbackEventProductStckCnt" parameterType="ProductVO" resultType="long">
+        SELECT NVL(sum(stck_qty),0)
+        FROM  pd_event_org_stock
+        WHERE prd_no = #{prdNo}
+        AND event_no = #{priceVO.eventNo}
+        AND prd_stck_stat_cd = '01'
+        /* dealMapper.getRollbackEventProductStckCnt */
+    </select>
+
+    <!-- 상품옵션 재고정보 데이타를  복사 -->
+    <update id="insertEventProductStocksCopy" parameterType="ProductVO">
+        INSERT INTO pd_event_rqst_stock
+        (stock_no,
+        event_no,
+        prd_no,
+        opt_item_no1,
+        opt_value_no1,
+        opt_value_nm1,
+        opt_item_no2,
+        opt_value_no2,
+        opt_value_nm2,
+        opt_item_no3,
+        opt_value_no3,
+        opt_value_nm3,
+        opt_item_no4,
+        opt_value_no4,
+        opt_value_nm4,
+        opt_item_no5,
+        opt_value_no5,
+        opt_value_nm5,
+        opt_item_no6,
+        opt_value_no6,
+        opt_value_nm6,
+        opt_item_no7,
+        opt_value_no7,
+        opt_value_nm7,
+        stck_qty,
+        add_prc,
+        prd_stck_stat_cd,
+        create_dt,
+        create_no,
+        update_dt,
+        update_no,
+        sel_qty,
+        bar_code,
+        reg_rnk,
+        opt_wght,
+        cstm_opt_apl_prc,
+        ctlg_no,
+        rep_opt_yn,
+        add_desc,
+        sppl_bnft_cd,
+        match_dt,
+        match_no,
+        rntl_cst
+        )
+        SELECT SEQ_PD_PRD_STCK.Nextval,
+        #{priceVO.eventNo},
+        #{prdNo},
+        opt_item_no1,
+        opt_value_no1,
+        opt_value_nm1,
+        opt_item_no2,
+        opt_value_no2,
+        opt_value_nm2,
+        opt_item_no3,
+        opt_value_no3,
+        opt_value_nm3,
+        opt_item_no4,
+        opt_value_no4,
+        opt_value_nm4,
+        opt_item_no5,
+        opt_value_no5,
+        opt_value_nm5,
+        opt_item_no6,
+        opt_value_no6,
+        opt_value_nm6,
+        opt_item_no7,
+        opt_value_no7,
+        opt_value_nm7,
+        <if test="baseVO.certTypCd != null and baseVO.certTypCd.equals('101')">
+            0, 0,
+        </if>
+        <if test="baseVO.certTypCd != null and !baseVO.certTypCd.equals('101')">
+            <if test="baseVO.bsnDealClf != null and baseVO.bsnDealClf.equals('02')">
+                0,
+            </if>
+            <if test="baseVO.bsnDealClf != null and !baseVO.bsnDealClf.equals('02')">
+                stck_qty,
+            </if>
+            <if test="baseVO.bsnDealClf != null and baseVO.bsnDealClf.equals('01')">
+                0,
+            </if>
+            <if test="baseVO.bsnDealClf != null and !baseVO.bsnDealClf.equals('01')">
+                add_prc,
+            </if>
+        </if>
+        <if test="baseVO.certTypCd != null and baseVO.certTypCd.equals('101')">
+            '02',
+        </if>
+        <if test="baseVO.certTypCd != null and !baseVO.certTypCd.equals('101')">
+            prd_stck_stat_cd,
+        </if>
+        sysdate,
+        #{createNo},
+        sysdate,
+        #{updateNo},
+        0 sel_qty,
+        bar_code,
+        reg_rnk,
+        opt_wght,
+        cstm_opt_apl_prc,
+        ctlg_no,
+        rep_opt_yn,
+        add_desc,
+        sppl_bnft_cd,
+        match_dt,
+        match_no,
+        rntl_cst
+        FROM pd_event_rqst_stock
+        WHERE prd_no = #{baseVO.reRegPrdNo}
+        AND event_no = #{priceVO.eventNo}
+        /* dealMapper.insertEventProductStocksCopy */
+    </update>
+
+    <!-- 계산형 옵션 등록 -->
+    <insert id="insertProductOptCalcForDealCopy" parameterType="ProductVO">
+        INSERT INTO PD_EVENT_RQST_CALC (
+        EVENT_NO, PRD_NO, OPT_ITEM_NO, OPT_ITEM_NM, OPT_ITEM_MIN_VALUE, OPT_ITEM_MAX_VALUE, OPT_UNIT_PRC, OPT_UNIT_CD, OPT_SEL_UNIT, CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO
+        )
+        SELECT /*+ INDEX(A PK_PD_EVENT_RQST_CALC) */ #{priceVO.eventNo}, #{prdNo}, OPT_ITEM_NO, OPT_ITEM_NM, OPT_ITEM_MIN_VALUE, OPT_ITEM_MAX_VALUE, OPT_UNIT_PRC, OPT_UNIT_CD, OPT_SEL_UNIT, CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO
+        FROM PD_EVENT_RQST_CALC A
+        WHERE EVENT_NO = #{priceVO.eventNo}
+        AND PRD_NO = #{baseVO.reRegPrdNo}
+        /* dealMapper.insertProductOptCalcForDealCopy */
+    </insert>
+
+    <!-- 계산형 옵션 등록 -->
+    <insert id="insertProductOptCalcForDeal" parameterType="PdEventRqstCalc">
+        INSERT INTO PD_EVENT_RQST_CALC(EVENT_NO, PRD_NO, OPT_ITEM_NO, OPT_ITEM_NM, OPT_ITEM_MIN_VALUE, OPT_ITEM_MAX_VALUE, OPT_UNIT_PRC, OPT_UNIT_CD, OPT_SEL_UNIT, CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO)
+        VALUES (#{eventNo}, #{prdNo}, #{optItemNo}, #{optItemNm}, #{optItemMinValue}, #{optItemMaxValue}, #{optUnitPrc}, #{optUnitCd}, #{optSelUnit}, SYSDATE, #{createNo}, SYSDATE, #{updateNo})
+        /* dealMapper.insertProductOptCalcForDeal */
+    </insert>
+
+    <insert id="insertEventProductStock" parameterType="ProductStockVO">
+        INSERT INTO pd_event_rqst_stock
+        (event_no,
+        stock_no,
+        prd_no,
+        opt_item_no1,
+        opt_value_no1,
+        opt_value_nm1,
+        opt_item_no2,
+        opt_value_no2,
+        opt_value_nm2,
+        opt_item_no3,
+        opt_value_no3,
+        opt_value_nm3,
+        opt_item_no4,
+        opt_value_no4,
+        opt_value_nm4,
+        opt_item_no5,
+        opt_value_no5,
+        opt_value_nm5,
+        opt_item_no6,
+        opt_value_no6,
+        opt_value_nm6,
+        opt_item_no7,
+        opt_value_no7,
+        opt_value_nm7,
+        add_prc,
+        stck_qty,
+        prd_stck_stat_cd,
+        create_dt,
+        create_no,
+        update_dt,
+        update_no,
+        sel_qty,
+        bar_code,
+        reg_rnk,
+        opt_wght,
+        cstm_opt_apl_prc,
+        ctlg_no,
+        add_desc,
+        sppl_bnft_cd,
+        match_dt,
+        match_no,
+        rntl_cst
+        )
+        VALUES
+        (#{eventNo},
+        #{stockNo},
+        #{prdNo},
+        #{optItemNo1},
+        #{optValueNo1},
+        #{optValueNm1},
+        #{optItemNo2},
+        #{optValueNo2},
+        #{optValueNm2},
+        #{optItemNo3},
+        #{optValueNo3},
+        #{optValueNm3},
+        #{optItemNo4},
+        #{optValueNo4},
+        #{optValueNm4},
+        #{optItemNo5},
+        #{optValueNo5},
+        #{optValueNm5},
+        #{optItemNo6},
+        #{optValueNo6},
+        #{optValueNm6},
+        #{optItemNo7},
+        #{optValueNo7},
+        #{optValueNm7},
+        #{addPrc},
+        #{stckQty},
+        #{prdStckStatCd},
+        TO_DATE(#{createDt}, 'YYYY/MM/DD HH24:MI:SS'),
+        #{createNo},
+        TO_DATE(#{updateDt}, 'YYYY/MM/DD HH24:MI:SS'),
+        #{updateNo},
+        #{selQty},
+        #{barCode},
+        #{regRnk},
+        #{optWght},
+        #{cstmOptAplPrc}*100,
+        <if test="ctlgNo == '0'">
+            null,
+            null,
+            null,
+            null,
+            null
+        </if>
+        <if test="ctlgNo != '0'">
+            #{ctlgNo},
+            #{addDesc},
+            #{spplBnftCd},
+            SYSDATE,
+            #{updateNo}
+        </if>
+        ,#{rntlCst}
+        )
+        /* dealMapper.insertEventProductStock */
+    </insert>
+
+    <!-- 상품 옵션값 데이타 등록 -->
+    <insert id="insertProductEvtOptValues" parameterType="PdOptValueVO">
+        INSERT INTO pd_event_rqst_opt_value
+        (event_no, prd_no, opt_item_no, opt_value_no, opt_value_nm, prd_stck_stat_cd, create_dt, create_no, update_dt, update_no, dgst_ext_nm, opt_value_seq)
+        VALUES
+        (#{eventNo}, #{prdNo}, #{optItemNo}, #{optValueNo}, #{optValueNm}, #{prdStckStatCd}, SYSDATE, #{createNo}, SYSDATE, #{updateNo}, #{dgstExtNm}
+        <if test="optValueSeq == '0'">
+            , SEQ_OPT_VALUE_UNIQUE.NEXTVAL
+        </if>
+        <if test="optValueSeq != '0'">
+            , #{optValueSeq}
+        </if>
+        )
+        /* dealMapper.insertProductEvtOptValues */
+    </insert>
+
+    <!--  옵션 정보를  입력한다 (쇼킹딜 상품정보) -->
+    <insert id="insertEventProductOptItem" parameterType="PdOptItemVO">
+        INSERT INTO pd_event_rqst_opt_item
+        (event_no,
+        prd_no,
+        opt_clf_cd,
+        opt_item_no,
+        opt_item_nm,
+        stock_clmn_pos,
+        stat_cd,
+        create_dt,
+        create_no,
+        update_dt,
+        update_no,
+        prd_expose_clf_cd,
+        opt_typ_cd)
+        VALUES
+        (#{eventNo}
+        ,#{prdNo}
+        ,#{optClfCd}
+        ,#{optItemNo}
+        ,#{optItemNm}
+        ,#{stockClmnPos}
+        ,#{statCd}
+        ,TO_DATE(#{createDt}, 'YYYY/MM/DD HH24:MI:SS')
+        ,#{createNo}
+        ,TO_DATE(#{updateDt}, 'YYYY/MM/DD HH24:MI:SS')
+        ,#{updateNo}
+        ,#{prdExposeClfCd}
+        ,#{optTypCd})
+        /* dealMapper.insertEventProductOptItem */
+    </insert>
+
+    <!-- 현재 독립형 상품 옵션값 데이타 등록 (쇼킹딜 상품정보) -->
+    <insert id="insertEventProductOptValues" parameterType="PdOptValueVO">
+        INSERT INTO pd_event_rqst_opt_value
+        (event_no, prd_no, opt_item_no, opt_value_no, opt_value_nm, prd_stck_stat_cd, create_dt, create_no, update_dt, update_no)
+        VALUES
+        (#{eventNo}, #{prdNo}, #{optItemNo}, #{optValueNo}, #{optValueNm}, #{prdStckStatCd}, SYSDATE, #{createNo}, SYSDATE, #{updateNo})
+        /* dealMapper.insertEventProductOptValues */
+    </insert>
+
+    <!-- 현재 상품 옵션 아이템 수정 (쇼킹딜 상품정보) -->
+    <update id="updateNewEventProductOptItem" parameterType="PdOptItemVO">
+        UPDATE  pd_event_rqst_opt_item
+        SET  opt_item_no = #{optItemNo}
+        ,stock_clmn_pos = #{stockClmnPos}
+        ,opt_clf_cd = #{optClfCd}
+        ,stat_cd = #{statCd}
+        ,update_dt = TO_DATE(#{updateDt}, 'YYYY/MM/DD HH24:MI:SS')
+        ,update_no = #{updateNo}
+        ,prd_expose_clf_cd =#{prdExposeClfCd}
+        ,opt_typ_cd = #{optTypCd}
+        WHERE  prd_no = #{prdNo}
+        AND  event_no = #{eventNo}
+        AND  opt_clf_cd = #{optClfCd}
+        AND  opt_item_nm = #{optItemNm}
+        /* dealMapper.updateNewEventProductOptItem */
+    </update>
+
+    <!-- 계산형 옵션 수정 -->
+    <update id="updateProductOptCalcForDeal" parameterType="PdEventRqstCalc">
+        UPDATE /*+ INDEX(A IX1_PD_EVENT_RQST_CALC) */ PD_EVENT_RQST_CALC A SET
+        OPT_ITEM_NM = #{optItemNm},
+        OPT_ITEM_MIN_VALUE = #{optItemMinValue},
+        OPT_ITEM_MAX_VALUE = #{optItemMaxValue},
+        OPT_UNIT_PRC = #{optUnitPrc},
+        OPT_UNIT_CD = #{optUnitCd},
+        OPT_SEL_UNIT = #{optSelUnit},
+        UPDATE_DT = SYSDATE,
+        UPDATE_NO = #{updateNo}
+        WHERE PRD_NO = #{prdNo}
+        AND OPT_ITEM_NO = #{optItemNo}
+        AND EVENT_NO = #{eventNo}
+        /* dealMapper.updateProductOptCalcForDeal */
+    </update>
+
+    <update id="updateEventProductStocks" parameterType="ProductStockVO">
+        UPDATE  pd_event_rqst_stock
+        SET        add_prc            = #{addPrc}
+        <if test="(bsnDealClf != null and !bsnDealClf.equals('02')) and (stckQtyModYn != null and stckQtyModYn.equals('Y'))">
+            , stck_qty           = #{stckQty}
+        </if>
+        , prd_stck_stat_cd   = #{prdStckStatCd}
+        , update_dt 		 = TO_DATE(#{updateDt}, 'YYYY/MM/DD HH24:MI:SS')
+        , update_no          = #{updateNo}
+        , bar_code           = #{barCode}
+        , reg_rnk            = #{regRnk}
+        , opt_wght           = #{optWght}
+        , cstm_opt_apl_prc	 = #{cstmOptAplPrc}*100
+        , opt_value_no1		 = #{optValueNo1}
+        , opt_value_no2		 = #{optValueNo2}
+        , opt_value_no3		 = #{optValueNo3}
+        , opt_value_no4		 = #{optValueNo4}
+        , opt_value_no5		 = #{optValueNo5}
+        , opt_value_no6		 = #{optValueNo6}
+        , opt_value_no7		 = #{optValueNo7}
+        , RNTL_CST			= #{rntlCst}
+        , ctlg_no = #{ctlgNo}
+        , add_desc	= #{addDesc}
+        , sppl_bnft_cd = #{spplBnftCd}
+        WHERE  stock_no  = #{stockNo}
+        and event_no = #{eventNo}
+        /* dealMapper.updateEventProductStocks */
+    </update>
+
+    <!-- 기존재고 정보중 변경이 발생한 데이터 삭제 (쇼킹딜 상품정보) -->
+    <delete id="deleteEventProductStocks" parameterType="ProductStockVO">
+        DELETE pd_event_rqst_stock WHERE prd_no = #{prdNo} AND event_no = #{eventNo} AND stock_no = #{stockNo}
+        /* dealMapper.deleteEventProductStocks */
+    </delete>
+
+    <!-- 쇼킹딜 상품 옵션 아이템 삭제 -->
+    <delete id="deleteNewEventProductOptItem" parameterType="PdOptItemVO">
+        DELETE pd_event_rqst_opt_item WHERE prd_no = #{prdNo} AND event_no = #{eventNo} AND opt_clf_cd = #{optClfCd} AND opt_item_nm = #{optItemNm}
+        /* dealMapper.deleteNewEventProductOptItem */
+    </delete>
+
+    <delete id="deleteProductEvtOptInfo" parameterType="PdOptValueVO">
+        DELETE pd_event_rqst_opt_value
+        WHERE EVENT_NO = #{eventNo}
+        AND prd_no = #{prdNo}
+        /* dealMapper.deleteProductEvtOptInfo */
+    </delete>
+
+    <!-- 계산형 옵션 삭제 -->
+    <delete id="deleteProductOptCalcForDeal" parameterType="PdEventRqstCalc">
+        DELETE /*+ INDEX(A IX1_PD_EVENT_RQST_CALC) */ FROM PD_EVENT_RQST_CALC A
+        WHERE PRD_NO = #{prdNo}
+        AND EVENT_NO = #{eventNo}
+        <if test="optItemNo != null and !optItemNo.equals('0')">
+            AND OPT_ITEM_NO = #{optItemNo}
+        </if>
+        /* dealMapper.deleteProductOptCalcForDeal */
+    </delete>
+
+    <!-- 현재 독립형 상품 옵션값 데이터 삭제 (쇼킹딜 상품정보) -->
+    <delete id="deleteEventProductOptValues" parameterType="ProductVO">
+        DELETE pd_event_rqst_opt_value WHERE prd_no = #{prdNo} AND event_no = #{eventNo}
+        /* dealMapper.deleteEventProductOptValues */
+    </delete>
+
+    <!-- 쇼킹딜 상품정보 와 쇼킹딜 신청정보 조회 (상품정보 수정 가능 단계 체크 위함) -->
+    <select id="getEventPrdInfoWithAprv" parameterType="EventRqstPrdInfoVO" resultMap="com.elevenst.terroir.product.registration.common.mapper.VoMapper.eventPrdInfoResult">
+        SELECT /* productEvtDAOMap.xml evt.getEventPrdInfoWithAprv */
+        APRV.EVENT_NO
+        , PRD.PRD_NO
+        , APRV.APRV_STAT_CD
+        , APRV.PRD_ADD_STAT_CD
+        , APRV.EVENT_BGN_DT
+        , NVL(RQST.EVENT_NO, -1) AS RQST_EVENT_NO
+        , NVL(ORG.EVENT_NO, -1) AS ORG_EVENT_NO
+        FROM
+        PD_EVENT_PRC_APRV APRV, PD_PRD PRD
+        , PD_EVENT_RQST_PRD_INFO RQST
+        , PD_EVENT_ORG_PRD_INFO ORG
+        WHERE
+        PRD.PRD_NO = APRV.PRD_NO
+        AND
+        APRV.USE_YN = 'Y'
+        AND
+        PRD.PRD_NO = #{prdNo}
+        <if test="eventNo gt 1">
+            AND APRV.EVENT_NO = #{eventNo}
+        </if>
+        <if test="eventNo lt 1">
+            <![CDATA[ AND APRV.APRV_STAT_CD IN ('03', '05', '06') ]]>
+        </if>
+        AND
+        APRV.EVENT_NO = RQST.EVENT_NO(+)
+        AND
+        APRV.EVENT_NO = ORG.EVENT_NO(+)
+    </select>
+
+    <select id="getEventProductStockLst" parameterType="ProductStockVO" resultType="ProductStockVO">
+        SELECT
+        a.*, rownum as no, count(*) over() AS totalCount
+        FROM (
+        SELECT
+        STOCK_NO					as      stockNo
+        ,PRD_NO						as      prdNo
+        ,EVENT_NO					as      eventNo
+        ,NVL(OPT_ITEM_NO1,0)		as      optItemNo1
+        ,NVL(OPT_VALUE_NO1,0)		as      optValueNo1
+        ,OPT_VALUE_NM1				as      optValueNm1
+        ,NVL(OPT_ITEM_NO2,0)		as      optItemNo2
+        ,NVL(OPT_VALUE_NO2,0)		as      optValueNo2
+        ,OPT_VALUE_NM2				as      optValueNm2
+        ,NVL(OPT_ITEM_NO3,0)		as		optItemNo3
+        ,NVL(OPT_VALUE_NO3,0)		as		optValueNo3
+        ,OPT_VALUE_NM3				as		optValueNm3
+        ,NVL(OPT_ITEM_NO4,0)		as		optItemNo4
+        ,NVL(OPT_VALUE_NO4,0)		as		optValueNo4
+        ,OPT_VALUE_NM4				as		optValueNm4
+        ,NVL(OPT_ITEM_NO5,0)		as		optItemNo5
+        ,NVL(OPT_VALUE_NO5,0)		as		optValueNo5
+        ,OPT_VALUE_NM5				as		optValueNm5
+        ,NVL(OPT_ITEM_NO6,0)		as		optItemNo6
+        ,NVL(OPT_VALUE_NO6,0)		as		optValueNo6
+        ,OPT_VALUE_NM6				as		optValueNm6
+        ,NVL(OPT_ITEM_NO7,0)		as		optItemNo7
+        ,NVL(OPT_VALUE_NO7,0)		as		optValueNo7
+        ,OPT_VALUE_NM7				as		optValueNm7
+        ,NVL(ADD_PRC,0)				as		addPrc
+        ,NVL(STCK_QTY,0)			as		stckQty
+        ,PRD_STCK_STAT_CD			as		prdStckStatCd
+        ,NVL(SEL_QTY,0)				as		selQty
+        ,BAR_CODE					as		barCode
+        ,NVL(OPT_WGHT,0)			as		optWght
+        ,NVL(cstm_Opt_Apl_Prc,0)/100	as		cstmOptAplPrc
+        ,nvl(RNTL_CST, 0)					as		rntlCst
+        FROM pd_event_rqst_stock
+        WHERE prd_no = #{prdNo}
+        AND event_no = #{eventNo}
+        AND PRD_STCK_STAT_CD in ('01','02')
+        ORDER BY REG_RNK, OPT_VALUE_NO1, OPT_VALUE_NO2, OPT_VALUE_NO3, OPT_VALUE_NO4, OPT_VALUE_NO5
+        ) a
+        /* dealMapper.getEventProductStockLst */
+    </select>
+
+    <select id="getEventProductStockOrgLst" parameterType="ProductStockVO" resultType="ProductStockVO">
+        SELECT
+        a.*, rownum as no, count(*) over() AS totalCount
+        FROM (
+        SELECT
+        STOCK_NO					as      stockNo
+        ,PRD_NO						as      prdNo
+        ,EVENT_NO					as      eventNo
+        ,NVL(OPT_ITEM_NO1,0)		as      optItemNo1
+        ,NVL(OPT_VALUE_NO1,0)		as      optValueNo1
+        ,OPT_VALUE_NM1				as      optValueNm1
+        ,NVL(OPT_ITEM_NO2,0)		as      optItemNo2
+        ,NVL(OPT_VALUE_NO2,0)		as      optValueNo2
+        ,OPT_VALUE_NM2				as      optValueNm2
+        ,NVL(OPT_ITEM_NO3,0)		as		optItemNo3
+        ,NVL(OPT_VALUE_NO3,0)		as		optValueNo3
+        ,OPT_VALUE_NM3				as		optValueNm3
+        ,NVL(OPT_ITEM_NO4,0)		as		optItemNo4
+        ,NVL(OPT_VALUE_NO4,0)		as		optValueNo4
+        ,OPT_VALUE_NM4				as		optValueNm4
+        ,NVL(OPT_ITEM_NO5,0)		as		optItemNo5
+        ,NVL(OPT_VALUE_NO5,0)		as		optValueNo5
+        ,OPT_VALUE_NM5				as		optValueNm5
+        ,NVL(OPT_ITEM_NO6,0)		as		optItemNo6
+        ,NVL(OPT_VALUE_NO6,0)		as		optValueNo6
+        ,OPT_VALUE_NM6				as		optValueNm6
+        ,NVL(OPT_ITEM_NO7,0)		as		optItemNo7
+        ,NVL(OPT_VALUE_NO7,0)		as		optValueNo7
+        ,OPT_VALUE_NM7				as		optValueNm7
+        ,NVL(ADD_PRC,0)				as		addPrc
+        ,NVL(STCK_QTY,0)			as		stckQty
+        ,PRD_STCK_STAT_CD			as		prdStckStatCd
+        ,NVL(SEL_QTY,0)				as		selQty
+        ,BAR_CODE					as		barCode
+        ,NVL(OPT_WGHT,0)			as		optWght
+        ,NVL(cstm_Opt_Apl_Prc,0)/100	as		cstmOptAplPrc
+        ,nvl(RNTL_CST, 0)					as		rntlCst
+        FROM pd_event_org_stock
+        WHERE prd_no = #{prdNo}
+        AND event_no = #{eventNo}
+        AND PRD_STCK_STAT_CD in ('01','02')
+        ORDER BY REG_RNK, OPT_VALUE_NO1, OPT_VALUE_NO2, OPT_VALUE_NO3, OPT_VALUE_NO4, OPT_VALUE_NO5
+        ) a
+        /* dealMapper.getEventProductStockOrgLst */
+    </select>
+
+    <select id="getShockDealStarted" parameterType="long" resultType="ProductEvtVO" >
+        SELECT
+        /*+ INDEX(A IX1_PD_EVENT_PRC_APRV) */
+        EVENT_NO as eventNo
+        , EVENT_PRMT_NO as eventPrmtNo
+        , PRD_NO as prdNo
+        , TO_CHAR(EVENT_BGN_DT, 'YYYY/MM/DD') as eventBgnDt
+        , TO_CHAR(EVENT_END_DT, 'YYYY/MM/DD') as eventEndDt
+        FROM   PD_EVENT_PRC_APRV A
+        WHERE  PRD_NO = #{prdNo}
+        AND    USE_YN='Y'
+        AND    APRV_STAT_CD='07'
+        AND    PRD_ADD_STAT_CD IN ('02', '03')
+        AND    SYSDATE BETWEEN (EVENT_BGN_DT - 1/72) AND (EVENT_END_DT + 1/1440) /* 20분전부터 ~ END+1분 */
+        AND    ROWNUM = 1
+        /* dealMapper.getShockDealStarted */
+    </select>
+</mapper>

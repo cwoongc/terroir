@@ -1,0 +1,78 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.coordi_prd.mapper.CoordiProductMapper">
+
+
+    <insert id="insertCoordiProduct" parameterType="PdPrdCoordi">
+        INSERT /* coordiProductMapper.insertCoordiProduct */ INTO PD_PRD_COORDI
+				(
+				    PRD_NO
+				    ,COORDI_PRD_NO
+				    ,CREATE_DT
+				    ,CREATE_NO
+				)
+				VALUES
+				(
+				    #{prdNo}
+				    ,#{coordiPrdNo}
+				    ,SYSDATE
+				    ,#{createNo}
+				)
+
+    </insert>
+
+	<delete id="deleteCoordiProduct" parameterType="long">
+		DELETE  /*coordiProductMapper.deleteCoordiProduct */ FROM PD_PRD_COORDI
+		WHERE PRD_NO = #{prdNo}
+	</delete>
+
+
+	<!-- 구) product.getMyCoordiPrdList -->
+	<select id="getCoordiPrdNoList" parameterType="long" resultType="CoordiProductVO">
+		SELECT A.COORDI_PRD_NO, B.PRD_NM, C.DTL_BASIC_EXT_NM, TO_CHAR(A.CREATE_DT, 'YYYY/MM/DD HH24:MI:SS') AS CREATE_DT, (SELECT DTLS_COM_NM FROM SY_CO_DETAIL WHERE GRP_CD = 'PD014' AND DTLS_CD = B.SEL_STAT_CD) AS SEL_STAT_NM
+		FROM PD_PRD_COORDI A, PD_PRD B, PD_PRD_IMAGE C
+		WHERE A.PRD_NO = #{prdNo}
+		AND A.COORDI_PRD_NO = B.PRD_NO
+		AND A.COORDI_PRD_NO = C.PRD_NO
+		/* coordiProductMapper.getMyCoordiProductList */
+	</select>
+
+
+	<!-- 구) product.getSohoCoordiPrdList -->
+	<select id="getDisplayCoordiProductList" parameterType="long" resultType="DisplayCoordiProductVO">
+		SELECT  /* coordiProductMapper.getDisplayCoordiProductList */
+		DLP.PRD_NO  /*전시상품 번호*/
+		,DLP.PRD_NM  /*전시상품 명*/
+		,DLP.SEL_PRC  /*전시상품 판매가*/
+		,DLP.FINAL_DSC_PRC  /* 전시상품 최종구매가능가 */
+		,DLP.DLV_CUPN_CD  /* 전시상품 배송쿠폰코드 */
+		,DLP.IMG_URL_02   /* 상품이미지URL02(170 *1 170 */
+		,CASE
+		WHEN DLP.SEL_PRC = DLP.FINAL_DSC_PRC THEN 'N' /* 전시상품 판매가 최종구매가능가 상이 여부 */
+		ELSE 'Y'
+		END as dscYn
+		FROM    DP_LIVE_PRD DLP
+		,PD_PRD_COORDI CRD
+		WHERE  DLP.PRD_NO = CRD.COORDI_PRD_NO
+		AND    CRD.PRD_NO = #{prdNo}
+	</select>
+
+
+	<!-- 해당 상품이 자신의 단일상품인지 조회 -->
+	<select id="getMyCoordiPrdCnt" parameterType="ProductVO" resultType="long">
+		SELECT /* productMapper.xml getMyCoordiPrdCnt */
+		/*+ INDEX(PD_PRD IX1_PD_PRD) */ COUNT(PRD_NO)
+		FROM PD_PRD
+		WHERE SEL_MNBD_NO = #{selMnbdNo}
+		AND SEL_STAT_CD IN ('103', '104', '105')
+		AND NVL(OM_PRD_YN , 'Y') = 'Y'
+		AND STD_PRD_YN = 'Y'
+		AND disp_ctgr_no_de > 0
+		<foreach collection="coordiProductVOList" item="coordiProductVO" open="AND PRD_NO IN (" separator="," close=")">
+			#{coordiProductVO.prdNo}
+		</foreach>
+	</select>
+
+
+</mapper>

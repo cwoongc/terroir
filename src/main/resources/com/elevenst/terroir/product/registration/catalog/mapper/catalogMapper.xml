@@ -1,0 +1,416 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.catalog.mapper.CatalogMapper">
+
+    <!-- 상품 저장 시 상품모델 사용여부 체크 -->
+    <select id="getCtlgModelNoCheck" parameterType="java.util.HashMap" resultType="int">
+        SELECT
+        /*+ INDEX(a PK_PD_CTLG) */
+        COUNT(*)
+        FROM PD_CTLG a
+        WHERE a.CTLG_NO = #{ctlgNo}
+        AND a.CTLG_STAT_CD = '103'
+        AND a.USE_YN = 'Y'
+        /* catalogMapper.getCtlgModelNoCheck */
+    </select>
+
+    <!-- 카탈로그 연결된 상품 삭제 처리 -->
+    <update id="deleteProductModel" parameterType="ItgModelInfoVO">
+        UPDATE
+        /*+ INDEX(PM PK_PD_CTLG_PRD_MATCH) */ PD_CTLG_PRD_MATCH PM
+        SET PM.USE_YN = 'N'
+        , PM.UPDATE_DT = SYSDATE
+        , PM.UPDATE_NO = #{updateNo}
+        WHERE PM.CTLG_NO = #{matchCtlgNo}
+        AND PM.MATCH_CLF_CD = #{matchClfCd}
+        AND PM.MATCH_OBJ_NO = #{prdNo}
+        /* catalogMapper.deleteProductModel */
+    </update>
+
+    <!-- 상품 카탈로그 매칭 정보 등록 -->
+    <update id="mergeProductCatalogMatch" parameterType="ProductStockVO">
+        MERGE
+        /*+ INDEX(A PK_PD_CTLG_PRD_MATCH) */
+        INTO PD_CTLG_PRD_MATCH A
+        USING (
+        SELECT #{ctlgNo} AS CTLG_NO, #{prdNo} AS PRD_NO, #{matchClfCd} AS MATCH_CLF_CD, #{createNo} AS CREATE_NO, #{updateNo} AS UPDATE_NO
+        FROM DUAL
+        ) TMP ON (A.CTLG_NO = TMP.CTLG_NO AND A.MATCH_CLF_CD = TMP.MATCH_CLF_CD AND A.MATCH_OBJ_NO = TMP.PRD_NO)
+        WHEN MATCHED THEN
+        UPDATE SET
+        A.USE_YN = 'Y'
+        , A.UPDATE_DT = SYSDATE
+        , A.UPDATE_NO = TMP.UPDATE_NO
+        WHEN NOT MATCHED THEN
+        INSERT
+        (CTLG_NO, MATCH_CLF_CD, MATCH_OBJ_NO, USE_YN, CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO)
+        VALUES
+        (TMP.CTLG_NO, TMP.MATCH_CLF_CD, TMP.PRD_NO, 'Y', SYSDATE, TMP.CREATE_NO, SYSDATE, TMP.UPDATE_NO)
+        /* optionMapper.mergeProductCatalogMatch */
+    </update>
+
+    <!-- 상품 모델정보 수정 -->
+    <update id="mergeProductModelInfo" parameterType="CatalogRecmVO">
+        MERGE INTO
+        <if test="ctlgSvcClf.equals('02')">
+            PD_CTLG_PRD_MATCH A
+            USING (
+            SELECT #{prdNo} AS PRD_NO, #{ctlgNo} AS CTLG_NO, #{createNo} AS CREATE_NO, #{matchClfCd} AS MATCH_CLF_CD
+            FROM DUAL
+            ) TMP ON (A.CTLG_NO = TMP.CTLG_NO AND A.MATCH_CLF_CD = TMP.MATCH_CLF_CD AND A.MATCH_OBJ_NO = TMP.PRD_NO)
+            WHEN MATCHED THEN
+            UPDATE SET
+            A.USE_YN = 'Y'
+            , A.UPDATE_DT = SYSDATE
+            , A.UPDATE_NO = TMP.CREATE_NO
+            WHEN NOT MATCHED THEN
+            INSERT
+            (CTLG_NO, MATCH_CLF_CD, MATCH_OBJ_NO, USE_YN, CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO)
+            VALUES
+            (TMP.CTLG_NO, TMP.MATCH_CLF_CD, TMP.PRD_NO, 'Y', SYSDATE, TMP.CREATE_NO, SYSDATE, TMP.CREATE_NO)
+        </if>
+        <if test="!ctlgSvcClf.equals('02')">
+            PD_PRD_MODEL PPM
+            USING (
+            SELECT #{prdNo} AS PRD_NO, #{ctlgNo} AS CTLG_NO, #{createNo} AS CREATE_NO, #{mnbdClfCd} AS MNBD_CLF_CD
+            FROM DUAL
+            ) TMP ON (PPM.PRD_NO = TMP.PRD_NO AND PPM.MNBD_CLF_CD IN ('03', '04'))
+            WHEN MATCHED THEN
+            UPDATE SET
+            PPM.MODEL_NO = TMP.CTLG_NO
+            , PPM.CREATE_NO = TMP.CREATE_NO
+            , PPM.CREATE_DT = SYSDATE
+            , PPM.MNBD_CLF_CD = TMP.MNBD_CLF_CD
+            WHEN NOT MATCHED THEN
+            INSERT
+            (PRD_NO, MNBD_CLF_CD, MODEL_NO, CREATE_NO, CREATE_DT)
+            VALUES
+            (TMP.PRD_NO, TMP.MNBD_CLF_CD, TMP.CTLG_NO, TMP.CREATE_NO, SYSDATE)
+        </if>
+        /* catalogMapper.mergeProductModelInfo */
+    </update>
+
+    <!-- 상품모델 조회, 카탈로그정보 -->
+    <select id="getProductCtlgModelInfo" parameterType="HashMap" resultType="HashMap">
+        select
+        /*+ LEADING(M2 C) USE_NL(C) INDEX(M2 PK_PD_PRD_MODEL) */
+        m2.prd_no,
+        c.ctlg_no,
+        c.ctlg_grp_no,
+        c.ctlg_stat_cd,
+        c.ctlg_typ_cd,
+        m2.mnbd_clf_cd,
+        m2.model_no,
+        m2.model_nm as model_nm_input,
+        decode(m2.model_no,-1, m2.model_nm,c.model_nm) as model_nm,
+        m2.model_cd_val,
+        c.min_price,
+        c.brand_name,
+        c.brand_cd,
+        c.maker_name,
+        c.img_url,
+        c.prd_match_cnt
+        from  (select ctlg_no,
+        max(prd_no) as prd_no,
+        max(ctlg_grp_no) as ctlg_grp_no,
+        max(ctlg_stat_cd) as ctlg_stat_cd,
+        max(ctlg_typ_cd) as ctlg_typ_cd,
+        max(mnbd_clf_cd) as mnbd_clf_cd,
+        max(model_no) as model_no,
+        max(model_nm) as model_nm_input,
+        max(disp_model_nm) as model_nm,
+        max(min_price) as min_price,
+        max(brand_name) as brand_name,
+        max(brand_cd) as brand_cd,
+        max(maker_name) as maker_name,
+        max(img_path) as img_url,
+        max(prd_match_cnt) as prd_match_cnt
+        from   (select /*+ LEADING(M C AC A) USE_NL(C AC A) INDEX(M PK_PD_PRD_MODEL) INDEX(C PK_PD_CTLG)
+        INDEX(AC PK_PD_CTLG_ATTR_COMP) INDEX(A IX3_PD_CTLG_ATTR) */
+        m.prd_no,
+        c.ctlg_grp_no,
+        c.ctlg_stat_cd,
+        c.ctlg_typ_cd,
+        m.mnbd_clf_cd,
+        m.model_no,
+        m.model_nm,
+        m.model_cd_val,
+        c.ctlg_no,
+        c.basi_amt,
+        c.basi_unt_cd,
+        c.prd_match_cnt,
+        (select dtls_com_nm
+        from   sy_co_detail
+        where  grp_cd = 'PD164'
+        and    dtls_cd = c.basi_unt_cd) as basi_unt_nm,
+        c.basi_unt_disp_yn,
+        a.ctlg_attr_nm,
+        0 as min_price,
+        decode(a.ctlg_attr_no, '1023', ac.ctlg_attr_value_nm, '') as brand_name,
+        decode(a.ctlg_attr_no, '1023', ac.ctlg_attr_value_no, '') as brand_cd,
+        decode(a.ctlg_attr_no, '15', ac.ctlg_attr_value_nm, '') as maker_name,
+        c.add_info_nm,
+        c.disp_model_nm,
+        '/t/100' || c.img_path as img_path
+        from   pd_prd_model m,
+        pd_ctlg c,
+        pd_ctlg_attr a,
+        pd_ctlg_attr_comp ac
+        where  m.model_no = c.ctlg_no
+        and    m.prd_no = #{prdNo}
+        <if test="optionPopupYn != null and optionPopupYn.equals('Y')">
+            and    mnbd_clf_cd in ('03','04','09')
+        </if>
+        <if test="optionPopupYn != null and !optionPopupYn.equals('Y')">
+            and    mnbd_clf_cd in ('03','04','06','07','08','09','10')
+        </if>
+        and    ac.ctlg_no = c.ctlg_no
+        and    c.use_yn = 'Y'
+        and    a.use_yn = 'Y'
+        and    c.ctlg_stat_cd = '103'
+        and    ac.ctlg_attr_no = a.ctlg_attr_no
+        )
+        group by ctlg_no
+        ) c,
+        pd_prd_model m2
+        where m2.prd_no = c.prd_no (+)
+        and   m2.prd_no = #{prdNo}
+        <if test="optionPopupYn != null and optionPopupYn.equals('Y')">
+            and   m2.mnbd_clf_cd in ('03','04')
+        </if>
+        <if test="optionPopupYn != null and !optionPopupYn.equals('Y')">
+            and   m2.mnbd_clf_cd in ('03','04','06','07','08','09','10')
+        </if>
+        and   rownum <![CDATA[ <= ]]> 1
+        /* catalogMapper.getProductCtlgModelInfo */
+    </select>
+
+    <update id="insertProductCatalogMatchInfo" parameterType="PdPrd">
+        <![CDATA[
+            INSERT /* catalogMapper.xml insertProductCatalogMatchInfo */
+            INTO PD_CTLG_PRD_MATCH (
+                CTLG_NO, MATCH_CLF_CD, MATCH_OBJ_NO, USE_YN, CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO, MATCH_TRT_CLF_CD
+            )
+            SELECT
+                A.CTLG_NO, '01', #{prdNo}, 'Y', SYSDATE, #{createNo}, SYSDATE, #{updateNo}, '01'
+            FROM (
+                SELECT /*+ LEADING(A B) USE_NL(B) INDEX(A IX16_PD_PRD) INDEX(B IX1_PD_CTLG_PRD_MATCH) */
+                    B.CTLG_NO
+                    , A.PRD_NO
+                    , ROW_NUMBER() OVER(ORDER BY DECODE(A.SEL_STAT_CD, '103', 1, '104', 2, 999) ASC, B.UPDATE_DT DESC) AS RNUM
+                FROM PD_PRD A, PD_CTLG_PRD_MATCH B
+                WHERE A.SEL_MNBD_NO = TO_NUMBER(#{selMnbdNo})
+                    AND A.DISP_CTGR_NO_DE > 0
+                    AND A.SELLER_PRD_CD = #{sellerPrdCd}
+                    AND A.PRD_NO = B.MATCH_OBJ_NO
+                    AND B.MATCH_CLF_CD = '01'
+                    AND B.USE_YN = 'Y'
+                    AND B.CTLG_NO > 1
+            ) A
+            WHERE A.RNUM = 1
+        ]]>
+    </update>
+
+    <!-- 카탈로그 상세 조회 -->
+    <select id="getCatalogDetailInfo" resultType="PrdModelVO" parameterType="PrdModelVO">
+        SELECT /* getCatalogDetailInfo (catalogMapper.xml) */
+        /*+ LEADING(CTG LST) USE_NL(LST) INDEX(CTG PK_PD_CTLG) */
+        CTG.CTLG_NO AS ctlgNo
+        ,CTG.CTLG_GRP_NO AS ctlgGrpNo
+        ,CTG.HGRNK_CTLG_NO AS hgrnkCtlgNo
+        ,CTG.DISP_MODEL_NM AS dispModelNm
+        ,CTG.BASI_AMT AS basiAmt
+        ,CTG.BASI_UNT_CD AS basiUntCd
+        ,CTG.BASI_UNT_DISP_YN AS basiUntDispYn
+        ,NVL(CTG.IMG_PATH,'') AS imgPath
+        ,NVL(CTG.PRD_MATCH_CNT, 0) AS prdMatchCnt
+        ,NVL(CTG.PRD_RECM_CNT, 0) AS prdRecmCnt
+        ,CTG.CTLG_STAT_CD AS ctlgStatCd
+        ,CTG.BAR_CODE AS barCode
+        ,CTG.REG_TYP_CD AS regTypCd
+        ,CTG.USE_YN AS useYn
+        ,CTG.APRV_NO AS aprvNo
+        ,CTG.CREATE_DT AS createDt
+        ,CTG.CREATE_NO AS createNo
+        ,(SELECT EMP_NM||'/'||EMP_ID FROM SY_EMP WHERE EMP_NO = CTG.CREATE_NO) AS createNm
+        ,CTG.UPDATE_DT AS updateDt
+        ,CTG.UPDATE_NO AS updateNo
+        ,(SELECT EMP_NM||'/'||EMP_ID FROM SY_EMP WHERE EMP_NO = CTG.UPDATE_NO) AS updateNm
+        <if test ="mode !=null and mode == 'SIMPLE'">
+            , '' AS etcInfo
+        </if>
+        <if test ="mode !=null and mode != 'SIMPLE'">
+            ,(
+            SELECT
+            LISTAGG(ETC_INFO, ' / ') WITHIN GROUP (ORDER BY DISP_RNK)
+            FROM
+            (
+            SELECT ETC_INFO, DISP_RNK
+            FROM (
+            SELECT /*+ LEADING(DTL ATTR COMP) USE_NL(ATTR COMP) */
+            ATTR.CTLG_ATTR_NM ||' : '|| NVL(COMP.CTLG_ATTR_VALUE_NM,'') AS ETC_INFO
+            ,DTL.DISP_RNK
+            FROM
+            PD_CTLG_ATTR_COMP COMP
+            ,PD_CTLG_ATTR_MAPP DTL
+            ,PD_CTLG_ATTR ATTR
+            WHERE
+            COMP.CTLG_ATTR_NO = DTL.CTLG_ATTR_NO
+            AND COMP.CTLG_NO =  #{ctlgNo}
+            AND DTL.DISP_CTGR_NO = FN_PD_CTLG_ATTR_CTGR(0, TO_NUMBER( #{ctlgNo}))
+            AND DTL.USE_YN = 'Y'
+            AND DTL.CTLG_ATTR_NO = ATTR.CTLG_ATTR_NO
+            AND DTL.DISP_YN = 'Y'
+            AND DTL.ADDT_ATTR_YN = 'N'
+            AND COMP.CTLG_ATTR_VALUE_NM IS NOT NULL
+            ORDER BY DTL.DISP_RNK
+            )
+            WHERE ROWNUM <![CDATA[<]]> 21
+            )
+            ) AS etcInfo
+        </if>
+        ,NVL((
+        SELECT /*+ INDEX(COMP PK_PD_CTLG_ATTR_COMP) */
+        CTLG_ATTR_VALUE_NM
+        FROM
+        PD_CTLG_ATTR_COMP COMP
+        WHERE
+        CTLG_NO =  #{ctlgNo}
+        AND CTLG_ATTR_NO = 1023
+        ),'') AS brandInfo
+        ,NVL((
+        SELECT /*+ INDEX(COMP PK_PD_CTLG_ATTR_COMP) */
+        CTLG_ATTR_VALUE_NM
+        FROM
+        PD_CTLG_ATTR_COMP COMP
+        WHERE
+        CTLG_NO = #{ctlgNo}
+        AND CTLG_ATTR_NO = 15
+        ),'') AS makerInfo
+        ,NVL(LST.DISP_CTGR_LEVEL,0) AS dispCtgrLevel
+        ,NVL(LST.DISP_CTGR1_NO,0) AS dispCtgr1No
+        ,NVL(LST.DISP_CTGR1_NM, '') AS dispCtgr1Nm
+        ,NVL(LST.DISP_CTGR2_NO,0) AS dispCtgr2No
+        ,NVL(LST.DISP_CTGR2_NM, '') AS dispCtgr2Nm
+        ,NVL(LST.DISP_CTGR3_NO,0) AS dispCtgr3No
+        ,NVL(LST.DISP_CTGR3_NM, '') AS dispCtgr3Nm
+        ,NVL(LST.DISP_CTGR4_NO,0) AS dispCtgr4No
+        ,NVL(LST.DISP_CTGR4_NM, '') AS dispCtgr4Nm
+        ,NVL(LST.DISP_CTGR_NO,0) AS dispCtgrNo
+        ,NVL(CTG.CTLG_SVC_CLF,'') AS ctlgSvcClf
+        ,NVL(CTG.CTLG_TYP_CD,'') AS ctlgTypCd
+        FROM
+        PD_CTLG CTG
+        ,DP_DISP_CTGR_LIST LST
+        WHERE
+        CTG.CTLG_NO = #{ctlgNo}
+        AND CTG.DISP_CTGR_NO = LST.DISP_CTGR_NO (+)
+    </select>
+
+    <!-- 상품 모델 정보 조회 -->
+    <select id="getProductModel" parameterType="PrdModelVO" resultType="PrdModelVO">
+        SELECT /* getProductModel (catalogMapper.xml) */
+        /*+ INDEX(A PK_PD_PRD_MODEL) */
+        A.MODEL_NO as modelNo
+        , A.MNBD_CLF_CD as mnbdClfCd
+        , A.MODEL_NM as modelNm
+        FROM PD_PRD_MODEL A
+        WHERE A.PRD_NO = #{prdNo}
+        <if test="mnbdClfCd != null and mnbdClfCd == '03'">
+            AND A.MNBD_CLF_CD IN ('03', '04', '06', '07', '08', '09', '10')
+        </if>
+        <if test="mnbdClfCd != null and mnbdClfCd == '04'">
+        AND A.MNBD_CLF_CD IN ('03', '04', '06', '07', '08', '09', '10')
+        </if>
+        <if test="mnbdClfCd != null and mnbdClfCd == '06'">
+        AND A.MNBD_CLF_CD IN ('03', '04', '06', '07', '08', '09', '10')
+        </if>
+        <if test="mnbdClfCd != null and mnbdClfCd != '03'">
+            <if test="mnbdClfCd != null and mnbdClfCd != '04'">
+                 <if test="mnbdClfCd != null and mnbdClfCd != '06'">
+                AND A.MNBD_CLF_CD = #{mnbdClfCd}
+                </if>
+            </if>
+        </if>
+        <![CDATA[
+		AND ROWNUM <= 1
+		]]>
+    </select>
+    <!-- 상품모델 삭제 -->
+    <delete id="deletePdPrdModel" parameterType="PrdModelVO">
+        delete from pd_prd_model
+        where	prd_no = #{prdNo}
+        <if test="mnbdClfCd != null and mnbdClfCd == '03'">
+            AND mnbd_clf_cd in ('03', '04', '06', '07', '08', '09', '10')
+        </if>
+        <if test="mnbdClfCd != null and mnbdClfCd == '04'">
+            AND mnbd_clf_cd in ('03', '04', '06', '07', '08', '09', '10')
+        </if>
+        <if test="mnbdClfCd != null and mnbdClfCd == '06'">
+            AND mnbd_clf_cd in ('03', '04', '06', '07', '08', '09', '10')
+        </if>
+        <if test="mnbdClfCd != null and mnbdClfCd == '03'">
+            <if test="mnbdClfCd != null and mnbdClfCd == '04'">
+                <if test="mnbdClfCd != null and mnbdClfCd == '06'">
+                    AND mnbd_clf_cd = #{mnbdClfCd}
+                </if>
+            </if>
+        </if>
+    </delete>
+
+    <!-- 상품모델 등록 insertProductModel -->
+    <update id="mergePdPrdModel" parameterType="PdPrdModel">
+        MERGE INTO PD_PRD_MODEL PPM
+        USING (
+            SELECT
+                #{prdNo} AS PRD_NO
+                ,#{mnbdClfCd} AS MNBD_CLF_CD
+                ,#{modelNo} AS MODEL_NO
+                ,#{createNo} AS CREATE_NO
+                ,NVL((SELECT DISP_MODEL_NM FROM PD_CTLG WHERE CTLG_NO = #{modelNo}), #{modelNm}) AS MODEL_NM
+                ,#{modelCdVal} as MODEL_CD_VAL
+        FROM DUAL
+        ) TMP ON (PPM.PRD_NO = TMP.PRD_NO
+        <if test="mnbdClfCd != null and mnbdClfCd == '03'">
+            AND PPM.MNBD_CLF_CD IN ('03', '04', '10')
+        </if>
+        <if test="mnbdClfCd != null and mnbdClfCd == '04'">
+            AND PPM.MNBD_CLF_CD IN ('03', '04', '10')
+        </if>
+        <if test="mnbdClfCd != null and mnbdClfCd == '06'">
+            AND PPM.MNBD_CLF_CD IN ('03', '04', '06', '07', '08', '10')
+        </if>
+        )
+        WHEN MATCHED THEN
+        UPDATE SET
+            PPM.MODEL_NO = TMP.MODEL_NO
+            ,PPM.CREATE_NO = TMP.CREATE_NO
+            ,PPM.CREATE_DT = SYSDATE
+            ,PPM.MNBD_CLF_CD = TMP.MNBD_CLF_CD
+            ,PPM.MODEL_NM = TMP.MODEL_NM
+            ,PPM.MODEL_CD_VAL = TMP.MODEL_CD_VAL
+        WHEN NOT MATCHED THEN
+        INSERT
+            (PRD_NO, MNBD_CLF_CD, MODEL_NO, CREATE_NO, CREATE_DT, MODEL_NM, MODEL_CD_VAL)
+        VALUES
+            (TMP.PRD_NO, TMP.MNBD_CLF_CD, TMP.MODEL_NO, TMP.CREATE_NO, SYSDATE, TMP.MODEL_NM, TMP.MODEL_CD_VAL)
+    </update>
+
+    <!-- 현재 상품이 무옵션 상품이고 카탈로그 매칭 안되어 있는 재고 정보 조회 -->
+    <select id="getProductStockCheckInfo" resultType="CatalogRecmVO" parameterType="CatalogRecmVO">
+        <![CDATA[
+		SELECT /* getProductStockCheckInfo (catalogMapper.xml) */
+			/*+ INDEX(A IX_PD_STOCK_03) */
+			A.STOCK_NO AS stockNo
+			, NVL(A.CTLG_NO, 0) AS ctlgNo
+		FROM PD_STOCK A
+		WHERE A.PRD_NO = #prdNo#
+			AND A.OPT_ITEM_NO1 = 0
+			AND A.OPT_VALUE_NO1 = 0
+	]]>
+        <if test="searchType != null and searchType == 'MODEL_CHANGE'">
+            AND A.CTLG_NO IS NULL
+        </if>
+    </select>
+</mapper>

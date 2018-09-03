@@ -1,0 +1,119 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.shop.mapper.ShopServiceTestMapper">
+
+
+    <insert id="insertProductShopBranch" parameterType="PdTownShopBranchComp">
+        INSERT /* ShopServiceTestMapper.insertProductShopBranch */ INTO PD_TOWN_SHOP_BRANCH_COMP (
+				PRD_NO
+				,SHOP_NO
+				,SHOP_BRANCH_NO
+			)
+			VALUES (
+				#{prdNo}
+				,#{shopNo}
+				,#{shopBranchNo}
+			)
+    </insert>
+
+    <select id="getProductShopBranchListByPrdNo" parameterType="long" resultType="PdTownShopBranchComp">
+        SELECT /* ShopServiceTestMapper.getShopBranchNoList */
+        PRD_NO
+        ,SHOP_NO
+        ,SHOP_BRANCH_NO
+        FROM PD_TOWN_SHOP_BRANCH_COMP
+        WHERE PRD_NO = #{prdNo}
+    </select>
+
+    <delete id="deleteProductShopBranchByPrdNo" parameterType="long">
+        DELETE /* ShopServiceTestMapper.deleteProductShopBranchByPrdNo */
+        FROM PD_TOWN_SHOP_BRANCH_COMP
+        WHERE PRD_NO = #{prdNo}
+    </delete>
+
+
+
+
+
+    <select id="getShopBranchNoList" parameterType="long" resultType="long">
+        SELECT /* ShopServiceTestMapper.getShopBranchNoList */
+          SHOP_BRANCH_NO
+        FROM DP_TOWN_SHOP_BRANCH
+        WHERE SHOP_NO = #{shopNo}
+    </select>
+
+
+    <insert id="insertShopBranch">
+        INSERT INTO /* ShopServiceTestMapper.insertShopBranch */
+          DP_TOWN_SHOP_BRANCH (shop_no, shop_branch_no, shop_branch_typ_cd, mail_no)
+        VALUES(#{shopNo}, #{shopBranchNo}, #{shopBranchTypCd}, #{mailNo})
+    </insert>
+
+
+    <delete id="deleteShopBranchByShopNo">
+        DELETE /* ShopServiceTestMapper.deleteShopBranchByShopNo */
+        FROM DP_TOWN_SHOP_BRANCH
+        WHERE SHOP_NO = #{shopNo}
+    </delete>
+
+
+
+
+
+    <select id="getShopBranchList" parameterType="long" resultType="ShopBranchVO">
+        SELECT /* ShopServiceTestMapper.getShopBranchNMList */
+            SHOP_NO,
+            SHOP_BRANCH_NO,
+            NVL(SHOP_BRANCH_TYP_CD,'') AS SHOP_BRANCH_TYP_CD,
+            NVL(SHOP_BRANCH_KIND_CD,'') AS SHOP_BRANCH_KIND_CD,
+            NVL(SHOP_BRANCH_NM,'') AS SHOP_BRANCH_NM,
+            NVL(SHOP_BRANCH_CD,'') AS SHOP_BRANCH_CD,
+            NVL(SHOP_SCRT_NO,'') AS SHOP_SCRT_NO,
+            NVL(MAIL_NO,'') AS MAIL_NO,
+            '' AS MAIL_NO_SEQ,
+            NVL(BASE_ADDR,'') AS BASE_ADDR,
+            NVL(DTLS_ADDR,'') AS DTLS_ADDR,
+            NVL(DISP_PRRT_RNK,0) AS DISP_PRRT_RNK,
+            NVL(DISP_CTGR1_NO_AREA,0) AS DISP_CTGR1_NO_AREA,
+            NVL(DISP_CTGR2_NO_AREA,0) AS DISP_CTGR2_NO_AREA,
+            NVL(DISP_CTGR3_NO_AREA, 0) AS DISP_CTGR3_NO_AREA,
+            NVL(DISP_CTGR4_NO_AREA,0) AS DISP_CTGR4_NO_AREA,
+            NVL(USE_YN,'') AS USE_YN,
+            NVL(CREATE_DT,'') AS CREATE_DT,
+            CREATE_NO,
+            NVL(UPDATE_DT,'') AS UPDATE_DT,
+            UPDATE_NO,
+            NVL(MAP_POINT_X,0) AS MAP_POINT_X,
+            NVL(MAP_POINT_Y,0) AS MAP_POINT_Y,
+            NVL(MAP_POS_X, '0') AS MAP_POS_X,
+            NVL(MAP_POS_Y, '0') AS MAP_POS_Y,
+            '0' AS MAP_POS_X_LIFE_PLUS,
+            '0' AS MAP_POS_Y_LIFE_PLUS,
+            NVL(STR_IMG_URL, '') AS STR_IMG_URL,
+            NVL(ADVRT_STMT_CONT, '') AS ADVRT_STMT_CONT,
+            NVL(STRT_GUIDE_STMT_CONT,'') AS STRT_GUIDE_STMT_CONT,
+            NVL(PARKNG_CAN_YN,'') AS PARKING_CAN_YN,
+            NVL(STR_INTR_IMG_URL,'') AS STR_INTR_IMG_URL,
+            NVL((SELECT /*+ INDEX(B PK_DP_TOWN_SHOP_TEL)*/ SHOP_TEL_NO
+	           FROM DP_TOWN_SHOP_TEL B
+	          WHERE A.SHOP_NO = B.SHOP_NO
+	            AND A.SHOP_BRANCH_NO = B.SHOP_BRANCH_NO
+	            AND TEL_PRRT_RNK = 0),'') AS TEL_NO_STR,
+	        NVL((SELECT DISP_CTGR1_NM ||'>'||DISP_CTGR2_NM FROM DP_DISP_CTGR_LIST WHERE DISP_CTGR_NO = DISP_CTGR2_NO_AREA),'0') AS DISP_CTGR_NM_AREA_DE,
+	        NVL(MEM_NO,0) AS MEM_NO,
+	        NVL((SELECT SEL_NO FROM DP_TOWN_SHOP C WHERE C.SHOP_NO = A.SHOP_NO ),0) AS SEL_MNBD_NO,
+	        NVL((SELECT MEM_ID FROM MB_MEM WHERE MEM_NO = (SELECT SEL_NO
+	           FROM DP_TOWN_SHOP C
+	          WHERE C.SHOP_NO = A.SHOP_NO )),'') AS MEM_ID,
+	        NVL((SELECT MEM_NM FROM MB_MEM WHERE MEM_NO = (SELECT SEL_NO
+	           FROM DP_TOWN_SHOP C
+	          WHERE C.SHOP_NO = A.SHOP_NO )),'') AS MEM_NM,
+	         0 as SALE_TIME_CNT
+ 		 FROM DP_TOWN_SHOP_BRANCH A
+		WHERE A.SHOP_NO = #{shopNo}
+		order by DISP_PRRT_RNK, SHOP_BRANCH_NM
+    </select>
+
+
+</mapper>

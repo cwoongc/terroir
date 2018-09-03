@@ -1,0 +1,435 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.etc.mapper.EtcMapper">
+    <!-- 상품 추가  정보 pd_prd_etc 를  입력한다 -->
+    <insert id="insertProductEtc" parameterType="PdPrdEtc">
+        INSERT /* productDAOMap.xml product.insertProductEtc 김태영 2010.02.22 */
+        into pd_prd_etc (
+        prd_no,
+        <if test ="prdSvcBgnDy!=null and prdSvcBgnDy!=''">
+            prd_svc_bgn_dy,
+        </if>
+        <if test="prdSvcEndDy!=null and prdSvcEndDy!=''">
+            prd_svc_end_dy,
+        </if>
+        <if test="seatTyp!=null and seatTyp!=''">
+            seat_typ,
+        </if>
+        <if test="theaterNm!=null and theaterNm!=''">
+            theater_nm,
+        </if>
+        <if test="theaterAreaInfo!=null and theaterAreaInfo!=''">
+            theater_area_info,
+        </if>
+
+        <if test="authorInfo!=null and authorInfo!=''">
+            author_info,
+        </if>
+        <if test="transInfo!=null and transInfo!=''">
+            trans_info,
+        </if>
+        <if test="picInfo!=null and picInfo!=''">
+            pic_info,
+        </if>
+        <if test="isbn13Cd!=null and isbn13Cd!=''">
+            isbn13_cd,
+        </if>
+        <if test="isbn10Cd!=null and isbn10Cd!=''">
+            isbn10_cd,
+        </if>
+        <if test="bookSize!=null and bookSize!=''">
+            book_size,
+        </if>
+        <if test="bookPage!=null and bookPage!=''">
+            book_page,
+        </if>
+        <if test="compInfo!=null and compInfo!=''">
+            comp_info,
+        </if>
+        <if test="preVwCd!=null and preVwCd!=''">
+            pre_vw_cd,
+        </if>
+        <if test="vodBrowserTyp!=null and vodBrowserTyp!=''">
+            vod_browser_typ,
+        </if>
+        <if test="vodUrl!=null and vodUrl!=''">
+            vod_url,
+        </if>
+
+        <if test="mainTitle!=null and mainTitle!=''">
+            main_title,
+        </if>
+        <if test="mudvdLabel!=null and mudvdLabel!=''">
+            mudvd_label,
+        </if>
+        <if test="freeGiftTgNo1!=null and freeGiftTgNo1!=''">
+            free_Gift_Tg_No1,
+        </if>
+        <if test="freeGiftTgNo2!=null and freeGiftTgNo2!=''">
+            free_Gift_Tg_No2,
+        </if>
+        <if test="issuCoLogoUrl!=null and issuCoLogoUrl!=''">
+            issu_co_logo_url,
+        </if>
+        prd_detail_out_link,
+        create_dt,
+        create_no,
+        update_dt,
+        update_no
+        )
+        values (
+        #{prdNo},
+        <if test="prdSvcBgnDy!=null and prdSvcBgnDy!=''">
+            to_date(#{prdSvcBgnDy},'YYYYMMDDHH24MISS'),
+        </if>
+        <if test="prdSvcEndDy!=null and prdSvcEndDy!=''">
+            to_date(#{prdSvcEndDy},'YYYYMMDDHH24MISS'),
+        </if>
+        <if test="seatTyp!=null and seatTyp!=''">
+            #{seatTyp},
+        </if>
+        <if test="theaterNm!=null and theaterNm!=''">
+            #{theaterNm},
+        </if>
+        <if test="theaterAreaInfo!=null and theaterAreaInfo!=''">
+            #{theaterAreaInfo},
+        </if>
+
+        <if test="authorInfo!=null and authorInfo!=''">
+            #{authorInfo},
+        </if>
+        <if test="transInfo!=null and transInfo!=''">
+            #{transInfo},
+        </if>
+        <if test="picInfo!=null and picInfo!=''">
+            #{picInfo},
+        </if>
+        <if test="isbn13Cd!=null and isbn13Cd!=''">
+            #{isbn13Cd},
+        </if>
+        <if test="isbn10Cd!=null and isbn10Cd!=''">
+            #{isbn10Cd},
+        </if>
+        <if test="bookSize!=null and bookSize!=''">
+            #{bookSize},
+        </if>
+        <if test="bookPage!=null and bookPage!=''">
+            #{bookPage},
+        </if>
+        <if test="compInfo!=null and compInfo!=''">
+            #{compInfo},
+        </if>
+        <if test="preVwCd!=null and preVwCd!=''">
+            #{preVwCd},
+        </if>
+        <if test="vodBrowserTyp!=null and vodBrowserTyp!=''">
+            #{vodBrowserTyp},
+        </if>
+        <if test="vodUrl!=null and vodUrl!=''">
+            #{vodUrl},
+        </if>
+        <if test="mainTitle!=null and mainTitle!=''">
+            #{mainTitle},
+        </if>
+        <if test="mudvdLabel!=null and mudvdLabel!=''">
+            #{mudvdLabel},
+        </if>
+        <if test="freeGiftTgNo1!=null and freeGiftTgNo1!=''">
+            #{freeGiftTgNo1},
+        </if>
+        <if test="freeGiftTgNo2!=null and freeGiftTgNo2!=''">
+            #{freeGiftTgNo2},
+        </if>
+        <if test="issuCoLogoUrl!=null and issuCoLogoUrl!=''">
+            #{issuCoLogoUrl},
+        </if>
+        #{prdDetailOutLink},
+        sysdate,
+        #{createNo},
+        sysdate,
+        #{updateNo}
+        )
+    </insert>
+
+    <!--  상품의 기타  정보 PD_PRD_ETC 를  조회한다 -->
+    <select id="getProductEtc" resultType="PrdEtcVO" parameterType="java.lang.Long">
+        SELECT /* productDAOMap.xml product.getProductEtc 김성준  2010.04.19 */
+        prd_no AS prdNo
+        ,to_char(prd_svc_bgn_dy, 'yyyy/mm/dd') as prdSvcBgnDy
+        ,to_char(prd_svc_end_dy, 'yyyy/mm/dd') as prdSvcEndDy
+        ,prd_detail_out_link  as prdDetailOutLink
+        ,to_char(create_dt, 'yyyy/mm/dd') as createDt
+        ,create_no      as createNo
+        ,to_char(update_dt, 'yyyy/mm/dd') as updateDt
+        ,update_no      as updateNo
+        ,seat_typ as seatTyp
+        ,theater_nm as theaterNm
+        ,theater_area_info as theaterAreaInfo
+        ,to_char(prd_svc_bgn_dy, 'hh24:mi:ss') as prdSvcBgnTime
+        ,to_char(prd_svc_end_dy, 'hh24:mi:ss') as prdSvcEndTime
+        ,trans_info as transInfo
+        ,pic_info as picInfo
+        ,isbn13_cd as isbn13Cd
+        ,isbn10_cd as isbn10cd
+        ,pre_vw_cd as preVwCd
+        ,free_gift_tg_no1 as freeGiftTgNo1
+        ,free_gift_tg_no2 as freeGiftTgNo2
+        ,main_title as mainTitle
+        ,mudvd_label as mudvdLabel
+        FROM   pd_prd_etc
+        WHERE  prd_no = #{prdNo}
+    </select>
+
+    <update id="updateProductEtc" parameterType="PdPrdEtc">
+        update /* productDAOMap.xml product.updateProductEtc 김태영2010.02.22 */
+        pd_prd_etc
+        set prd_svc_bgn_dy = to_date(#{prdSvcBgnDy},'YYYYMMDDHH24MISS')
+        ,prd_svc_end_dy = to_date(#{prdSvcEndDy},'YYYYMMDDHH24MISS')
+        ,prd_detail_out_link =#{prdDetailOutLink}
+        ,update_dt = sysdate
+        ,update_no =#{updateNo}
+        <if test="seatTyp!=null and seatTyp!=''">
+            ,seat_typ =#{seatTyp}
+        </if>
+        <if test="theaterNm!=null and theaterNm!=''">
+            ,theater_nm =#{theaterNm}
+        </if>
+        <if test="theaterAreaInfo!=null and theaterAreaInfo!=''">
+            ,theater_area_info =#{theaterAreaInfo}
+        </if>
+
+        <if test="authorInfo!=null and authorInfo!=''">
+            ,author_info =#{authorInfo}
+        </if>
+        <if test="transInfo!=null and transInfo!=''">
+            ,trans_info =#{transInfo}
+        </if>
+        <if test="picInfo!=null and picInfo!=''">
+            ,pic_info =#{picInfo}
+        </if>
+        <if test="isbn13Cd!=null and isbn13Cd!=''">
+            ,isbn13_cd =#{isbn13Cd}
+        </if>
+        <if test="isbn10Cd!=null and isbn10Cd!=''">
+            ,isbn10_cd =#{isbn10Cd}
+        </if>
+        <if test="bookSize!=null and bookSize!=''">
+            ,book_size =#{bookSize}
+        </if>
+        <if test="bookPage!=null and bookPage!=''">
+            ,book_page =#{bookPage}
+        </if>
+        <if test="compInfo!=null and compInfo!=''">
+            ,comp_info =#{compInfo}
+        </if>
+        <if test="preVwCd!=null and preVwCd!=''">
+            ,pre_vw_cd =#{preVwCd}
+        </if>
+        <if test="vodBrowserTyp!=null and vodBrowserTyp!=''">
+            ,vod_browser_typ =#{vodBrowserTyp}
+        </if>
+        <if test="vodUrl!=null and vodUrl!=''">
+            ,vod_url =#{vodUrl}
+        </if>
+        <if test="issuCoLogoUrl!=null and issuCoLogoUrl!=''">
+            ,issu_co_logo_url =#{issuCoLogoUrl}
+        </if>
+        ,main_title=#{mainTitle}
+        ,mudvd_label=#{mudvdLabel}
+        ,free_Gift_Tg_No1=#{freeGiftTgNo1}
+        ,free_Gift_Tg_No2=#{freeGiftTgNo2}
+        where prd_no =#{prdNo}
+    </update>
+
+
+    <!-- 상품의 시간재고 사용여부 조회 -->
+    <select id="getPrdRsvSchdlYn" resultType="HashMap" parameterType="long">
+        SELECT /* etcMapper.getPrdRsvSchdlYn */
+        RSV_SCHDL_YN as rsvSchdlYn, RSV_SCHDL_CLF_CD as rsvSchdlClfCd
+        FROM PD_PRD_OTHERS PRO
+        WHERE 1=1
+        AND PRO.PRD_NO = #{prdNo}
+    </select>
+
+    <select id="getBeefTraceInfo" parameterType="long" resultType="PrdOthersVO">
+        select /* EtcMapper.xml getgetBeefTraceInfo  */
+        prd_no as prdNo,
+        beef_trace_no as beefTraceNo
+        from pd_prd_others
+        where prd_no = #{prdNo}
+    </select>
+
+    <update id="updateBeefTraceInfo" parameterType="PdPrdOthers">
+        update /* EtcMapper.xml updateBeefTraceInfo  */
+        pd_prd_others
+        set update_no = #{updateNo}
+        ,update_dt = sysdate
+        ,beef_trace_no = #{beefTraceNo}
+        where prd_no = #{prdNo}
+    </update>
+
+    <insert id="insertBeefTraceInfo" parameterType="PdPrdOthers">
+        insert /* EtcMapper.xml insertBeefTraceInfo */
+        into pd_prd_others (prd_no, create_no, create_dt, update_no, update_dt, beef_trace_no)
+        values (#{prdNo}, #{createNo}, sysdate, #{updateNo}, sysdate, #{beefTraceNo})
+    </insert>
+
+    <select id="getProdMedicalDeviceInfo" parameterType="long" resultType="PrdOthersVO">
+        select /* EtcMapper.xml getProdMedicalDeviceInfo 이경택  2011.05.12  */
+        prd_no as prdNo,
+        nvl(health_itm_auth_num, '') as healthItmAuthNum,
+        nvl(health_sale_co_num, '') as healthSaleCoNum,
+        nvl(pre_adv_chk_num, '') as preAdvChkNum,
+        template_prd_no as templatePrdNo,
+        sel_prd_clf_fp_cd as selPrdClfFpCd,
+        buy_dsbl_dy_cd as buyDsblDyCd,
+        prd_rious_qty as prdRiousQty,
+        add_query_cont as addQueryCont,
+        add_query_hint_cont as addQueryHintCont,
+        svc_can_rgn_clf_cd as svcCanRgnClfCd,
+        dlv_proc_can_dd as dlvProcCanDd,
+        rsv_schdl_yn as rsvSchdlYn,
+        rsv_schdl_clf_cd as rsvSchdlClfCd,
+        ptnr_prd_clf_cd as ptnrPrdClfCd
+        from pd_prd_others
+        where prd_no = #{prdNo}
+    </select>
+
+    <!-- 구매불가일 수정 -->
+    <update id="updateProductOthersBuyDsblDyInfo" parameterType="PdPrdOthers">
+        UPDATE /* updateProductOthersBuyDsblDyInfo (EtcMapper.xml) */ PD_PRD_OTHERS
+        SET BUY_DSBL_DY_CD = #{buyDsblDyCd}
+        , UPDATE_DT = SYSDATE
+        , UPDATE_NO = #{updateNo}
+        WHERE PRD_NO = #{prdNo}
+    </update>
+
+    <insert id="insertProductOthersBuyDsblDyInfo" parameterType="PdPrdOthers">
+        INSERT INTO /* insertProductOthersBuyDsblDyInfo (EtcMapper.xml) */ PD_PRD_OTHERS (
+        PRD_NO, BUY_DSBL_DY_CD, CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO
+        ) VALUES (
+        #{prdNo}, #{buyDsblDyCd}, SYSDATE, #{createNo}, SYSDATE, #{updateNo}
+        )
+    </insert>
+
+    <update id="updateProductEtcYes24" parameterType="PdPrdEtc">
+        update /* etcMapper.xml updateProductEtcYes24 */
+        pd_prd_etc
+        set prd_svc_bgn_dy = to_date(#{prdSvcBgnDy},'YYYYMMDDHH24MISS')
+        ,prd_svc_end_dy = to_date(#{prdSvcEndDy},'YYYYMMDDHH24MISS')
+        ,prd_detail_out_link = #{prdDetailOutLink}
+        ,update_dt = sysdate
+        ,update_no = #{updateNo}
+        <if test="seatTyp!=null and seatTyp!=''">
+            ,seat_typ = #{seatTyp}
+        </if>
+        <if test="theaterNm!=null and theaterNm!=''">
+            ,theater_nm = #{theaterNm}
+        </if>
+        <if test="theaterAreaInfo!=null and theaterAreaInfo!=''">
+            ,theater_area_info = #{theaterAreaInfo}
+        </if>
+        <if test="authorInfo!=null and authorInfo!=''">
+            ,author_info = #{authorInfo}
+        </if>
+        ,trans_info = #{transInfo}
+        ,pic_info = #{picInfo}
+        ,isbn13_cd = #{isbn13Cd}
+        ,isbn10_cd = #{isbn10Cd}
+        ,pre_vw_cd = #{preVwCd}
+        <if test="bookSize!=null and bookSize!=''">
+            ,book_size = #{bookSize}
+        </if>
+        <if test="bookPage!=null and bookPage!=''">
+            ,book_page = #{bookPage}
+        </if>
+        <if test="compInfo!=null and compInfo!=''">
+            ,comp_info = #{compInfo}
+        </if>
+        <if test="vodBrowserTyp!=null and vodBrowserTyp!=''">
+            ,vod_browser_typ =#{vodBrowserTyp}
+        </if>
+        <if test="vodUrl!=null and vodUrl!=''">
+            ,vod_url =#{vodUrl}
+        </if>
+        ,free_gift_tg_no1 =#{freeGiftTgNo1}
+        ,free_gift_tg_no2 =#{freeGiftTgNo2}
+        ,main_title =#{mainTitle}
+        ,mudvd_label =#{mudvdLabel}
+        where prd_no = #{prdNo}
+    </update>
+
+    <update id="updateProductOthersPtnrInfo" parameterType="PdPrdOthers">
+        UPDATE /* updateProductOthersPtnrInfo (etcmapper.xml) */
+        /*+ INDEX(A PK_PD_PRD_OTHERS) */
+        PD_PRD_OTHERS A
+        SET PTNR_PRD_CLF_CD = #{ptnrPrdClfCd}
+        , UPDATE_DT = SYSDATE
+        , UPDATE_NO = #{updateNo}
+        WHERE PRD_NO = #{prdNo}
+    </update>
+
+    <!-- 제휴사상품구분코드 등록 -->
+    <update id="insertProductOthersPtnrInfo" parameterType="PdPrdOthers">
+        INSERT INTO /* insertProductOthersBuyDsblDyInfo (etcmapper.xml) */ PD_PRD_OTHERS (
+        PRD_NO, PTNR_PRD_CLF_CD, CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO
+        ) VALUES (
+        #{prdNo}, #{ptnrPrdClfCd}, SYSDATE, #{createNo}, SYSDATE, #{updateNo}
+        )
+    </update>
+
+    <insert id="insertProdMedicalDeviceInfo" parameterType="PdPrdOthers">
+        insert into/* etcmapper.xml insertProdMedicalDeviceInfo */
+        pd_prd_others (prd_no, create_no, create_dt, update_no, update_dt, health_itm_auth_num, health_sale_co_num, pre_adv_chk_num, template_prd_no, sel_prd_clf_fp_cd)
+        values (#{prdNo},
+        #{createNo},
+        sysdate,
+        #{updateNo},
+        sysdate,
+        #{healthItmAuthNum},
+        #{healthSaleCoNum},
+        #{preAdvChkNum},
+        #{templatePrdNo},
+        #{selPrdClfFpCd})
+    </insert>
+
+    <update id="updateProdMedicalDeviceInfo" parameterType="PdPrdOthers">
+        update /* updateProdMedicalDeviceInfo etcmapper.xml */
+        pd_prd_others
+        set update_no = #{updateNo}
+        ,update_dt = sysdate
+        ,health_itm_auth_num = #{healthItmAuthNum}
+        ,health_sale_co_num = #{healthSaleCoNum}
+        ,pre_adv_chk_num = #{preAdvChkNum}
+        ,sel_prd_clf_fp_cd = #{selPrdClfFpCd}
+        where prd_no = #{prdNo}
+    </update>
+
+    <!-- 생활플러스 기타정보 등록 -->
+    <update id="insertProductOthersForLife" parameterType="PdPrdOthers">
+        MERGE INTO /* insertProductOthersForLife (etcMapper.xml) */ PD_PRD_OTHERS PPO
+        USING (
+        SELECT #{prdNo} AS PRD_NO, #{createNo} AS CREATE_NO, #{prdRiousQty} AS PRD_RIOUS_QTY, #{addQueryCont} AS ADD_QUERY_CONT, #{addQueryHintCont} AS ADD_QUERY_HINT_CONT, #{svcCanRgnClfCd} AS SVC_CAN_RGN_CLF_CD
+        , #{dlvProcCanDd} AS DLV_PROC_CAN_DD , #{rsvSchdlYn} AS RSV_SCHDL_YN , #{rsvSchdlClfCd} AS RSV_SCHDL_CLF_CD, #{ptnrPrdClfCd} AS PTNR_PRD_CLF_CD
+        FROM DUAL
+        ) TMP ON (PPO.PRD_NO = TMP.PRD_NO)
+        WHEN MATCHED THEN
+        UPDATE SET
+        PPO.PRD_RIOUS_QTY = TMP.PRD_RIOUS_QTY
+        , PPO.ADD_QUERY_CONT = TMP.ADD_QUERY_CONT
+        , PPO.ADD_QUERY_HINT_CONT = ADD_QUERY_HINT_CONT
+        , PPO.SVC_CAN_RGN_CLF_CD = TMP.SVC_CAN_RGN_CLF_CD
+        , PPO.DLV_PROC_CAN_DD = TMP.DLV_PROC_CAN_DD
+        , PPO.RSV_SCHDL_YN = TMP.RSV_SCHDL_YN
+        , PPO.RSV_SCHDL_CLF_CD = TMP.RSV_SCHDL_CLF_CD
+        , PPO.UPDATE_DT = SYSDATE
+        , PPO.UPDATE_NO = CREATE_NO
+        , PPO.PTNR_PRD_CLF_CD = TMP.PTNR_PRD_CLF_CD
+        WHEN NOT MATCHED THEN
+        INSERT
+        (PRD_NO, PRD_RIOUS_QTY, ADD_QUERY_CONT, ADD_QUERY_HINT_CONT, SVC_CAN_RGN_CLF_CD, DLV_PROC_CAN_DD, RSV_SCHDL_YN, RSV_SCHDL_CLF_CD, CREATE_NO, CREATE_DT, UPDATE_NO, UPDATE_DT, PTNR_PRD_CLF_CD)
+        VALUES
+        (TMP.PRD_NO, TMP.PRD_RIOUS_QTY, TMP.ADD_QUERY_CONT, TMP.ADD_QUERY_HINT_CONT, TMP.SVC_CAN_RGN_CLF_CD, TMP.DLV_PROC_CAN_DD, TMP.RSV_SCHDL_YN, TMP.RSV_SCHDL_CLF_CD, TMP.CREATE_NO, SYSDATE, TMP.CREATE_NO, SYSDATE, TMP.PTNR_PRD_CLF_CD)
+    </update>
+</mapper>

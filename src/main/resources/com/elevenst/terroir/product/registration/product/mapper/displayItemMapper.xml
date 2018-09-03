@@ -1,0 +1,49 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.product.mapper.DisplayItemMapper">
+
+    <!--
+    개   요 : 전시아이템 조회(외부 인터페이스용)(수정중)
+    작성자 : 한경재
+    -->
+
+    <select id="getDisplayItemListIF" resultType="ProductVO" parameterType="HashMap">
+        SELECT
+        disp_itm_no,
+        fee_itm_no,
+        disp_itm_nm,
+        rltn_img_reg_yn,
+        rltn_img_url,
+        use_yn,
+        TO_CHAR (create_dt, 'YYYY/MM/DD') AS create_dt,
+        create_no,
+        TO_CHAR (update_dt, 'YYYY/MM/DD') AS update_dt,
+        update_no,
+        COUNT (*) OVER (ORDER BY 1) AS totalcount,
+        ROWNUM AS rowcnt,
+        pre_vw_scrt,
+        disp_fee,
+        apl_bgn_dt,
+        apl_end_dt,
+        disp_itm_typ_cd,
+        premium_yn,
+        gif_yn,
+        plusup_yn,
+        bold_yn,
+        bg_yn,
+        cupn_iss_cn_yn
+        FROM dp_disp_itm
+        WHERE use_yn = 'Y'
+        <if test="itemType != null and itemType != ''">
+            AND apl_bgn_dt &lt;= SYSDATE
+            AND apl_end_dt &gt;= SYSDATE
+            <if test="itemType == 'isFeeItmNoMoreZero'">
+                AND  fee_itm_no &gt; 0
+            </if>
+        </if>
+        ORDER BY disp_prrt_rnk
+        /* displayItemMapper.getDisplayItemListIF */
+    </select>
+
+</mapper>

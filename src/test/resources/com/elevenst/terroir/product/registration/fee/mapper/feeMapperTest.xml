@@ -1,0 +1,33 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.fee.mapper.FeeMapperTest">
+    <!-- 수수료 종료 일자 -->
+    <update id="setSeFeeEndDt" parameterType="SeFeeItm">
+        update se_fee_itm/* seFeeItmDAOMap.xml seFeeItm.setSeFeeEndDt */
+        set APL_END_DY = sysdate, UPDATE_NO = #{updateNo}, UPDATE_DT = sysdate
+        where SEL_FEE_APL_OBJ_NO = #{selFeeAplObjNo}
+        AND FEE_KD_CD='03' and  FEE_TYP_CD='03101'
+        AND APL_END_DY > sysdate
+    </update>
+
+    <insert id="insertSeeFeeItm" parameterType="SeFeeItm">
+    insert into se_fee_itm (FEE_ITM_NO,FEE_TYP_CD,FEE_KD_CD,FEE,SEL_FEE_APL_OBJ_NO,CREATE_DT,CREATE_NO,UPDATE_DT,UPDATE_NO,APL_END_DY)
+    VALUES(
+            #{feeItmNo},
+            #{feeKdCd},
+            #{feeTypCd},
+            #{fee},
+            #{selFeeAplObjNo},
+            #{createDt},
+            #{createNo},
+            #{updateDt},
+            #{updateNo},
+            TO_DATE(#{aplEndDy},'YYYYMMDDHH24MISS')
+            )
+    </insert>
+
+    <delete id="deleteSetFeeTest" parameterType="long">
+        delete from se_fee_itm where FEE_ITM_NO = #{feeItmNO}
+    </delete>
+</mapper>

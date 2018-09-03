@@ -1,0 +1,32 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.editor.mapper.EditorServiceTestMapper">
+
+    <select id="selectEditor" parameterType="Long" resultType="EditorVO">
+        SELECT
+         #{id} "ID"
+         ,'cwoongc' "NAME"
+         ,'01' AS "EDITOR_EXAMPLE_CD"
+        FROM dual
+    </select>
+
+    <insert id="insertEditor" parameterType="EditorExampleEntity">
+        INSERT INTO EDITOR_EXAMPLE(id, name)
+        VALUES (#{id}, #{name})
+    </insert>
+
+    <update id="updateEditor" parameterType="EditorExampleEntity">
+        UPDATE EDITOR_EXAMPLE
+        SET NAME = #{name}
+           ,EDITOR_EXAMPLE_CD = #{editorExampleCd}
+        WHERE ID = #{id}
+    </update>
+
+    <delete id="deleteEditor" parameterType="EditorExampleEntity">
+        DELETE FROM EDITOR_EXAMPLE
+        WHERE ID = #{id}
+    </delete>
+
+
+</mapper>

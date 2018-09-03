@@ -1,0 +1,10 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.help.mapper.HelpMapper">
+
+    <select id="getSellerFaqs" resultType="HelpVO" parameterType="java.lang.String" >
+        SELECT title, cont, hefilename	FROM sy_help_memo WHERE display_yn = 'Y' and code = #{code}
+    </select>
+
+</mapper>

@@ -1,0 +1,181 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.image.mapper.ProductImageMapper">
+
+    <!-- 조회 -->
+    <select id="getProductImage" parameterType="long" resultType="PdPrdImage">
+        SELECT
+        PRD_NO
+        , URL_PATH
+        , BASIC_EXT_NM
+        , ADD1_EXT_NM
+        , ADD2_EXT_NM
+        , ADD3_EXT_NM
+        , L170_EXT_NM
+        , L80_EXT_NM
+        , PNG_EXT_NM
+        , ORG_EXT_NM
+        , CUT_CNT
+        , STYLE_EXT_NM
+        , WIRELSS_DTL_EXT_NM
+        , VER_NO
+        , BASIC_ZOOMIN_IMG_YN
+        , ADD1_ZOOMIN_IMG_YN
+        , ADD2_ZOOMIN_IMG_YN
+        , ADD3_ZOOMIN_IMG_YN
+        , DTL_BASIC_EXT_NM
+        , MOBL_BASIC_EXT_NM
+        , MOBL_ADD1_EXT_NM
+        , MOBL_ADD2_EXT_NM
+        , MOBL_ADD3_EXT_NM
+        , MOBL_ADD4_EXT_NM
+        , CARD_VW_IMG_URL
+        , PTNR_EXUS_IMG_URL
+        , IMG_SCORE_EFTV_YN
+        , BASE_IMG_SCORE
+        , DTL_BASE_IMG_SCORE
+        , BASE_IMG_WDTH_VAL
+        , BASE_IMG_VRTCL_VAL
+        , DTL_BASE_IMG_WDTH_VAL
+        , DTL_BASE_IMG_VRTCL_VAL
+        FROM PD_PRD_IMAGE
+        WHERE PRD_NO = #{prdNo}
+        /* productImageMapper.getProductImage */
+    </select>
+
+    <update id="insertProductImage" parameterType="PdPrdImage">
+        INSERT INTO
+        PD_PRD_IMAGE
+        ( PRD_NO
+        , URL_PATH
+        , BASIC_EXT_NM
+        , ADD1_EXT_NM
+        , ADD2_EXT_NM
+        , ADD3_EXT_NM
+        , L170_EXT_NM
+        , L80_EXT_NM
+        , PNG_EXT_NM
+        , ORG_EXT_NM
+        , STYLE_EXT_NM
+        , WIRELSS_DTL_EXT_NM
+        , CUT_CNT
+        , CREATE_DT
+        , UPDATE_DT
+        , VER_NO
+        , BASIC_ZOOMIN_IMG_YN
+        , ADD1_ZOOMIN_IMG_YN
+        , ADD2_ZOOMIN_IMG_YN
+        , ADD3_ZOOMIN_IMG_YN
+        , DTL_BASIC_EXT_NM
+        , CARD_VW_IMG_URL
+        , PTNR_EXUS_IMG_URL
+        , IMG_SCORE_EFTV_YN
+        , BASE_IMG_SCORE
+        , DTL_BASE_IMG_SCORE
+        , BASE_IMG_WDTH_VAL
+        , BASE_IMG_VRTCL_VAL
+        , DTL_BASE_IMG_WDTH_VAL
+        , DTL_BASE_IMG_VRTCL_VAL )
+        VALUES
+        ( #{prdNo}
+        , #{urlPath}
+        , NVL(#{basicExtNm}, #{dtlBasicExtNm})
+        , #{add1ExtNm}
+        , #{add2ExtNm}
+        , #{add3ExtNm}
+        , #{l170ExtNm}
+        , #{l80ExtNm}
+        , #{pngExtNm}
+        , #{orgExtNm}
+        , #{styleExtNm}
+        , #{wirelssDtlExtNm}
+        , #{cutCnt}
+        , SYSDATE
+        , SYSDATE
+        , #{verNo}
+        , #{basicZoominImgYn}
+        , #{add1ZoominImgYn}
+        , #{add2ZoominImgYn}
+        , #{add3ZoominImgYn}
+        , #{dtlBasicExtNm}
+        , #{cardVwImgUrl}
+        , #{ptnrExusImgUrl}
+        , #{imgScoreEftvYn}
+        , #{baseImgScore}
+        , #{dtlBaseImgScore}
+        , #{baseImgWdthVal}
+        , #{baseImgVrtclVal}
+        , #{dtlBaseImgWdthVal}
+        , #{dtlBaseImgVrtclVal} )
+        /* productImageMapper.insertProductImage */
+    </update>
+
+    <!-- 내역 -->
+    <update id="insertProductImageChgHist" parameterType="PdPrdImageChgHist">
+        INSERT INTO
+        PD_PRD_IMAGE_CHG_HIST
+        ( PRD_NO
+        , HIST_DT
+        , BASE_IMG_CHG_YN
+        , DTL_BASE_IMG_CHG_YN
+        , ADD1_IMG_CHG_YN
+        , ADD2_IMG_CHG_YN
+        , ADD3_IMG_CHG_YN
+        , CREATE_DT
+        , CREATE_NO
+        , UPDATE_DT
+        , UPDATE_NO )
+        VALUES
+        ( #{prdNo}
+        , SYSDATE
+        , #{baseImgChgYn}
+        , #{dtlBaseImgChgYn}
+        , #{add1ImgChgYn}
+        , #{add2ImgChgYn}
+        , #{add3ImgChgYn}
+        , SYSDATE
+        , 0
+        , SYSDATE
+        , 0 )
+        /* productImageMapper.insertProductImageChgHist */
+    </update>
+
+    <update id="updateProductImage" parameterType="PdPrdImage">
+        UPDATE
+        PD_PRD_IMAGE
+        SET
+        URL_PATH = #{urlPath},
+        BASIC_EXT_NM = NVL(#{basicExtNm}, #{dtlBasicExtNm}),
+        ADD1_EXT_NM = #{add1ExtNm},
+        ADD2_EXT_NM = #{add2ExtNm},
+        ADD3_EXT_NM = #{add3ExtNm},
+        L170_EXT_NM = #{l170ExtNm},
+        L80_EXT_NM = #{l80ExtNm},
+        PNG_EXT_NM= #{pngExtNm},
+        ORG_EXT_NM= #{orgExtNm},
+        STYLE_EXT_NM = #{styleExtNm},
+        <!--WIRELSS_DTL_EXT_NM = #{wirelssDtlExtNm},-->
+        CUT_CNT= #{cutCnt},
+        UPDATE_DT = SYSDATE,
+        VER_NO = #{verNo},
+        basic_zoomin_img_yn = #{basicZoominImgYn},
+        add1_zoomin_img_yn = #{add1ZoominImgYn},
+        add2_zoomin_img_yn = #{add2ZoominImgYn},
+        add3_zoomin_img_yn = #{add3ZoominImgYn},
+        dtl_basic_ext_nm = #{dtlBasicExtNm},
+        <!--CARD_VW_IMG_URL = #{cardVwImgUrl},-->
+        PTNR_EXUS_IMG_URL = #{ptnrExusImgUrl},
+        IMG_SCORE_EFTV_YN = #{imgScoreEftvYn}
+        WHERE PRD_NO = #{prdNo}
+        /* productImageMapper.updateProductImage */
+    </update>
+
+
+    <!--<delete id="deleteProductImage" parameterType="long">
+        DELETE /* productImageMapper.deleteProductImage */
+        FROM pd_prd_image
+        WHERE prd_no = #{prdNo}
+    </delete>-->
+
+</mapper>

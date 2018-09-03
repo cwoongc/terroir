@@ -1,0 +1,387 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.product.mapper.ProductVerticalMapper">
+
+    <insert id="insertTour" parameterType="PdPrdTour">
+        INSERT INTO PD_PRD_TOUR
+        (
+        PRD_NO
+        , MAX_SEL_PRC
+        , DRC_STL_YN
+        , IFRAME_ACSS_YN
+        , SVC_AREA_CD
+        , CN_FEE_APL_YN
+        , DIRECT_STL_YN
+        , HOTEL_COUNTRY
+        , HOTEL_CITY
+        , HOTEL_BASE_ADDR
+        , HOTEL_DTLS_ADDR
+        , HOTEL_ADDR_TYP_CD
+        , HOTEL_MAIL_NO
+        , HOTEL_BUILD_MNG_NO
+        , HOTEL_TLPHN_NO
+        , HOTEL_FLOOR
+        , HOTEL_ROOM_CNT
+        , SIDO_NM
+        , SIGUNGU_NM
+        , CHECK_IN_TIME
+        , CHECK_OUT_TIME
+        , HOTEL_PRD_TYPE
+        , HOTEL_GRADE
+        , MAP_POS_Y
+        , MAP_POS_X
+        , PRD_PRMT_FLAG
+        , TOUR_PRD_TYPE
+        , TOUR_NATION_TYPE
+        , TOUR_NIGHT_DAYS
+        , DPRT_COUNTRY
+        , DPRT_CITY
+        , ARRV_COUNTRY
+        , ARRV_CITY
+        , TOUR_DAYS
+        , TOUR_SITE_INFO
+        , CREATE_DT
+        , DTLS_DESC_TYP
+        , DGST_DESC
+        , OFFR_SVC_LIST
+        , ROOM_INFO_URL
+        , LOC_INFO_URL
+        , USE_INFO_URL
+        , ROOM_INFO_HTML
+        , LOC_INFO_HTML
+        , USE_INFO_HTML
+        , CREATE_NO
+        )
+        VALUES (
+        #{prdNo}
+        , #{maxSelPrc}
+        , #{drcStlYn}
+        , #{iframeAcssYn}
+        , #{svcAreaCd}
+        , #{cnFeeAplYn}
+        , #{directStlYn}
+        , #{hotelCountry}
+        , #{hotelCity}
+        , #{hotelBaseAddr}
+        , #{hotelDtlsAddr}
+        , #{hotelAddrTypCd}
+        , #{hotelMailNo}
+        , #{hotelBuildMngNo}
+        , #{hotelTlphnNo}
+        , #{hotelFloor}
+        , #{hotelRoomCnt}
+        , #{sidoNm}
+        , #{sigunguNm}
+        , #{checkInTime}
+        , #{checkOutTime}
+        , #{hotelPrdType}
+        , #{hotelGrade}
+        , #{mapPosY}
+        , #{mapPosX}
+        , #{prdPrmtFlag}
+        , #{tourPrdType}
+        , #{tourNationType}
+        , #{tourNightDays}
+        , #{dprtCountry}
+        , #{dprtCity}
+        , #{arrvCountry}
+        , #{arrvCity}
+        , #{tourDays}
+        , #{tourSiteInfo}
+        , SYSDATE
+        , #{dtlsDescTyp}
+        , #{dgstDesc}
+        , #{offrSvcList}
+        , #{roomInfoUrl}
+        , #{locInfoUrl}
+        , #{useInfoUrl}
+        , #{roomInfoHtml}
+        , #{locInfoHtml}
+        , #{useInfoHtml}
+        , #{createNo}
+        )
+        /* productVerticalMapper.insertTour */
+    </insert>
+
+    <update id="insertTourHist" parameterType="long">
+        INSERT INTO /* productVerticalMapper.insertTourHist */
+        PD_PRD_TOUR_HIST
+        (
+        PRD_NO
+        , HIST_APL_DT
+        , MAX_SEL_PRC
+        , DRC_STL_YN
+        , IFRAME_ACSS_YN
+        , SVC_AREA_CD
+        , CN_FEE_APL_YN
+        , DIRECT_STL_YN
+        , HOTEL_COUNTRY
+        , HOTEL_CITY
+        , HOTEL_BASE_ADDR
+        , HOTEL_DTLS_ADDR
+        , HOTEL_ADDR_TYP_CD
+        , HOTEL_MAIL_NO
+        , HOTEL_BUILD_MNG_NO
+        , HOTEL_TLPHN_NO
+        , HOTEL_FLOOR
+        , HOTEL_ROOM_CNT
+        , SIDO_NM
+        , SIGUNGU_NM
+        , CHECK_IN_TIME
+        , CHECK_OUT_TIME
+        , HOTEL_PRD_TYPE
+        , HOTEL_GRADE
+        , MAP_POS_Y
+        , MAP_POS_X
+        , PRD_PRMT_FLAG
+        , TOUR_PRD_TYPE
+        , TOUR_NATION_TYPE
+        , TOUR_NIGHT_DAYS
+        , DPRT_COUNTRY
+        , DPRT_CITY
+        , ARRV_COUNTRY
+        , ARRV_CITY
+        , TOUR_DAYS
+        , TOUR_SITE_INFO
+        , CREATE_DT
+        , CREATE_NO
+        , UPDATE_DT
+        , UPDATE_NO
+        , DTLS_DESC_TYP
+        , DGST_DESC
+        , OFFR_SVC_LIST
+        , ROOM_INFO_URL
+        , LOC_INFO_URL
+        , USE_INFO_URL
+        , ROOM_INFO_HTML
+        , LOC_INFO_HTML
+        , USE_INFO_HTML
+        )
+        SELECT PRD_NO
+        , SYSDATE
+        , MAX_SEL_PRC
+        , DRC_STL_YN
+        , IFRAME_ACSS_YN
+        , SVC_AREA_CD
+        , CN_FEE_APL_YN
+        , DIRECT_STL_YN
+        , HOTEL_COUNTRY
+        , HOTEL_CITY
+        , HOTEL_BASE_ADDR
+        , HOTEL_DTLS_ADDR
+        , HOTEL_ADDR_TYP_CD
+        , HOTEL_MAIL_NO
+        , HOTEL_BUILD_MNG_NO
+        , HOTEL_TLPHN_NO
+        , HOTEL_FLOOR
+        , HOTEL_ROOM_CNT
+        , SIDO_NM
+        , SIGUNGU_NM
+        , CHECK_IN_TIME
+        , CHECK_OUT_TIME
+        , HOTEL_PRD_TYPE
+        , HOTEL_GRADE
+        , MAP_POS_Y
+        , MAP_POS_X
+        , PRD_PRMT_FLAG
+        , TOUR_PRD_TYPE
+        , TOUR_NATION_TYPE
+        , TOUR_NIGHT_DAYS
+        , DPRT_COUNTRY
+        , DPRT_CITY
+        , ARRV_COUNTRY
+        , ARRV_CITY
+        , TOUR_DAYS
+        , TOUR_SITE_INFO
+        , CREATE_DT
+        , CREATE_NO
+        , UPDATE_DT
+        , UPDATE_NO
+        , DTLS_DESC_TYP
+        , DGST_DESC
+        , OFFR_SVC_LIST
+        , ROOM_INFO_URL
+        , LOC_INFO_URL
+        , USE_INFO_URL
+        , ROOM_INFO_HTML
+        , LOC_INFO_HTML
+        , USE_INFO_HTML
+        FROM PD_PRD_TOUR
+        WHERE PRD_NO = #{prdNo}
+    </update>
+
+    <select id="getProductTourDetail" parameterType="long" resultType="PdPrdTour">
+        SELECT /* productVertialMapper.getProductTourDetail */
+        /*+ LEADING(PPT PPAC) USE_NL(PPAC) INDEX(PPT PK_PD_PRD_TOUR) */
+        PPT.PRD_NO
+        , PPT.MAX_SEL_PRC
+        , PPT.DRC_STL_YN
+        , PPT.IFRAME_ACSS_YN
+        , PPT.SVC_AREA_CD
+        , PPT.CN_FEE_APL_YN
+        , PPT.DIRECT_STL_YN
+        , PPT.HOTEL_COUNTRY
+        , PPT.HOTEL_CITY
+        , PPT.HOTEL_BASE_ADDR
+        , PPT.HOTEL_DTLS_ADDR
+        , PPT.HOTEL_ADDR_TYP_CD
+        , PPT.HOTEL_MAIL_NO
+        , PPT.HOTEL_BUILD_MNG_NO
+        , PPT.HOTEL_TLPHN_NO
+        , PPT.HOTEL_FLOOR
+        , PPT.HOTEL_ROOM_CNT
+        , PPT.CHECK_IN_TIME
+        , PPT.CHECK_OUT_TIME
+        , PPT.HOTEL_PRD_TYPE
+        , PPT.HOTEL_GRADE
+        , PPT.MAP_POS_Y
+        , PPT.MAP_POS_X
+        , PPT.PRD_PRMT_FLAG
+        , PPTT.TOUR_PRD_TYPE
+        , PPT.TOUR_NATION_TYPE
+        , PPT.TOUR_NIGHT_DAYS
+        , PPT.DPRT_COUNTRY
+        , PPT.DPRT_CITY
+        , PPT.ARRV_COUNTRY
+        , PPT.ARRV_CITY
+        , PPT.TOUR_DAYS
+        , PPT.TOUR_SITE_INFO
+        , PPT.CREATE_DT
+        , PPT.CREATE_NO
+        , PPT.UPDATE_DT
+        , PPT.UPDATE_NO
+        , PPT.SIDO_NM
+        , PPT.SIGUNGU_NM
+        , PPT.DEAL_YN
+        , PPT.DEAL_ICON
+        , PPT.DEAL_BGN_DY
+        , PPT.DEAL_END_DY
+        , PPT.ITEM_DISP_BGN_DY
+        , PPT.ITEM_DISP_END_DY
+        , PPT.PRD_DESC_BGN_DY
+        , PPT.PRD_DESC_END_DY
+        , CASE WHEN SYSDATE &gt; PPT.PRD_DESC_BGN_DY AND SYSDATE &lt; PPT.PRD_DESC_END_DY THEN 1 ELSE 0 END AS PRD_DESC_IS_SHOW
+        , PPT.PRD_DESC_HTML
+        , PPT.PRD_DESC_IMG
+        , PPT.RSV_LMT_QTY
+        , PPT.RSV_LMT_BGN_DY
+        , PPT.RSV_LMT_END_DY
+        , PPT.RSV_QTY_YN
+        , PPT.ITEM_TERM_YN
+        , PPT.PRC_ICON
+        , PPT.RSV_CNT
+        , PPT.DTLS_DESC_TYP
+        , PPT.DGST_DESC
+        , PPT.OFFR_SVC_LIST
+        , PPT.ROOM_INFO_URL
+        , PPT.LOC_INFO_URL
+        , PPT.USE_INFO_URL
+        , PPT.ROOM_INFO_HTML
+        , PPT.LOC_INFO_HTML
+        , PPT.USE_INFO_HTML
+        , PPT.LOCATION_ID
+        , PPT.TRADVS_EVL_CNT
+        , PPT.TRADVS_EVL_SCORE
+        , PPT.TRADVS_EVL_CLCT_DT
+        , PPAC.HOTEL_COUNTRY_CD
+        , PPAC.HOTEL_CITY_CD
+        , PPAC.HOTEL_PRD_TYPE_CD
+        , PPAC.HOTEL_GRADE_CD
+        , PPAC.TOUR_PRD_TYPE_CD
+        , PPAC.TOUR_NATION_TYPE_CD
+        , PPAC.TOUR_NIGHT_DAYS_CD
+        , PPAC.TOUR_DAYS_CD
+        , PPAC.DPRT_COUNTRY_CD
+        , PPAC.DPRT_CITY_CD
+        , PPAC.ARRV_COUNTRY_CD
+        , PPAC.ARRV_CITY_CD
+        , PP.PRD_NM
+        FROM PD_PRD_TOUR PPT,
+        PD_PRD PP
+        , (SELECT /*+ NO_MERGE */*
+        FROM (SELECT PPAC.OBJ_PRD_NO
+        , PPAC.PRD_ATTR_CD
+        , PPAC.PRD_ATTR_VALUE_CD
+        FROM (SELECT /*+ INDEX(A PK_PD_PRD_ATTR_COMP) */
+        PPAC.OBJ_PRD_NO
+        , PPAC.PRD_ATTR_CD
+        , PPAC.PRD_ATTR_VALUE_CD
+        , ROW_NUMBER() OVER(PARTITION BY PPAC.PRD_ATTR_CD ORDER BY AO.DISP_PRRT_RNK) AS RNUM
+        FROM PD_PRD_ATTR_COMP PPAC
+        , (SELECT OBJ.DISP_PRRT_RNK
+        , OBJ.DISP_OBJ_NM
+        FROM DP_DISP_SPCE SPCE
+        , DP_PRD_DISP DISP
+        , DP_DISP_OBJ OBJ
+        WHERE SPCE.DISP_SPCE_ID = 'DP_TOUR_7085'
+        AND SPCE.DISP_SPCE_NO = DISP.DISP_ADVRT_AREA_NO
+        AND DISP.DISP_ADVRT_NO = OBJ.DISP_ADVRT_NO
+        AND DISP.DISP_STAT_CD = '03'
+        AND DISP.USE_YN = 'Y'
+        AND OBJ.DISP_OBJ_STAT_CD = '03'
+        AND SPCE.DISP_OBJ_CLF_CD = '14'
+        ) AO
+        WHERE PPAC.OBJ_PRD_NO = #{prdNo}
+        AND PPAC.PRD_ATTR_VALUE_NM = AO.DISP_OBJ_NM(+)
+        ) PPAC
+        WHERE PPAC.RNUM = 1
+        )
+        PIVOT (
+        MAX(PRD_ATTR_VALUE_CD)
+        FOR PRD_ATTR_CD IN( '68785381' AS HOTEL_COUNTRY_CD
+        ,'68785399' AS HOTEL_CITY_CD
+        ,'68785454' AS HOTEL_PRD_TYPE_CD
+        ,'68785488' AS HOTEL_GRADE_CD
+        ,'68781481' AS TOUR_PRD_TYPE_CD
+        ,'68781587' AS TOUR_NATION_TYPE_CD
+        ,'68785161' AS TOUR_NIGHT_DAYS_CD
+        ,'68785177' AS TOUR_DAYS_CD
+        ,'68785261' AS DPRT_COUNTRY_CD
+        ,'68785302' AS DPRT_CITY_CD
+        ,'68785322' AS ARRV_COUNTRY_CD
+        ,'68785349' AS ARRV_CITY_CD
+        )
+        )
+        ) PPAC
+        , (SELECT /*+ NO_MERGE LEADING(COMP AO) USE_NL(AO) INDEX(COMP PK_PD_PRD_ATTR_COMP) */
+        WM_CONCAT(AO.DISP_OBJ_NM) AS TOUR_PRD_TYPE
+        FROM PD_PRD_ATTR_COMP COMP
+        , (SELECT /*+ NO_MERGE LEADING(SPCE DISP OBJ) USE_NL(DISP OBJ) */
+        OBJ.DISP_PRRT_RNK
+        , OBJ.DISP_OBJ_NM
+        FROM DP_DISP_SPCE SPCE
+        , DP_PRD_DISP DISP
+        , DP_DISP_OBJ OBJ
+        WHERE SPCE.DISP_SPCE_ID = 'DP_TOUR_7085'
+        AND SPCE.DISP_SPCE_NO = DISP.DISP_ADVRT_AREA_NO
+        AND DISP.DISP_ADVRT_NO = OBJ.DISP_ADVRT_NO
+        AND DISP.DISP_STAT_CD = '03'
+        AND DISP.USE_YN = 'Y'
+        AND OBJ.DISP_OBJ_STAT_CD = '03'
+        AND SPCE.DISP_OBJ_CLF_CD = '14'
+        ) AO
+        WHERE COMP.OBJ_PRD_NO = #{prdNo}
+        AND COMP.PRD_ATTR_CD = '68781481'
+        AND COMP.PRD_ATTR_VALUE_NM = AO.DISP_OBJ_NM
+        ORDER BY AO.DISP_PRRT_RNK
+        ) PPTT
+        WHERE PPT.PRD_NO = PPAC.OBJ_PRD_NO
+        AND PPT.PRD_NO = #{prdNo}
+        AND PPT.PRD_NO = PP.PRD_NO
+    </select>
+
+    <update id="updateTourProductForSO" parameterType="PdPrdTour">
+        UPDATE PD_PRD_TOUR /* productVerticalMapper.updateTourProductForSO */
+        SET DRC_STL_YN = #{drcStlYn}
+        , IFRAME_ACSS_YN = #{iframeAcssYn}
+        , SVC_AREA_CD = #{svcAreaCd}
+        , CN_FEE_APL_YN = #{cnFeeAplYn}
+        , DIRECT_STL_YN = #{directStlYn}
+        , SIDO_NM = #{sidoNm}
+        , SIGUNGU_NM = #{sigunguNm}
+        , UPDATE_DT = SYSDATE
+        , UPDATE_NO = #{createNo}
+        WHERE PRD_NO = #{prdNo}
+    </update>
+</mapper>

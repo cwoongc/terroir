@@ -1,0 +1,454 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.fee.mapper.FeeMapper">
+    <!-- 수수료 종료 일자 -->
+    <update id="setSeFeeEndDt" parameterType="SeFeeItm">
+        UPDATE SE_FEE_ITM /* FeeMapper.xml setSeFeeEndDt */
+        SET
+            APL_END_DY = SYSDATE
+            ,UPDATE_NO = #{updateNo}
+            ,UPDATE_DT = SYSDATE
+        WHERE SEL_FEE_APL_OBJ_NO = #{selFeeAplObjNo}
+        AND FEE_KD_CD='03'
+        AND FEE_TYP_CD='03101'
+        AND APL_END_DY > SYSDATE
+    </update>
+
+    <update id="updateSeFeeItmCtgr" parameterType="SeFeeItm">
+        UPDATE SE_FEE_ITM /* FeeMapper.xml updateSeFeeItmCtgr */
+        SET
+            DISP_CTGR_NO = FN_PD_SELL_GET_DISP_CTGR('01', '2', #{dispCtgrNo})
+            ,UPDATE_DT = SYSDATE
+            ,UPDATE_NO = #{updateNo}
+        WHERE
+            FEE_KD_CD = '03'
+        AND FEE_TYP_CD = '03101'
+        AND SEL_FEE_APL_OBJ_CLF_CD = '02'
+        AND BASI_SEL_FEE_YN = 'N'
+        AND SEL_FEE_APL_OBJ_NO = #{selFeeAplObjNo}
+        AND DISP_CTGR_NO = (SELECT  DISP_CTGR2_NO_DE FROM PD_PRD WHERE PRD_NO = #{selFeeAplObjNo})
+        AND SYSDATE BETWEEN APL_BGN_DY AND APL_END_DY
+    </update>
+
+    <select id="getHasSaleFeeMedPeriodOverlap" parameterType="SeFeeItm" resultType="SeFeeItm">
+        SELECT	/* feeMapper.xml getHasSaleFeeMedPeriodOverlap */
+            FEE_ITM_NO AS feeItmNo
+            ,FEE_ITM_NM AS feeItmNm
+            ,TO_CHAR(APL_BGN_DY, 'YYYYMMDDHH24MISS') as aplBgnDy
+            ,TO_CHAR(APL_END_DY, 'YYYYMMDDHH24MISS') as aplEndDy
+            ,FEE_KD_CD AS feeKdCd
+            ,FEE_TYP_CD AS feeTypCd
+            ,FEE_APL_UNIT_CD AS feeAplUnitCd
+            ,FEE AS fee
+            ,FRC_END_YN AS frcEndYn
+            ,FEE_ITM_DESC AS feeItmDesc
+            ,RNG_USE_YN AS rngUseYn
+            ,PRGRS_APL_YN AS prgrsAplYn
+            ,SEL_FEE_APL_OBJ_CLF_CD AS selFeeAplObjClfCd
+            ,SEL_FEE_APL_OBJ_NO AS selFeeAplObjNo
+            ,DISP_CTGR_NO AS dispCtgrNo
+            ,SEL_MTHD_CD AS selMthdCd
+            ,BASI_SEL_FEE_YN AS basiSelFeeYn
+            ,TO_CHAR(CREATE_DT, 'YYYYMMDDHH24MISS') AS createDt
+            ,CREATE_NO AS createNo
+            ,TO_CHAR(UPDATE_DT, 'YYYYMMDDHH24MISS') AS updateDt
+            ,UPDATE_NO AS updateNo
+            ,TO_CHAR(NVL(REQUEST_DT, CREATE_DT), 'YYYYMMDDHH24MISS') AS requestDt
+            ,NVL(REQUEST_NO, CREATE_NO) AS requestNo
+            ,TO_CHAR(APPROVE_DT, 'YYYYMMDDHH24MISS') AS approveDt
+            ,APPROVE_NO AS approveNo
+            ,ADD_PRD_FEE AS addPrdFee
+            ,CONSULT_NO AS consultNo
+            ,PROL_AGREE_YN AS prolAgreeYn
+        FROM SE_FEE_ITM
+        WHERE FEE_KD_CD = '03' 		/* 수수료종류:상품판매*/
+        AND FEE_TYP_CD = '03101' 	/* 수수료유형:상품판매수수료*/
+        AND SEL_FEE_APL_OBJ_CLF_CD = #{selFeeAplObjClfCd} /* 판매수수료적용대상구분:카테고리,상품,회원*/
+        AND BASI_SEL_FEE_YN = 'N' /* 기본판매수수료여부*/
+        AND DISP_CTGR_NO = #{dispCtgrNo}
+        AND SEL_MTHD_CD = #{selMthdCd}
+        AND SEL_FEE_APL_OBJ_NO = #{selFeeAplObjNo}  /* 상품번호 */
+        AND FEE_ITM_NO != #{feeItmNo}
+        AND FEE_APL_UNIT_CD = #{feeAplUnitCd}
+        AND (
+                (TO_DATE(#aplBgnDy#, 'yyyymmddhh24miss') BETWEEN APL_BGN_DY AND APL_END_DY)
+            OR  (TO_DATE(#aplEndDy#, 'yyyymmddhh24miss') BETWEEN APL_BGN_DY AND APL_END_DY)
+            OR  (APL_BGN_DY BETWEEN TO_DATE(#aplBgnDy#, 'yyyymmddhh24miss') AND TO_DATE(#aplEndDy#, 'yyyymmddhh24miss'))
+            OR  (APL_END_DY BETWEEN TO_DATE(#aplBgnDy#, 'yyyymmddhh24miss') AND TO_DATE(#aplEndDy#, 'yyyymmddhh24miss'))
+        )
+    </select>
+
+    <update id="updateSeFeeItm" parameterType="SeFeeItm">
+        UPDATE /* feeMapper.xml updateSeFeeItm */
+            SE_FEE_ITM
+        SET
+            UPDATE_NO = #{updateNo}
+            ,UPDATE_DT = SYSDATE
+        <if test="aplBgnDy != ''">
+            ,APL_BGN_DY = TO_DATE(#aplBgnDy#, 'YYYYMMDDHH24MISS')
+        </if>
+        <if test="aplBgnDy != ''">
+            ,APL_BGN_DY = TO_DATE(#aplBgnDy#, 'YYYYMMDDHH24MISS')
+        </if>
+        <if test="aplBgnDy != ''">
+            ,APL_BGN_DY = TO_DATE(#aplBgnDy#, 'YYYYMMDDHH24MISS')
+        </if>
+        <if test="aplEndDy != ''">
+            ,APL_END_DY = TO_DATE(#aplEndDy#, 'YYYYMMDDHH24MISS')
+        </if>
+        WHERE FEE_ITM_NO = #feeItmNo#
+    </update>
+
+    <update id="insertSeFeeItmHist" parameterType="SeFeeItm">
+        /* feeMapper.xml insertSeFeeItmHist */
+        INSERT INTO	SE_FEE_ITM_HIST
+        (
+        FEE_ITM_HIST_NO
+        , FEE_ITM_NO
+        , HIST_OCCR_DT
+        , FEE_ITM_NM
+        , APL_BGN_DY
+        , APL_END_DY
+        , FEE_KD_CD
+        , FEE_TYP_CD
+        , SEL_MTHD_CD
+        , FEE_APL_UNIT_CD
+        , FEE
+        , FEE_ITM_DESC
+        , RNG_USE_YN
+        , PRGRS_APL_YN
+        , SEL_FEE_APL_OBJ_CLF_CD
+        , SEL_FEE_APL_OBJ_NO
+        , DISP_CTGR_NO
+        , BASI_SEL_FEE_YN
+        , CREATE_DT
+        , CREATE_NO
+        , UPDATE_DT
+        , UPDATE_NO
+        , FRC_END_YN
+        , DML_TYP_CD
+        , REQUEST_DT
+        , REQUEST_NO
+        , APRV_STAT_CD
+        , APPROVE_DT
+        , APPROVE_NO
+        , ADD_PRD_FEE
+        , CONSULT_NO
+        , SELLER_AGREE_YN
+        )
+        SELECT
+        SEQ_SE_FEE_ITM_HIST.NEXTVAL
+        , FEE_ITM_NO
+        , TO_DATE(#{histOccrDt}, 'YYYYMMDDHH24MISS')
+        , FEE_ITM_NM
+        , APL_BGN_DY
+        , APL_END_DY
+        , FEE_KD_CD
+        , FEE_TYP_CD
+        , SEL_MTHD_CD
+        , FEE_APL_UNIT_CD
+        , FEE
+        , FEE_ITM_DESC
+        , RNG_USE_YN
+        , PRGRS_APL_YN
+        , SEL_FEE_APL_OBJ_CLF_CD
+        , SEL_FEE_APL_OBJ_NO
+        , DISP_CTGR_NO
+        , BASI_SEL_FEE_YN
+        , CREATE_DT
+        , CREATE_NO
+        , UPDATE_DT
+        , UPDATE_NO
+        , FRC_END_YN
+        , #{dmlTypCd}
+        , REQUEST_DT
+        , REQUEST_NO
+        , '03'
+        , APPROVE_DT
+        , APPROVE_NO
+        , ADD_PRD_FEE
+        , CONSULT_NO
+        , SELLER_AGREE_YN
+        FROM SE_FEE_ITM
+        WHERE 1=1
+        AND FEE_ITM_NO = #{feeItmNo}
+    </update>
+
+    <delete id="deleteSeFeeAplRng" parameterType="SeFeeItm">
+        DELETE /* feeMapper.xml deleteSeFeeAplRng */ SE_FEE_APL_RNG
+        WHERE  FEE_ITM_NO = #{feeItmNo}
+    </delete>
+
+    <delete id="deleteSeFeeItm" parameterType="SeFeeItm">
+        DELETE /* feeMapper.xml deleteSeFeeItm */ SE_FEE_ITM
+        WHERE FEE_ITM_NO = #{feeItmNo}
+    </delete>
+
+    <select id="getSeFeeAplRngByFeeItmNo" parameterType="SeFeeItm" resultType="SeFeeAplRng">
+        SELECT /* feeMapper.xml getSeFeeAplRngByFeeItmNo */
+            FEE_ITM_NO AS feeItmNo
+            ,APL_RNG_BGN_VAL AS aplRngBgnVal
+            ,APL_RNG_END_VAL AS aplRngEndVal
+            ,FEE AS fee
+            ,TO_CHAR(CREATE_DT,'yyyymmddhh24miss') AS createDt
+            ,CREATE_NO AS createNo
+            ,TO_CHAR(UPDATE_DT,'yyyymmddhh24miss') AS updateDt
+            ,UPDATE_NO AS updateNo
+        FROM SE_FEE_APL_RNG
+        WHERE FEE_ITM_NO = #{feeItmNo}
+        ORDER BY APL_RNG_BGN_VAL
+    </select>
+
+    <select id="getSeFeeItmSeq" resultType="long">
+        SELECT /* feeMapper.xml getSeFeeItmSeq */
+            SEQ_SE_FEE_ITM.NEXTVAL
+        FROM DUAL
+    </select>
+
+    <insert id="insertSeFeeItm" parameterType="SeFeeItm">
+        INSERT /* feeMapper.xml insertSeFeeItm */ INTO SE_FEE_ITM
+        ( FEE_ITM_NO
+        , FEE_ITM_NM
+        , APL_BGN_DY
+        , APL_END_DY
+        , FEE_KD_CD
+        , FEE_TYP_CD
+        , FEE_APL_UNIT_CD
+        , FEE
+        , FRC_END_YN
+        , FEE_ITM_DESC
+        , RNG_USE_YN
+        , PRGRS_APL_YN
+        , SEL_FEE_APL_OBJ_CLF_CD
+        , SEL_FEE_APL_OBJ_NO
+        , DISP_CTGR_NO
+        , SEL_MTHD_CD
+        , BASI_SEL_FEE_YN
+        , CREATE_DT
+        , CREATE_NO
+        , UPDATE_DT
+        , UPDATE_NO
+        , REQUEST_DT
+        , REQUEST_NO
+        , APPROVE_DT
+        , APPROVE_NO
+        , ADD_PRD_FEE
+        , CONSULT_NO
+        , SELLER_AGREE_YN
+        , PROL_AGREE_YN
+        ) VALUES (
+          #{feeItmNo}
+        , #{feeItmNm}
+        , TO_DATE(#aplBgnDy}, 'YYYYMMDDHH24MISS')
+        , TO_DATE(#aplEndDy}, 'YYYYMMDDHH24MISS')
+        , #{feeKdCd}
+        , #{feeTypCd}
+        , #{feeAplUnitCd}
+        , #{fee}
+        , #{frcEndYn}
+        , #{feeItmDesc}
+        , #{rngUseYn}
+        , #{prgrsAplYn}
+        , #{selFeeAplObjClfCd}
+        , #{selFeeAplObjNo}
+        , #{dispCtgrNo}
+        , #{selMthdCd}
+        , #{basiSelFeeYn}
+        , TO_DATE(#{createDt}, 'YYYYMMDDHH24MISS')
+        , #{createNo}
+        , TO_DATE(#{updateDt}, 'YYYYMMDDHH24MISS')
+        , #{updateNo}
+        , TO_DATE({requestDt}, 'YYYYMMDDHH24MISS')
+        , #{requestNo}
+        , TO_DATE(#{approveDt}, 'YYYYMMDDHH24MISS')
+        , #{approveNo}
+        , #{addPrdFee}
+        , #{consultNo}
+        , #{sellerAgreeYN}
+        , #{prolAgreeYn}
+        )
+    </insert>
+
+    <insert id="insertSeFeeAplRng" parameterType="SeFeeAplRng">
+        INSERT /* feeMapper.xml insertSeFeeAplRng */
+        INTO SE_FEE_APL_RNG
+        (
+          FEE_ITM_NO
+        , APL_RNG_END_VAL
+        , APL_RNG_BGN_VAL
+        , FEE
+        , CREATE_DT
+        , CREATE_NO
+        , UPDATE_DT
+        , UPDATE_NO
+        ) VALUES (
+          #{feeItmNo}
+        , #{aplRngEndVal}
+        , #{aplRngBgnVal}
+        , #{fee}
+        , TO_DATE(#{createDt}, 'YYYYMMDDHH24MISS')
+        , #{createNo}
+        , TO_DATE(#{updateDt}, 'YYYYMMDDHH24MISS')
+        , #{updateNo}
+        )
+    </insert>
+
+    <select id="getProductSaleFee" parameterType="SeFeeItemVO" resultType="string">
+        SELECT
+        FN_SEL_FEE(#{dispCtgr2No}, #{dispCtgr3No}, #{selMthdCd}, #{selMnbdNo}, #{prdNo}, #{selPrc}) as RNG_FEE_INFO
+        FROM DUAL
+        /* feeMapper.getProductSaleFee */
+    </select>
+
+    <!-- 중카테고리 기본 수수료율 조회 -->
+    <select id="getCategoryDefaultFee" parameterType="ProductVO" resultType="SaleFeeVO">
+        <![CDATA[
+		SELECT
+			/*+ INDEX(A IX5_SE_FEE_ITM) */
+			A.FEE AS fee
+		FROM SE_FEE_ITM A
+		WHERE FEE_KD_CD = '03'
+			AND FEE_TYP_CD = '03101'
+			AND FEE_APL_UNIT_CD = '02'
+			AND SEL_FEE_APL_OBJ_CLF_CD = '01'
+			AND BASI_SEL_FEE_YN = 'Y'
+			AND DISP_CTGR_NO = TO_NUMBER(#{dispCtgrNo})
+			AND SEL_MTHD_CD = NVL(#{baseVO.selMthdCd}, '01')
+			AND APL_BGN_DY <= SYSDATE
+			AND APL_END_DY >= SYSDATE
+			AND ROWNUM <= 1
+	]]>
+        /* feeMapper.getCategoryDefaultFee */
+    </select>
+
+    <!-- 기본 마진율 조회  -->
+    <select id="getBasicMarginRate" resultType="long" parameterType="long">
+        SELECT
+        nvl(max(fee), 0) AS fee
+        FROM se_fee_itm
+        WHERE fee_kd_cd ='05'
+        AND fee_typ_cd ='05101'
+        AND sel_fee_apl_obj_no = #{memNo}
+        AND sysdate BETWEEN apl_bgn_dy AND apl_end_dy
+        /* feeMapper.getBasicMarginRate */
+    </select>
+
+    <!-- 카드사 무이자 수수료 리스트 전체 카운트 -->
+    <select id="getTotalCrdtCrdenFeeCnt" resultType="int" parameterType="BasketNointerestVO">
+        SELECT
+        COUNT(crden.crden_cd) AS cnt
+        FROM (  SELECT  crden_cd
+        ,spc_cnrt_clf
+        ,use_yn
+        ,ltrim(max(sys_connect_by_path(dfrm_rt,'/')), '/') data
+        ,update_dt
+        FROM (  SELECT  crden_cd
+        ,dfrm_rt
+        ,spc_cnrt_clf
+        ,use_yn
+        ,int_free_mon_cd
+        ,row_number() over(partition by crden_cd,spc_cnrt_clf,use_yn order by to_number(int_free_mon_cd)) rn
+        ,update_dt
+        FROM  ( SELECT  a.crden_cd
+        ,b.int_free_crden_dfrm_rt dfrm_rt
+        ,b.spc_cnrt_clf
+        ,b.use_yn
+        ,b.int_free_mon_cd
+        ,to_char(b.int_free_end_dt,'yyyy-mm-dd hh24:mi:ss') update_dt
+        FROM    sy_crdt_crden a
+        ,sy_int_free b
+        WHERE   a.crden_cd = b.crden_cd
+        AND     b.int_free_typ_cd = 'C'
+        AND     a.use_yn = 'Y'
+        AND     to_char(b.int_free_end_dt,'yyyy-mm-dd hh24:mi:ss') = '9999-12-31 23:59:59'
+        <if test="searchCard != null and searchCard != '' and searchCard == 'ALL'">
+          AND a.crden_cd = #{searchCard}
+        </if>
+        <if test="searchType != null and searchType != '' and searchType == 'ALL'">
+          AND b.use_yn = #{searchType}
+        </if>
+        <if test="spcCnrtCLF != null and spcCnrtCLF != '' and spcCnrtCLF == 'ALL'">
+          AND b.spc_cnrt_clf = #{spcCnrtCLF}
+        </if>
+        )
+        )
+        START WITH rn = 1
+        CONNECT BY PRIOR crden_cd = crden_cd
+        AND PRIOR spc_cnrt_clf = spc_cnrt_clf
+        AND PRIOR use_yn = use_yn
+        AND PRIOR rn = rn - 1
+        AND PRIOR update_dt = update_dt
+        GROUP BY  crden_cd, spc_cnrt_clf, use_yn, update_dt
+        ) crden
+        /* feeMapper.getTotalCrdtCrdenFeeCnt */
+    </select>
+
+    <!-- 카드사 무이자 수수료 검색  리스트-->
+    <select id="getCrdtCrdenFeeList" resultType="BasketNointerestVO" parameterType="BasketNointerestVO">
+        SELECT
+        *
+        FROM ( SELECT ROWNUM num, t1.*
+        FROM ( SELECT  crden.crden_cd
+        ,(SELECT dtls_com_nm FROM sy_co_detail WHERE grp_cd = 'SY004' AND dtls_cd = crden.crden_cd) crden_nm
+        ,crden.spc_cnrt_clf
+        ,crden.use_yn
+        ,crden.data
+        ,CASE WHEN base.crden_base_fee_rt>=1 THEN LTRIM(to_char(base.crden_base_fee_rt,'90.99')) ELSE LTRIM(to_char(crden_base_fee_rt,'90.99')) END crden_base_fee_rt
+        ,crden.update_dt
+        FROM (  SELECT  crden_cd
+        ,spc_cnrt_clf
+        ,use_yn
+        ,ltrim(max(sys_connect_by_path(dfrm_rt,'/')), '/') data
+        ,update_dt
+        FROM (  SELECT  crden_cd
+        ,CASE WHEN dfrm_rt>=1 THEN LTRIM(to_char(dfrm_rt,'90.99')) ELSE LTRIM(to_char(dfrm_rt,'90.99')) END dfrm_rt
+        ,spc_cnrt_clf
+        ,use_yn
+        ,int_free_mon_cd
+        ,row_number() over(partition by crden_cd,spc_cnrt_clf,use_yn,update_dt order by to_number(int_free_mon_cd)) rn
+        ,update_dt
+        FROM  ( SELECT  a.crden_cd
+        ,b.int_free_crden_dfrm_rt dfrm_rt
+        ,b.spc_cnrt_clf
+        ,b.use_yn
+        ,b.int_free_mon_cd
+        ,to_char(b.int_free_end_dt,'yyyy-mm-dd hh24:mi:ss') update_dt
+        FROM    sy_crdt_crden a
+        ,sy_int_free b
+        WHERE   a.crden_cd = b.crden_cd
+        AND     b.int_free_typ_cd = 'C'
+        AND     a.use_yn = 'Y'
+        AND     to_char(b.int_free_end_dt,'yyyy-mm-dd hh24:mi:ss') = '9999-12-31 23:59:59'
+        <if test="searchCard != null and searchCard != '' and searchCard == 'ALL'">
+          AND a.crden_cd = #{searchCard}
+        </if>
+        <if test="searchType != null and searchType != '' and searchType == 'ALL'">
+          AND b.use_yn = #{searchType}
+        </if>
+        <if test="spcCnrtCLF != null and spcCnrtCLF != '' and spcCnrtCLF == 'ALL'">
+          AND b.spc_cnrt_clf = #{spcCnrtCLF}
+        </if>
+        )
+        )
+        START WITH rn = 1
+        CONNECT BY PRIOR crden_cd = crden_cd
+        AND PRIOR spc_cnrt_clf = spc_cnrt_clf
+        AND PRIOR use_yn = use_yn
+        AND PRIOR rn = rn - 1
+        AND PRIOR update_dt = update_dt
+        GROUP BY  crden_cd, spc_cnrt_clf, use_yn, update_dt
+        ) crden
+        , sy_crdt_crden_base_fee base
+        WHERE crden.crden_cd = base.crden_cd
+        AND   base.use_yn = 'Y'
+        ORDER BY crden_nm , spc_cnrt_clf, update_dt desc
+        ) t1
+        )
+        <![CDATA[
+        WHERE num >= #{startRowNum} AND num < #{endRowNum}
+        ]]>
+        /* feeMapper.getCrdtCrdenFeeList */
+    </select>
+
+</mapper>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <!--하기 세팅은 각 프로젝트 상황에 맞게 세팅 해주세요-->
+    <settings>
+        <setting name="cacheEnabled" value="true" />
+        <setting name="lazyLoadingEnabled" value="true" />
+        <setting name="aggressiveLazyLoading" value="true" />
+        <setting name="useGeneratedKeys" value="true" />
+        <setting name="defaultExecutorType" value="SIMPLE" />
+        <setting name="defaultStatementTimeout" value="60" />
+        <setting name="autoMappingBehavior" value="FULL" />
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <setting name="localCacheScope" value="STATEMENT"/>
+        <setting name="jdbcTypeForNull" value="VARCHAR" />
+    </settings>
+
+    <typeHandlers>
+        <package name="com.elevenst.common.mybatis.typehandler"/>
+    </typeHandlers>
+
+</configuration>

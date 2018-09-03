@@ -1,0 +1,1383 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.category.mapper.CategoryMapper">
+
+    <insert id="insertDpGnrlDisp" parameterType="DpGnrlDisp">
+        INSERT /* cateogyMapper.insertDpGnrlDisp */ INTO DP_GNRL_DISP (
+            DISP_CTGR_NO
+            ,PRD_NO
+            ,DISP_BGN_DY
+            ,DISP_END_DY
+            ,CREATE_DT
+            ,CREATE_NO
+            ,UPDATE_DT
+            ,UPDATE_NO
+            ,GNRL_CTGR_NO
+            ,GNRL_CTGR1_NO
+            ,GNRL_CTGR2_NO
+            ,GNRL_CTGR3_NO
+            ,GNRL_CTGR4_NO
+            ,GNRL_SEL_STAT_CD
+            ,GNRL_SEL_MTHD_CD
+            ,GNRL_SEL_MNBD_NO
+            ,GNRL_STCK_QTY
+            ,GNRL_OPT_CD
+            ,GNRL_ADD_PRD_QTY
+            ,GNRL_DLV_CST_PAY_TYP_CD
+            ,GNRL_DLV_CST_INST_BASI_CD
+            ,GNRL_MINOR_SEL_CN_YN
+            ,GNRL_BRAND_CD
+            ,GNRL_BSN_DEAL_CLF
+            ,GNRL_DLV_CLF
+            ,GNRL_OM_PRD_YN
+            ,GNRL_SVC_AREA_CD
+            ,GNRL_HIDE_YN
+            ,GBL_DLV_YN
+            ,GNRL_ENG_DISP_YN
+            ,STD_PRD_YN
+        ) VALUES (
+            #{dispCtgrNo}
+            ,#{prdNo}
+            ,TO_DATE(#{dispBgnDy},'YYYYMMDDHH24MISS')
+            ,TO_DATE(#{dispEndDy},'YYYYMMDDHH24MISS')
+            ,SYSDATE
+            ,#{createNo}
+            ,SYSDATE
+            ,#{updateNo}
+            ,#{dispCtgrNo}
+            ,FN_PD_SELL_GET_DISP_CTGR('01','1',#{dispCtgrNo})
+            ,FN_PD_SELL_GET_DISP_CTGR('01','2',#{dispCtgrNo})
+            ,FN_PD_SELL_GET_DISP_CTGR('01','3',#{dispCtgrNo})
+            ,NVL(FN_PD_SELL_GET_DISP_CTGR('01','4',#{dispCtgrNo}), 0)
+            ,#{gnrlSelStatCd}
+            ,#{gnrlSelMthdCd}
+            ,#{gnrlSelMnbdNo}
+            ,#{gnrlStckQty}
+            ,#{gnrlOptCd}
+            ,#{gnrlAddPrdQty}
+            ,#{gnrlDlvCstPayTypCd}
+            ,#{gnrlDlvCstInstBasiCd}
+            ,#{gnrlMinorSelCnYn}
+            ,#{gnrlBrandCd}
+            ,#{gnrlBsnDealClf}
+            ,#{gnrlDlvClf}
+            ,#{gnrlOmPrdYn}
+            ,#{gnrlSvcAreaCd}
+            ,NVL(#{gnrlHideYn}, NULL)
+            ,#{gblDlvYn}
+            ,#{gnrlEngDispYn}
+            ,#{stdPrdYn}
+        )
+    </insert>
+
+    <select id="getDisplayCategoryParentList" parameterType="Long" resultType="CategoryVO">
+        SELECT /* categoryDAOMap.product.getDisplayCategoryParentList */
+                A.DISP_CTGR_NO                                  AS dispCtgrNo
+              , NVL(A.STD_CTGR_NO,0)                            AS stdCtgrNo
+              , A.HGRNK_CTGR_NO                                 AS hgrnkCtgrNo
+              , A.DISP_CTGR_NM                                  AS dispCtgrNm
+              , A.DISP_CTGR_TYP_CD                              AS dispCtgrTypCd
+              , A.DISP_CTGR_STAT_CD                             AS dispCtgrStatCd
+              , A.PRD_IMG_SZ_CD                                 AS prdImgSzCd
+              , A.PRD_SRT_TYP_CD                                AS prdSrtTypCd
+              , NVL(A.DISP_PRRT_RNK,0)                          AS dispPrrtRnk
+              , A.SND_PLN_TRM                                   AS sndPlnTrm
+              , A.MNFC_EFTV_DY_NESS_YN                          AS mnfcEftvDyNessYn
+              , A.ADLT_CRTF_YN                                  AS adltCrtfYn
+              , A.UN_DLV_CN_YN                                  AS unDlvCnYn
+              , A.USE_YN                                        AS useYn
+              , TO_CHAR(A.CREATE_DT,'RRRR/MM/DD HH24:MI:SS')    AS createDt
+              , A.CREATE_NO                                     AS createNo
+              , TO_CHAR(A.UPDATE_DT,'RRRR/MM/DD HH24:MI:SS')    AS updateDt
+              , A.UPDATE_NO                                     AS updateNo
+              , SF_GETNAME_PD_STD_CTGR(A.STD_CTGR_NO,3)         AS stdCtgrPath
+              , SF_GETNAME_DP_DISP_CTGR(A.DISP_CTGR_NO,4)       AS dispCtgrPath
+              , A.DISP_CTGR_CD                                  AS dispCtgrCd
+              , A.DISP_CTGR_URLTYP_CD                           AS dispCtgrUrltypCd
+              , A.DISP_CTGR_URL                                 AS dispCtgrUrl
+              , A.DISP_CTGR_ADVRT_CONT                          AS dispCtgrAdvrtCont
+              , A.APRV_CRTF_YN                                  AS aprvCrtfYn
+              , A.UNIQ_SOHO_YN                                  AS uniqSohoYn
+              , A.ABRD_BRAND_YN                                 AS abrdBrandYn
+              , A.ABRD_CTGR_NO                                  AS abrdCtgrNo
+              , A.OCB_SAVE_RT                                   AS ocbSaveRt
+              , A.CTGR_PNT_RT                                   AS ctgrPntRt
+              , A.CTGR_PNT_ADD_RT                               AS ctgrPntAddRt
+              , A.DFLTCHK_TAXABLE_YN                            AS dfltchkTaxableYn
+              , A.STD_FEE_DEFAULT                               AS stdFeeDefault
+              , A.STD_FEE_GROUP_BUYING                          AS stdFeeGroupBuying
+              , A.STD_FEE_AUCTION                               AS stdFeeAuction
+              , NULL                                            AS stdFeeUsed
+              , A.DISP_CTGR_KIND_CD                             AS dispCtgrKindCd
+              , NVL(A.LOW_PRC_COMP_YN,'N')                      AS lowPrcCompYn
+              , NVL(A.CTGR_PNT_PRE_YN,'N')                      AS ctgrPntPreYn
+              , NVL(A.CTGR_PNT_PRE_RT,0)                        AS ctgrPntPreRt
+              , NVL(A.OCB_ZONE_YN,'N')                          AS ocbZoneYn
+              , NVL(A.OCB_ZONE_SAVE_RT,'0')                     AS ocbZoneSaveRt
+              , NVL(A.BCKT_EX_YN,'N')                           AS bcktExYn
+              , A.SVC_CTGR_TYP_CD                               AS svcCtgrTypCd
+              , NVL(A.PARTNER_1203_DSC_RT,0)                    AS partner1203DscRt
+              , NVL(A.ADD_CTGR_DISP_YN,'N')                     AS addCtgrDispYn
+              , NVL(A.DSC_RT,0)                                 AS dscRt
+              , NVL(A.SELLER_GRD_EXCEPT_YN,'Y')                 AS sellerGrdExceptYn
+              , NVL(A.AUTO_CANCEL_YN,'Y')                       AS autoCancelYn
+              , A.GBL_DLV_YN                                    AS gblDlvYn
+              , A.BASKET_AREA_DISP_YN                           as basketAreaDispYn
+              , CASE WHEN NVL(A.GBL_HS_CODE_NO,0) > 0
+                          THEN  (SELECT GBL_HS_CODE FROM WM_GBL_HS_CODE WHERE GBL_HS_CODE_NO = A.GBL_HS_CODE_NO)
+                     ELSE ''
+                END                                             AS gblHsCode
+              , A.OFFER_DISP_LMT_YN                             AS offerDispLmtYn
+              , A.BOOK_CLF_CD                                   AS bookClfCd
+        FROM    DP_DISP_CTGR A
+        WHERE   A.DISP_CTGR_NO NOT IN (#{dispCtgrNo})
+        START WITH A.DISP_CTGR_NO = #{dispCtgrNo}
+        CONNECT BY PRIOR A.HGRNK_CTGR_NO = A.DISP_CTGR_NO
+    </select>
+
+
+    <select id="getServiceDisplayCategoryInfo" resultType="CategoryVO" parameterType="long">
+        SELECT /* CategoryMapper.getServiceDisplayCategoryInfo */
+            A.disp_ctgr_no            				AS dispCtgrNo,
+            nvl(A.std_ctgr_no,0)             		AS stdCtgrNo,
+            A.hgrnk_ctgr_no           				AS hgrnkCtgrNo,
+            A.disp_ctgr_nm            				AS dispCtgrNm,
+            A.disp_ctgr_typ_cd        				AS dispCtgrTypCd,
+            A.disp_ctgr_stat_cd       				AS dispCtgrStatCd,
+            A.prd_img_sz_cd           				AS prdImgSzCd,
+            A.prd_srt_typ_cd          				AS prdSrtTypCd,
+            nvl(A.disp_prrt_rnk,0)    				AS dispPrrtRnk,
+            A.snd_pln_trm             				AS sndPlnTrm,
+            A.mnfc_eftv_dy_ness_yn    				AS mnfcEftvDyNessYn,
+            A.adlt_crtf_yn            				AS adltCrtfYn,
+            a.aprv_crtf_yn    						AS aprvCrtfYn,
+            A.un_dlv_cn_yn            				AS unDlvCnYn,
+            A.uniq_soho_yn							AS uniqSohoYn,
+            A.abrd_brand_yn							AS abrdBrandYn,
+            A.abrd_ctgr_no							AS abrdCtgrNo,
+            sf_getname_dp_disp_ctgr(A.abrd_ctgr_no,4) AS abrdCtgrNm,
+            A.use_yn                  				AS useYn,
+            TO_CHAR(A.create_dt,'yyyy/mm/dd HH24:MI:SS') AS createDt,
+            A.create_no               				AS createNo,
+            TO_CHAR(A.update_dt,'yyyy/mm/dd HH24:MI:SS') AS updateDt,
+            A.update_no               				AS updateNo,
+            sf_getname_pd_std_ctgr(A.std_ctgr_no,3) 	AS stdCtgrPath,
+            (SELECT B.reg_nm FROM V_MB_REG_PSN_INQ B WHERE A.create_no = B.reg_no) AS memNm,
+            (SELECT B.reg_nm FROM V_MB_REG_PSN_INQ B WHERE A.update_no = B.reg_no) AS updateNm,
+            sf_getname_dp_disp_ctgr(A.disp_ctgr_no,4) as dispCtgrPath,
+            A.disp_ctgr_cd							as dispCtgrCd,
+            A.disp_ctgr_urltyp_cd					as dispCtgrUrltypCd,
+            A.disp_ctgr_url							as dispCtgrUrl,
+            A.disp_ctgr_advrt_cont					as dispCtgrAdvrtCont,
+            A.prd_typ_cd							as prdTypCd,
+            A.ocb_save_rt							as ocbSaveRt,
+            A.ctgr_pnt_rt							as ctgrPntRt,
+            A.ctgr_pnt_add_rt						as ctgrPntAddRt,
+            nvl(A.low_prc_comp_yn,'N')				AS lowPrcCompYn,
+            nvl(A.ctgr_pnt_pre_yn,'N')				AS ctgrPntPreYn,
+            nvl(A.ctgr_pnt_pre_rt,0)				AS ctgrPntPreRt,
+            (SELECT decode(COUNT(*), 0, 'true', 'false')
+            FROM dp_disp_ctgr
+            WHERE hgrnk_ctgr_no = #{dispCtgrNo}
+            AND disp_ctgr_kind_cd = a.disp_ctgr_kind_cd
+            AND use_yn = 'Y') AS nodetype,
+            nvl(ctgr.disp_ctgr1_no,0) as rootCtgrNo,
+            A.dfltchk_taxable_yn                  	AS dfltchkTaxableYn,
+            A.std_fee_default                  		AS stdFeeDefault,
+            A.std_fee_group_buying             		AS stdFeeGroupBuying,
+            A.std_fee_auction                  		AS stdFeeAuction,
+            null									AS stdFeeUsed,
+            (SELECT MIN(FEE) FROM SE_FEE_APRV_BASIS
+            WHERE DISP_CTGR_NO = #{dispCtgrNo}
+            AND FEE_KD_CD = '06'
+            AND FEE_TYP_CD = '03101'
+            AND SEL_FEE_APL_OBJ_CLF_CD = '01'
+            AND SYSDATE BETWEEN apl_bgn_dy AND apl_end_dy
+            ) AS stdFeeSkDeal,
+            c.aprv_fee_default               		AS aprvFeeDefault,
+            c.aprv_fee_group_buying          		AS aprvFeeGroupBuying,
+            c.aprv_fee_auction               		AS aprvFeeAuction,
+            c.aprv_fee_used							AS aprvFeeUsed,
+            d.bnsr_default               		    AS bnsrDefault,
+            d.bnsr_group_buying          		    AS bnsrGroupBuying,
+            d.bnsr_auction               		    AS bnsrAuction,
+            d.bnsr_used							    AS bnsrUsed,
+            b.fee_01								as feeDefault,
+            b.fee_02								as feeGroupBuying,
+            b.fee_03								as feeAuction,
+            b.fee_05								as feeUsed,
+            a.disp_ctgr_kind_cd						AS dispCtgrKindCd,
+            a.icon_cd								AS iconCd,
+            a.disp_ctgr_url_popup_yn				AS dispCtgrUrlPopupYn,
+            length(a.disp_ctgr_cd)/3                AS lev,
+            (SELECT nvl(brand_cd,'')
+            FROM dp_disp_ctgr_brand_map
+            WHERE brand_ctgr3_no = a.disp_ctgr_no) AS brandCd,
+            nvl(A.ocb_zone_yn,'N')					AS ocbZoneYn,
+            nvl(A.ocb_zone_save_rt,'0')				AS ocbZoneSaveRt,
+            nvl(A.seller_auth_yn,'N')				AS sellerAuthYn,
+            nvl(A.mobile_yn,'N')					AS mobileYn,
+            nvl(A.BCKT_EX_YN,'N')					AS bcktExYn,
+            A.SVC_CTGR_TYP_CD						AS svcCtgrTypCd,
+            nvl(A.partner_1203_dsc_rt,0)			AS partner1203DscRt,
+            NVL(A.add_ctgr_disp_yn,'N')				AS addCtgrDispYn
+            , NVL(A.ad_point_fee,0)					AS adPointFee
+            , ctgr.disp_ctgr1_no 						AS lctgrNo
+            , ctgr.disp_ctgr2_no 						AS mctgrNo
+            , ctgr.disp_ctgr3_no 						AS sctgrNo
+            , ctgr.disp_ctgr4_no 						AS dctgrNo
+            ,intfree_apply_yn  as intfreeApplyYn
+            ,nvl(A.dsc_rt,0)							as dscRt
+            ,to_char(ad_bgn_dt, 'yyyy/mm/dd') AS adBgnDt
+            ,to_char(ad_end_dt, 'yyyy/mm/dd') AS adEndDt
+            ,NVL(a.SELLER_GRD_EXCEPT_YN,'Y') AS sellerGrdExceptYn
+            ,NVL(a.AUTO_CANCEL_YN,'Y') 		AS autoCancelYn
+            ,NVL(A.hs_code, '')					AS hsCode
+            ,NVL(A.disp_ctgr_eng_nm, '')		AS dispCtgrEngNm
+            ,nvl(a.maxLimitQty,0)					as maxLimitQty
+            ,a.ADD_CTGR_DISP_TYP_CD         as addCtgrDispTypCd
+            ,a.DISP_OS_YN						as dispOsYn
+            ,a.brand_navi_disp_yn				as brandNaviDispYn
+            ,NVL(a.USED_REG_CD, '00')			as usedRegCD
+            ,a.om_ctgr_yn							as omCtgrYn
+            ,a.svc_area_cd							as svcAreaCd
+            ,a.GBL_DLV_YN 							as gblDlvYn
+            ,(CASE
+            WHEN NVL(A.GBL_HS_CODE_NO, 0) > 0
+            THEN (SELECT GBL_HS_CODE FROM WM_GBL_HS_CODE WHERE GBL_HS_CODE_NO = A.GBL_HS_CODE_NO)
+            ELSE ''
+            END) AS gblHsCode
+            ,NVL(a.gbl_hs_code_no , 0)				as gblHsCodeNo
+            ,a.BASKET_AREA_DISP_YN as basketAreaDispYn
+            ,NVL(a.eng_disp_yn, 'N') 		as engDispYn
+            --,nvl(A.GBL_DLV_PRD_WGHT, 0) as gblDvlPrdWght
+            ,nvl((SELECT GBL_DLV_PRD_WGHT FROM DP_DISP_CTGR WHERE DISP_CTGR_NO = CTGR.DISP_CTGR3_NO), 0) as gblDvlPrdWght
+            ,A.ADD_CTGR_TYP_CD AS addCtgrTypCd
+            ,A.BRAND_FIND_DISP_YN AS brandFindDispYn
+            ,NVL(A.PARTNER_PAY_CD, '') AS partnerPayCd
+            ,A.OFFER_DISP_LMT_YN AS offerDispLmtYn
+            ,A.VIEW_TYP AS viewTyp
+            ,A.CTGR_INFO_CD AS ctgrInfoCd
+            ,(SELECT INN.CTGR_INFO_CD FROM DP_DISP_CTGR INN WHERE INN.DISP_CTGR_NO = A.HGRNK_CTGR_NO ) AS hgrnkCtgrInfoCd
+            ,A.REGL_DLV_YN AS reglDlvYn
+            ,A.DISP_CTGR_IMG_URL AS dispCtgrImgUrl
+            ,NVL(A.STD_OPT_GRP_NO, 0) AS stdOptGrpNo
+            ,NVL(A.MINOR_ORD_LMT_YN, 'N') AS minorOrdLmtYn
+            ,(
+                SELECT
+                    COUNT(*) CHILD_CNT
+                FROM DP_DISP_CTGR
+                WHERE HGRNK_CTGR_NO = A.DISP_CTGR_NO
+                and DISP_CTGR_STAT_CD in ('03','05')
+                and DISP_CTGR_KIND_CD = '01'
+                AND USE_YN = 'Y'
+            ) as childCnt
+        FROM dp_disp_ctgr A
+            ,dp_disp_ctgr_list ctgr
+            ,(
+                SELECT
+                    MIN(DECODE(SEL_MTHD_CD, '01', FEE) ) FEE_01,
+                    MIN(DECODE(SEL_MTHD_CD, '02', FEE) ) FEE_02,
+                    MIN(DECODE(SEL_MTHD_CD, '03', FEE) ) FEE_03,
+                    MIN(DECODE(SEL_MTHD_CD, '05', FEE) ) FEE_05,
+                    MIN(DISP_CTGR_NO) DISP_CTGR_NO
+                FROM SE_FEE_ITM
+                WHERE DISP_CTGR_NO = #{dispCtgrNo}
+                AND FEE_KD_CD = '03'
+                AND FEE_TYP_CD = '03101'
+                AND SEL_FEE_APL_OBJ_CLF_CD = '01'
+                AND BASI_SEL_FEE_YN = 'Y'
+                AND FEE_APL_UNIT_CD = '02'
+                AND SYSDATE BETWEEN apl_bgn_dy AND apl_end_dy
+            ) B
+            ,(
+                SELECT
+                    MIN(DECODE(SEL_MTHD_CD, '01', FEE) ) aprv_fee_default,
+                    MIN(DECODE(SEL_MTHD_CD, '02', FEE) ) aprv_fee_group_buying,
+                    MIN(DECODE(SEL_MTHD_CD, '03', FEE) ) aprv_fee_auction,
+                    MIN(DECODE(SEL_MTHD_CD, '05', FEE) ) aprv_fee_used,
+                    MIN(DISP_CTGR_NO) DISP_CTGR_NO
+                FROM SE_FEE_APRV_BASIS
+                WHERE DISP_CTGR_NO = #{dispCtgrNo}
+                AND FEE_KD_CD = '03'
+                AND FEE_TYP_CD = '03101'
+                AND SEL_FEE_APL_OBJ_CLF_CD = '01'
+                AND SYSDATE BETWEEN apl_bgn_dy AND apl_end_dy
+            ) C
+            ,(
+                SELECT
+                    MIN(DECODE(SEL_MTHD_CD, '01', FEE) ) bnsr_default,
+                    MIN(DECODE(SEL_MTHD_CD, '02', FEE) ) bnsr_group_buying,
+                    MIN(DECODE(SEL_MTHD_CD, '03', FEE) ) bnsr_auction,
+                    MIN(DECODE(SEL_MTHD_CD, '05', FEE) ) bnsr_used,
+                    MIN(DISP_CTGR_NO) DISP_CTGR_NO
+                FROM SE_FEE_APRV_BASIS
+                WHERE DISP_CTGR_NO = #{dispCtgrNo}
+                AND FEE_KD_CD = '03'
+                AND FEE_TYP_CD = '04101'
+                AND SEL_FEE_APL_OBJ_CLF_CD = '01'
+                AND SYSDATE BETWEEN apl_bgn_dy AND apl_end_dy
+            ) D
+        WHERE A.disp_ctgr_no = #{dispCtgrNo}
+        and a.disp_ctgr_no = b.disp_ctgr_no(+)
+        and a.disp_ctgr_no = c.disp_ctgr_no(+)
+        and a.disp_ctgr_no = d.disp_ctgr_no(+)
+        and a.disp_ctgr_no = ctgr.disp_ctgr_no(+)
+        and a.use_yn='Y'
+    </select>
+
+    <select id="getSimpleCategoryInfo" parameterType="Long" resultType="CategoryVO">
+        SELECT
+                DISP_CTGR_NO AS DispCtgrNo
+              , DISP_CTGR_NM AS DispCtgrNm
+              , HGRNK_CTGR_NO AS hgrnkCtgrNo
+              , DISP_CTGR_TYP_CD AS dispCtgrTypCd
+              , DISP_CTGR_STAT_CD AS dispCtgrStatCd
+              , DISP_CTGR_ATTR_CD AS dispCtgrAttrCd
+              , DISP_CTGR_KIND_CD AS dispCtgrKindCd
+              , NVL(USED_REG_CD, '00') AS usedRegCD
+              , PRD_TYP_CD AS prdTypCd
+              , USE_YN AS useYn
+        FROM    DP_DISP_CTGR
+        WHERE   1=1
+        AND     DISP_CTGR_NO = #{dispCtgrNo}
+        AND     USE_YN = 'Y'
+        AND     ROWNUM = 1
+    </select>
+
+    <select id="canRegistProductTypeToCategory" parameterType="ProductVO" resultType="String">
+        <![CDATA[
+            SELECT
+                    CASE WHEN CTGR_CHK_YN = 'Y'
+                              THEN DECODE(
+                                    (
+                                     SELECT     COUNT(1)
+                                     FROM       PD_PRD_TYP_CTGR_MAP B
+                                              , DP_DISP_CTGR C
+                                     WHERE      1=1
+                                     AND        B.PRD_TYP_CD    = A.PRD_TYP_CD
+                                     AND        B.CTGR_TYP_CD   = CASE WHEN C.PRD_TYP_CD = '09' AND C.SVC_CTGR_TYP_CD NOT IN ('01', '04')
+                                                                            THEN '01'
+                                                                       ELSE NVL(C.PRD_TYP_CD, '01')
+                                                                  END
+                                     AND        C.DISP_CTGR_NO  = #{dispCtgrNo}
+                                     AND        B.USE_YN = 'Y'
+                                     AND        ROWNUM <=1), 0, 'N', 'Y'
+                                     )
+                         ELSE 'Y'
+                    END REG_YN
+            FROM    PD_PRD_TYP_INFO A
+            WHERE   1=1
+            AND     PRD_TYP_CD = #{baseVO.prdTypCd}
+        ]]>
+    </select>
+
+    <!-- 신선 카테고리 여부 체크 -->
+    <select id="getFreshCategoryYn" resultType="String" parameterType="ProductVO">
+        <![CDATA[
+    	SELECT /* categoryMapper.getFreshCategoryYn */
+	    	NVL(
+			    (SELECT 'Y' FROM
+			    (
+			        SELECT DISP_CTGR_NO
+			        FROM   DP_DISP_CTGR CTGR
+			        WHERE  LEVEL >= 2
+			        AND DISP_CTGR_TYP_CD = '01'
+			        AND DISP_CTGR_STAT_CD = '03'
+			        START WITH DISP_CTGR_NO = #{dispCtgrNo}
+			        CONNECT BY PRIOR HGRNK_CTGR_NO = DISP_CTGR_NO
+			    ) CTGR, PD_SELLER_AUTH AUTH
+			    WHERE CTGR.DISP_CTGR_NO = TO_NUMBER(AUTH.AUTH_OBJ_NO)
+			    AND AUTH.SEL_MNBD_NO = 0
+			    AND AUTH.AUTH_TYP_CD = '03'
+			    AND AUTH.USE_YN ='Y'
+			    AND EXISTS (
+			    	SELECT 1
+			    	FROM PD_SELLER_AUTH
+			    	WHERE SEL_MNBD_NO = #{selMnbdNo}
+			    		AND AUTH_TYP_CD = '01'
+				        AND AUTH_OBJ_NO = #{baseVO.prdTypCd}
+				        AND OBJ_CLF_CD = '02'
+				        AND USE_YN = 'Y'
+			    )
+			    AND ROWNUM <= 1
+			), 'N') AS FRESH_YN
+		FROM DUAL
+	]]>
+    </select>
+
+    <select id="existProductInCategory" resultType="string" parameterType="long">
+        select /* categoryDAOMap.existProductInCategory */
+        decode(count(1), 1, 'Y', 'N') EXIST_YN
+        from  dp_gnrl_disp
+        where disp_ctgr_no = #{dispCtgrNo}#
+        and   rownum = 1
+    </select>
+
+    <!-- 상품 구성 번호로 구성상품 재고 수정한다 -->
+    <update id="updateProductGeneralDisplay" parameterType="DpGnrlDispVO">
+        UPDATE
+        DP_GNRL_DISP
+        SET
+        <if test="mvCtgrYn != null and mvCtgrYn.equals('Y')">
+            disp_ctgr_no = #{dispCtgrNo},
+            gnrl_ctgr_no = #{dispCtgrNo},
+            gnrl_ctgr1_no = FN_PD_SELL_GET_DISP_CTGR('01', '1', #{dispCtgrNo}),
+            gnrl_ctgr2_no = FN_PD_SELL_GET_DISP_CTGR('01', '2', #{dispCtgrNo}),
+            gnrl_ctgr3_no = FN_PD_SELL_GET_DISP_CTGR('01', '3', #{dispCtgrNo}),
+            gnrl_ctgr4_no = NVL(FN_PD_SELL_GET_DISP_CTGR('01', '4', #{dispCtgrNo}), 0),
+        </if>
+        <if test="selStatCd != null and selStatCd != ''">
+            gnrl_sel_stat_cd = #{selStatCd},
+        </if>
+        <if test="selMthdCd != null and selMthdCd != ''">
+            gnrl_sel_mthd_cd = #{selMthdCd},
+        </if>
+        <if test="stckQty != null and stckQty != '-1'">
+            gnrl_stck_qty = #{stckQty},
+        </if>
+        <if test="increaseQty != null and increaseQty != '' and increaseQty != '0'">
+            gnrl_stck_qty =  CASE WHEN gnrl_stck_qty - #{increaseQty} <![CDATA[  <= ]]> 0 THEN 0
+            ELSE gnrl_stck_qty - #{increaseQty} END,
+        </if>
+        <if test="optCd != null and optCd != ''">
+            gnrl_opt_cd = #{optCd},
+        </if>
+        <if test="addPrdQty != null and addPrdQty != '-1'">
+            gnrl_add_prd_qty = #{addPrdQty},
+        </if>
+        <if test="dlvCstPayTypCd != null and dlvCstPayTypCd != ''">
+            gnrl_dlv_cst_pay_typ_cd = #{dlvCstPayTypCd},
+        </if>
+        <if test="dlvCstInstBasiCd != null and dlvCstInstBasiCd != ''">
+            gnrl_dlv_cst_inst_basi_cd = #{dlvCstInstBasiCd},
+        </if>
+        <if test="minorSelCnYn != null and minorSelCnYn != ''">
+            gnrl_minor_sel_cn_yn = #{minorSelCnYn},
+        </if>
+        <if test="brandCd != null and brandCd != ''">
+            gnrl_brand_cd = #{brandCd},
+        </if>
+        <if test="dispBgnDy != null and dispBgnDy != ''">
+            disp_bgn_dy = to_date(#{dispBgnDy},'RRRRMMDDHH24MISS'),
+        </if>
+        <if test="dispEndDy != null and dispEndDy != ''">
+            disp_end_dy = to_date(#{dispEndDy},'RRRRMMDDHH24MISS'),
+        </if>
+        <if test="bsnDealClf != null and bsnDealClf != ''">
+            gnrl_bsn_deal_clf = #{bsnDealClf},
+        </if>
+        <if test="dlvClf != null and dlvClf != ''">
+            gnrl_dlv_clf = #{dlvClf},
+        </if>
+        <if test="omPrdYn != null and omPrdYn != ''">
+            gnrl_om_prd_yn = #{omPrdYn},
+        </if>
+        <if test="svcAreaCd != null and svcAreaCd != ''">
+            gnrl_svc_area_cd = #{svcAreaCd},
+        </if>
+        <if test="gblDlvYn != null and gblDlvYn != ''">
+            gbl_dlv_yn = #{gblDlvYn},
+        </if>
+        <if test="hideYn != null and hideYn != ''">
+            gnrl_hide_yn = #{hideYn},
+        </if>
+        <if test="engDispYn != null and engDispYn != ''">
+            gnrl_eng_disp_yn = #{engDispYn},
+        </if>
+        <if test="disableUpdateYn != null and !disableUpdateYn.equals('Y')">
+            update_dt = sysdate,
+        </if>
+        <if test="updateNo != null and updateNo != ''">
+            <if test="updateNo > 0">
+                update_no = #{updateNo}
+            </if>
+            <if test="updateNo == 0">
+                prd_no = #{prdNo}
+            </if>
+
+        </if>
+        WHERE
+        prd_no = #{prdNo}
+        /* categoryMapper.updateProductGeneralDisplay */
+    </update>
+
+    <!-- 전시카테고리 기타설정 정보(상품 수정및등록 제한설정) -->
+    <select id="getCategoryOtherFixing" resultMap="com.elevenst.terroir.product.registration.common.mapper.VoMapper.productVOMap" parameterType="long">
+        select
+        offer_disp_lmt_yn as offerDispLmtYn
+        , aprv_crtf_yn as aprvCrtfYn
+        , disp_ctgr_no as dispCtgrNo
+        from
+        dp_disp_ctgr
+        where
+        disp_ctgr_no = (select disp_ctgr_no_de from pd_prd where prd_no = #{prdNo})
+        /* categoryMapper.getCategoryOtherFixing */
+    </select>
+
+    <select id="getProductExptCategory" parameterType="HashMap" resultType="int">
+        SELECT
+            COUNT(*) AS CNT
+        FROM
+            DP_DISP_CTGR_EXPT
+        WHERE
+            1 = 1
+        <foreach collection="exptTypeList" item="exptType" open=" AND EXPT_TYPE IN (" separator="," close=")">
+            #{exptType}
+        </foreach>
+        <if test="hgrnkYn == 'Y'">
+        AND DISP_CTGR_NO IN (
+                            SELECT DISP_CTGR_NO
+                            FROM
+                                DP_DISP_CTGR CONNECT BY DISP_CTGR_NO = PRIOR HGRNK_CTGR_NO
+                            AND LEVEL >= 1 START WITH DISP_CTGR_NO = #{dispCtgrNo}
+                            )
+        </if>
+        <if test="hgrnkYn == 'N'">
+        AND DISP_CTGR_NO  = #{dispCtgrNo}
+        </if>
+    </select>
+
+
+    <update id="updateDpGnrlDisp" parameterType="DpGnrlDisp">
+        UPDATE /* categoryMapper.xml updateDpGnrlDisp */
+            DP_GNRL_DISP
+        SET
+            DISP_CTGR_NO = #{dispCtgrNo}
+            ,DISP_BGN_DY = to_date(#{dispBgnDy},'YYYYMMDDHH24MISS')
+            ,DISP_END_DY = to_date(#{dispEndDy},'YYYYMMDDHH24MISS')
+            ,UPDATE_DT = SYSDATE
+            ,UPDATE_NO = #{updateNo}
+            ,GNRL_CTGR_NO = #{dispCtgrNo}
+            ,GNRL_CTGR1_NO = FN_PD_SELL_GET_DISP_CTGR('01', '1', #{dispCtgrNo})
+            ,GNRL_CTGR2_NO = FN_PD_SELL_GET_DISP_CTGR('01', '2', #{dispCtgrNo})
+            ,GNRL_CTGR3_NO = FN_PD_SELL_GET_DISP_CTGR('01', '3', #{dispCtgrNo})
+            ,GNRL_CTGR4_NO = NVL(FN_PD_SELL_GET_DISP_CTGR('01', '4', #{dispCtgrNo}), 0)
+            ,GNRL_SEL_STAT_CD = #{gnrlSelStatCd}
+            ,GNRL_SEL_MTHD_CD = #{gnrlSelMthdCd}
+            ,GNRL_STCK_QTY = #{gnrlStckQty}
+            ,GNRL_OPT_CD = #{gnrlOptCd}
+            ,GNRL_ADD_PRD_QTY = #{gnrlAddPrdQty}
+            ,GNRL_DLV_CST_PAY_TYP_CD = #{gnrlDlvCstPayTypCd}
+            ,GNRL_DLV_CST_INST_BASI_CD = #{gnrlDlvCstInstBasiCd}
+            ,GNRL_MINOR_SEL_CN_YN = #{gnrlMinorSelCnYn}
+            ,GNRL_BRAND_CD = #{gnrlBrandCd}
+            ,GNRL_BSN_DEAL_CLF = #{gnrlBsnDealClf}
+            ,GNRL_DLV_CLF = #{gnrlDlvClf}
+            ,GNRL_OM_PRD_YN = #{gnrlOmPrdYn}
+            ,GNRL_SVC_AREA_CD = #{gnrlSvcAreaCd}
+            ,GBL_DLV_YN = #{gblDlvYn}
+            ,GNRL_HIDE_YN = #{gnrlHideYn}
+            ,GNRL_ENG_DISP_YN = #{gnrlEngDispYn}
+            ,STD_PRD_YN = #{stdPrdYn}
+        WHERE
+            PRD_NO = #{prdNo}
+    </update>
+
+    <!-- 전시카테고리 하위 리스트 조회 -->
+    <select id="getDisplayCategoryChildList" parameterType="HashMap" resultType="DpDispCtgrMetaVO">
+        SELECT
+        SUBSTR(a.ctgr_cd,4,3) AS ctgr_grp_cd ,
+        a.ctgr_no ,
+        a.ref_ctgr_no ,
+        (SELECT disp_ctgr_cd FROM dp_disp_ctgr WHERE disp_ctgr_no = a.ref_ctgr_no AND ROWNUM = 1) AS ref_ctgr_cd ,
+        (SELECT disp_ctgr_kind_cd FROM dp_disp_ctgr WHERE disp_ctgr_no = a.ref_ctgr_no AND ROWNUM = 1) as ref_ctgr_kind_cd,
+        '' AS gbl_dlv_yn ,
+        a.hg_ctgr_no ,
+        a.ctgr_nm ,
+        a.ctgr_eng_nm as DISP_CTGR_ENG_NM ,/* 영문명 추가 by jkin */
+        a.ctgr_cd ,
+        (CASE WHEN LENGTH(a.ctgr_cd) = 6 THEN 1
+        WHEN LENGTH(a.ctgr_cd) = 9 THEN 2
+        ELSE 0 END ) AS ctgr_lv ,
+        a.disp_rnk ,
+        a.ctgr_kind_cd ,
+        a.ctgr_icon_cd ,
+        a.ctgr_txt_color ,
+        a.ctgr_bold_use_yn ,
+        a.ctgr_link_url ,
+        a.ctgr_link_popup_yn ,
+        a.add_info_use_yn ,
+        a.add_info_class_nm ,
+        a.add_info_link_use_yn ,
+        a.add_info_link_url ,
+        a.add_info_link_popup_yn ,
+        (SELECT COUNT(1) AS cnt FROM dp_disp_ctgr_meta WHERE hg_ctgr_no = a.ctgr_no AND use_yn = 'Y' AND ctgr_stat_cd = '03') AS depth2_count,
+        a.add_info_class_text,
+        a.ctgr_icon_url,
+        a.ctgr_icon_slct_url,
+        (SELECT disp_ctgr_level FROM dp_disp_ctgr_list WHERE disp_ctgr_no = a.ref_ctgr_no AND ROWNUM = 1) AS ref_ctgr_level
+        FROM   dp_disp_ctgr_meta a
+        WHERE a.hg_ctgr_no = #{hgCtgrNo}
+        AND a.use_yn = 'Y'
+        AND a.ctgr_stat_cd = '03'
+        ORDER BY disp_rnk ASC
+        /* categoryMapper.getDisplayCategoryChildList */
+    </select>
+
+    <!-- 전시카테고리 목록  -->
+    <select id="getServiceDisplayCategoryProduct" resultType="CategoryVO" parameterType="CategoryVO">
+        SELECT
+        /*+ INDEX(A FK1_DP_DISP_CTGR) */
+        '' lEV,
+        '' CLS_DISP_CTGR_NM,
+        DISP_CTGR_NO,
+        DISP_CTGR_CD,
+        NVL(STD_CTGR_NO,99999999999) STD_CTGR_NO,
+        HGRNK_CTGR_NO,
+        DISP_CTGR_NM,
+        DISP_CTGR_TYP_CD,
+        DISP_CTGR_STAT_CD,
+        PRD_IMG_SZ_CD,
+        PRD_SRT_TYP_CD,
+        NVL(DISP_PRRT_RNK,0) DISP_PRRT_RNK,
+        SND_PLN_TRM,
+        MNFC_EFTV_DY_NESS_YN,
+        ADLT_CRTF_YN,
+        aprv_crtf_yn,
+        UN_DLV_CN_YN,
+        USE_YN,
+        (SELECT /*+ INDEX(B FK1_DP_DISP_CTGR) */DECODE(COUNT(*), 0, 'Y', 'N')
+        FROM DP_DISP_CTGR B
+        WHERE USE_YN='Y'
+        AND DISP_CTGR_STAT_CD IN ('03','05')
+        AND DISP_CTGR_KIND_CD = '01'
+        AND HGRNK_CTGR_NO = A.DISP_CTGR_NO) IS_LAST,
+        CREATE_DT,
+        CREATE_NO,
+        UPDATE_DT,
+        UPDATE_NO,
+        DFLTCHK_TAXABLE_YN,
+        MOBILE_YN,
+        NVL(PRD_TYP_CD, '01') PRD_TYP_CD,
+        NVL(SVC_AREA_CD, '') SVC_AREA_CD,
+        ENG_DISP_YN,
+        SVC_CTGR_TYP_CD
+        ,OFFER_DISP_LMT_YN
+        ,BOOK_CLF_CD
+        ,NVL(MINOR_ORD_LMT_YN, 'N') AS MINOR_ORD_LMT_YN
+        ,A.MAXLIMITQTY
+        FROM DP_DISP_CTGR A
+        WHERE USE_YN='Y'
+        AND disp_ctgr_kind_cd = '01'
+
+        <!-- 대카테고리에서 [전시]상태만 노출 -->
+        <if test="lev != null and lev.equals('0')">
+            AND (disp_ctgr_stat_cd = '03' /** 전시 **/
+            OR (DISP_CTGR_NO in (962803,1001122) AND disp_ctgr_stat_cd IN ('03','05')))
+        </if>
+
+        <!-- 대카테고리 외 카테고리는 [전시,전시대기]상태만 노출 -->
+        <if test="lev != null and !lev.equals('0')">
+            AND disp_ctgr_stat_cd IN ('03','05') /** 전시,전시대기 **/
+        </if>
+
+        <if test="lev == null || lev == ''">
+            AND disp_ctgr_stat_cd IN ('03','05') /** 전시,전시대기 **/
+        </if>
+
+        <if test="dispCtgrNo != null">
+            AND HGRNK_CTGR_NO = #{dispCtgrNo}
+            <if test="dispCtgr1NoArr != null and dispCtgr1NoArr.length gt 0">
+                <foreach item="dispCtgr1No" collection="dispCtgr1NoArr" open="AND DISP_CTGR_NO IN  (" close=")" separator=",">
+                    #{dispCtgr1No}
+                </foreach>
+            </if>
+        </if>
+
+        <if test="dispCtgrNo == null || dispCtgrNo == ''">
+            AND HGRNK_CTGR_NO = 0
+        </if>
+        <if test="userUniqSohoYn != null and userUniqSohoYn.equals('N')">
+            <![CDATA[
+			AND (UNIQ_SOHO_YN IS NULL OR UNIQ_SOHO_YN <> 'Y')
+			]]>
+        </if>
+        <if test="userAbrdBrandYn != null and userAbrdBrandYn.equals('N')">
+            <![CDATA[
+			AND (ABRD_BRAND_YN IS NULL OR ABRD_BRAND_YN <> 'Y')
+			]]>
+        </if>
+        <if test="userAbrdBrandYn != null and userAbrdBrandYn.equals('Y')">
+            <![CDATA[
+			AND (ABRD_BRAND_YN IS NULL OR ABRD_BRAND_YN = 'Y')
+			]]>
+        </if>
+        <if test="userOcbZoneYn != null and userOcbZoneYn.equals('N')">
+            <![CDATA[
+			AND (ocb_zone_yn IS NULL OR ocb_zone_yn <> 'Y')
+			]]>
+        </if>
+        <if test="omCtgrYn != null and omCtgrYn.equals('N')">
+            <![CDATA[
+			AND (SVC_AREA_CD = #{svcAreaCd} OR SVC_AREA_CD IS NULL)
+			]]>
+            <if test="svcAreaCd != null and svcAreaCd.equals('03')">
+                <![CDATA[
+				AND (OM_CTGR_YN = #{omCtgrYn})
+				AND PRD_TYP_CD <> 21 /*배달상품 카테고리제외*/
+				]]>
+            </if>
+        </if>
+        <if test="omCtgrYn != null and !omCtgrYn.equals('N')">
+            <![CDATA[
+			AND (OM_CTGR_YN IS NULL OR OM_CTGR_YN = 'Y') AND SVC_AREA_CD IS NULL
+			]]>
+        </if>
+        <if test="lev != null and lev != ''">
+            <if test="lev.equals('1')">
+                <if test="dispCtgrNo == '2967' and bookCtgrAuthYn.equals('Y')">
+                  AND disp_ctgr_no IN ( 3118, 3138, 3141 )
+                </if>
+                <if test="ocbZoneYn.equals('Y')">
+                    and  (   seller_auth_yn = 'N' OR
+                    disp_ctgr_no in ( select hgrnk_ctgr_no
+                    from dp_disp_ctgr
+                    where disp_ctgr_no in ( select disp_ctgr_no
+                    from dp_disp_ctgr_seller_auth
+                    where mem_no = #{ocbZoneAppvMemNo}
+                    )
+                    )
+                    )
+                </if>
+            </if>
+            <if test="lev.equals('2') and ocbZoneYn.equals('Y')">
+                and (
+                seller_auth_yn = 'N' OR
+                disp_ctgr_no in ( select disp_ctgr_no
+                from dp_disp_ctgr_seller_auth
+                where mem_no = #{ocbZoneAppvMemNo}
+                )
+                )
+            </if>
+            <if test="lev.equals('3') and ocbZoneYn.equals('Y')">
+                and (
+                seller_auth_yn = 'N' OR
+                disp_ctgr_no in ( select disp_ctgr_no
+                from dp_disp_ctgr_seller_auth
+                where mem_no = #{ocbZoneAppvMemNo}
+                )
+                )
+            </if>
+        </if>
+        ORDER BY DISP_PRRT_RNK
+        /* categoryMapper.getServiceDisplayCategoryProduct */
+    </select>
+
+    <select id="getHelpDpDispObjList" resultType="DpDispObjVO" parameterType="DpDispObjVO">
+        select dispObjHtml, dispObjWinWidth, dispObjWinHeight
+        from   (select nvl(rel.disp_Obj_Html,'') dispObjHtml,
+        nvl(rel.disp_Obj_rel_Width, 0) dispObjWinWidth,
+        nvl(rel.disp_obj_rel_height, 0) dispObjWinHeight
+        from   dp_disp_spce spce,
+        dp_prd_disp disp,
+        dp_disp_rel_obj rel
+        where  spce.disp_spce_id = #{dispSpceId}
+        and    disp.disp_advrt_area_no = spce.disp_spce_no
+        and    rel.disp_obj_no = #{dispObjNo}
+        and    rel.disp_advrt_no = disp.disp_advrt_no
+        order by rel.DISP_PRRT_RNK desc )
+        where  rownum = 1
+    </select>
+
+    <!-- 전시카테고리  상세 - 사용여부 체크 제외 (상품정보 수정/보기 영역)  -->
+    <select id="getDisplayCategoryInfoNoneUseCheck" resultType="CategoryVO" parameterType="java.lang.Long">
+        SELECT /* categoryDAOMap.product.getDisplayCategoryInfoNoneUseCheck */
+        A.disp_ctgr_no            				AS dispCtgrNo,
+        nvl(A.std_ctgr_no,0)             		AS stdCtgrNo,
+        A.hgrnk_ctgr_no           				AS hgrnkCtgrNo,
+        A.disp_ctgr_nm            				AS dispCtgrNm,
+        A.disp_ctgr_typ_cd        				AS dispCtgrTypCd,
+        A.disp_ctgr_stat_cd       				AS dispCtgrStatCd,
+        A.prd_img_sz_cd           				AS prdImgSzCd,
+        A.prd_srt_typ_cd          				AS prdSrtTypCd,
+        nvl(A.disp_prrt_rnk,0)    				AS dispPrrtRnk,
+        A.snd_pln_trm             				AS sndPlnTrm,
+        A.mnfc_eftv_dy_ness_yn    				AS mnfcEftvDyNessYn,
+        A.adlt_crtf_yn            				AS adltCrtfYn,
+        a.aprv_crtf_yn    						AS aprvCrtfYn,
+        A.un_dlv_cn_yn            				AS unDlvCnYn,
+        A.uniq_soho_yn							AS uniqSohoYn,
+        A.abrd_brand_yn							AS abrdBrandYn,
+        A.abrd_ctgr_no							AS abrdCtgrNo,
+        sf_getname_dp_disp_ctgr(A.abrd_ctgr_no,4) AS abrdCtgrNm,
+        A.use_yn                  				AS useYn,
+        TO_CHAR(A.create_dt,'yyyy/mm/dd') AS createDt,
+        A.create_no               				AS createNo,
+        TO_CHAR(A.update_dt,'yyyy/mm/dd') AS updateDt,
+        A.update_no               				AS updateNo,
+        sf_getname_pd_std_ctgr(A.std_ctgr_no,3) 	AS stdCtgrPath,
+        (SELECT B.reg_nm FROM V_MB_REG_PSN_INQ B WHERE A.create_no = B.reg_no) AS memNm,
+        sf_getname_dp_disp_ctgr(A.disp_ctgr_no,4) as dispCtgrPath,
+        A.disp_ctgr_cd							as dispCtgrCd,
+        A.disp_ctgr_urltyp_cd					as dispCtgrUrltypCd,
+        A.disp_ctgr_url							as dispCtgrUrl,
+        A.disp_ctgr_advrt_cont					as dispCtgrAdvrtCont,
+        A.prd_typ_cd							as prdTypCd,
+        A.ocb_save_rt							as ocbSaveRt,
+        A.ctgr_pnt_rt							as ctgrPntRt,
+        A.ctgr_pnt_add_rt						as ctgrPntAddRt,
+        nvl(A.low_prc_comp_yn,'N')				AS lowPrcCompYn,
+        nvl(A.ctgr_pnt_pre_yn,'N')				AS ctgrPntPreYn,
+        nvl(A.ctgr_pnt_pre_rt,0)				AS ctgrPntPreRt,
+        (SELECT decode(COUNT(*), 0, 'true', 'false')
+        FROM dp_disp_ctgr
+        WHERE hgrnk_ctgr_no = #{dispCtgrNo}
+        AND disp_ctgr_kind_cd = a.disp_ctgr_kind_cd
+        AND use_yn = 'Y'
+        AND disp_ctgr_stat_cd IN ('03', '05') ) AS nodetype,
+        ctgr.disp_ctgr1_no as rootCtgrNo,
+        A.dfltchk_taxable_yn                  	AS dfltchkTaxableYn,
+        A.std_fee_default                  		AS stdFeeDefault,
+        A.std_fee_group_buying             		AS stdFeeGroupBuying,
+        A.std_fee_auction                  		AS stdFeeAuction,
+        null                  		AS stdFeeUsed,
+        b.fee_01								as feeDefault,
+        b.fee_02								as feeGroupBuying,
+        b.fee_03								as feeAuction,
+        b.fee_05								as feeUsed,
+        a.disp_ctgr_kind_cd						AS dispCtgrKindCd,
+        a.icon_cd								AS iconCd,
+        a.disp_ctgr_url_popup_yn				AS dispCtgrUrlPopupYn,
+        length(a.disp_ctgr_cd)/3                AS lev,
+        (SELECT nvl(brand_cd,'')
+        FROM dp_disp_ctgr_brand_map
+        WHERE brand_ctgr3_no = a.disp_ctgr_no) AS brandCd,
+        nvl(A.ocb_zone_yn,'N')					AS ocbZoneYn,
+        nvl(A.ocb_zone_save_rt,'0')				AS ocbZoneSaveRt,
+        nvl(A.seller_auth_yn,'N')				AS sellerAuthYn,
+        nvl(A.mobile_yn,'N')					AS mobileYn,
+        nvl(A.BCKT_EX_YN,'N')					AS bcktExYn,
+        A.SVC_CTGR_TYP_CD						AS svcCtgrTypCd,
+        nvl(A.partner_1203_dsc_rt,0)			AS partner1203DscRt,
+        NVL(A.add_ctgr_disp_yn,'N')				AS addCtgrDispYn
+        , NVL(A.ad_point_fee,0)					AS adPointFee
+        , ctgr.disp_ctgr1_no as lctgrNo
+        , ctgr.disp_ctgr2_no as mctgrNo
+        , ctgr.disp_ctgr3_no as sctgrNo
+        , ctgr.disp_ctgr4_no as dctgrNo
+        ,intfree_apply_yn  as intfreeApplyYn
+        ,nvl(A.dsc_rt,0)							as dscRt
+        ,to_char(ad_bgn_dt, 'yyyy/mm/dd') adBgnDt
+        ,to_char(ad_end_dt, 'yyyy/mm/dd') adEndDt
+        ,NVL(A.ctgr_cupn_ex_yn,'N')				AS ctgrCupnExYn
+        ,nvl(a.maxLimitQty,0)					as maxLimitQty
+        ,nvl(hs_code, '') as hsCode
+        ,nvl(USED_REG_CD, '00') as usedRegCD
+        ,nvl(A.svc_area_cd, '') as svcAreaCd
+        ,nvl(A.GBL_DLV_YN,'N')				AS gblDlvYn
+        ,nvl(GBL_HS_CODE_NO, 0) as gblHsCodeNo
+        ,case when nvl(a.gbl_hs_code_no,0) > 0 then  (select gbl_hs_code from wm_gbl_hs_code where gbl_hs_code_no = a.gbl_hs_code_no) else '' end gblHsCode
+        ,nvl(A.eng_disp_yn,'N')				AS engDispYn
+        ,A.OFFER_DISP_LMT_YN AS offerDispLmtYn
+        , A.disp_ctgr_attr_cd AS dispCtgrAttrCd
+        , A.book_clf_cd AS bookClfCd
+        , NVL(A.MINOR_ORD_LMT_YN, 'N') AS minorOrdLmtYn
+        FROM dp_disp_ctgr A,
+        dp_disp_ctgr_list ctgr,
+        (SELECT
+        MIN(DECODE(SEL_MTHD_CD, '01', FEE) ) FEE_01,
+        MIN(DECODE(SEL_MTHD_CD, '02', FEE) ) FEE_02,
+        MIN(DECODE(SEL_MTHD_CD, '03', FEE) ) FEE_03,
+        MIN(DECODE(SEL_MTHD_CD, '05', FEE) ) FEE_05,
+        MIN(DISP_CTGR_NO) DISP_CTGR_NO
+        FROM SE_FEE_ITM
+        WHERE DISP_CTGR_NO = #{dispCtgrNo}
+        AND FEE_KD_CD = '03'
+        AND FEE_TYP_CD = '03101'
+        AND SEL_FEE_APL_OBJ_CLF_CD = '01'
+        AND BASI_SEL_FEE_YN = 'Y'
+        AND FEE_APL_UNIT_CD = '02'
+        AND SYSDATE BETWEEN apl_bgn_dy AND apl_end_dy
+        ) B
+        WHERE A.disp_ctgr_no = #{dispCtgrNo}
+        and a.disp_ctgr_no = b.disp_ctgr_no(+)
+        and a.disp_ctgr_no = ctgr.disp_ctgr_no(+)
+    </select>
+
+    <!-- 전시카테고리 셀러 권한 설정 여부 조회 -->
+    <select id="getDispCtgrSellerAuthYn" resultType="String" parameterType="CategoryVO">
+        SELECT
+        nvl(seller_auth_yn,'N')
+        FROM dp_disp_ctgr
+        WHERE disp_ctgr_no = #{dispCtgrNo}
+        /* categoryMapper.getDispCtgrSellerAuthYn */
+    </select>
+
+    <!-- 전시카테고리 셀러 권한 조회 -->
+    <select id="getDispCtgrSellerAuth" resultType="int" parameterType="CategoryVO">
+        SELECT
+        COUNT(*)
+        FROM dp_disp_ctgr_seller_auth
+        WHERE disp_ctgr_no = #{dispCtgrNo}
+        AND mem_no = #{selMnbdNo}
+        /* categoryMapper.getDispCtgrSellerAuth */
+    </select>
+
+    <!-- 전시카테고리 셀러 권한 조회 -->
+    <select id="getDispCtgrSellerAuthCnt" resultType="int" parameterType="ProductVO">
+        SELECT /* categoryMapper.getDispCtgrSellerAuth */
+            COUNT(*)
+        FROM DP_DISP_CTGR_SELLER_AUTH
+        WHERE DISP_CTGR_NO = #{dispCtgrNo}
+        AND MEM_NO = #{selMnbdNo}
+    </select>
+
+    <select id="getDpDispCtgrList" parameterType="CategoryVO" resultType="CategoryVO">
+        select
+        disp_ctgr1_no lctgrNo
+        ,disp_ctgr2_no mctgrNo
+        ,disp_ctgr3_no sctgrNo
+        ,disp_ctgr4_no dctgrNo
+        ,disp_ctgr1_nm lctgrNm
+        ,disp_ctgr2_nm mctgrNm
+        ,disp_ctgr3_nm sctgrNm
+        ,disp_ctgr4_nm dctgrNm
+        ,disp_ctgr_no dispCtgrNo
+        ,disp_ctgr_nm dispCtgrNm
+        ,disp_ctgr_cd dispCtgrCd
+        ,disp_ctgr_level dispCtgrLvl
+        from dp_disp_ctgr_list
+        where 1=1
+        <if test="lctgrNo != null and lctgrNo != ''">
+            and disp_ctgr1_no = #{lctgrNo}
+        </if>
+        <if test="mctgrNo != null and mctgrNo != ''">
+            and disp_ctgr2_no = #{mctgrNo}
+        </if>
+        <if test="sctgrNo != null and sctgrNo != ''">
+            and disp_ctgr3_no = #{sctgrNo}
+        </if>
+        <if test="dctgrNo != null and dctgrNo != ''">
+            and disp_ctgr4_no = #{dctgrNo}
+        </if>
+        <if test="dispCtgrNo != null and dispCtgrNo != '' and dispCtgrNo != '0'">
+            and disp_ctgr_no = #{dispCtgrNo}
+        </if>
+        <if test="lctgrNoArr != null and lctgrNoArr.length > 0">
+            <foreach item="lctgrNos" collection="lctgrNoArr" open="AND disp_ctgr1_no in ( " close=")" separator=",">
+                #{lctgrNos}
+            </foreach>
+        </if>
+        <if test="mctgrNoArr != null and mctgrNoArr.length > 0">
+            <foreach item="mctgrNos" collection="mctgrNoArr" open="AND disp_ctgr2_no in ( " close=")" separator=",">
+                #{mctgrNos}
+            </foreach>
+        </if>
+        <if test="sctgrNoArr != null and sctgrNoArr.length > 0">
+            <foreach item="sctgrNos" collection="sctgrNoArr" open="AND disp_ctgr3_no in ( " close=")" separator=",">
+                #{sctgrNos}
+            </foreach>
+        </if>
+        <if test="dctgrNoArr != null and dctgrNoArr.length > 0">
+            <foreach item="dctgrNos" collection="dctgrNoArr" open="AND disp_ctgr4_no in ( " close=")" separator=",">
+                #{dctgrNos}
+            </foreach>
+        </if>
+        <if test="dispCtgrNoArr != null and dispCtgrNoArr.length > 0">
+            <foreach item="dispCtgrNos" collection="dispCtgrNoArr" open="AND disp_ctgr_no in ( " close=")" separator=",">
+                #{dispCtgrNos}
+            </foreach>
+        </if>
+        /* categoryMapper.getDpDispCtgrList */
+    </select>
+
+    <!-- 최근 등록한 일반 전시  정보 Town dp_gnrl_disp 를  조회한다 -->
+    <select id="getRecentProductGeneralDisplay" resultType="CategoryVO" parameterType="CategoryVO">
+        SELECT  disp_ctgr_no, ctgr_no_Path,
+        (SELECT  disp_ctgr1_nm||'>'||disp_ctgr2_nm||'>'||disp_ctgr3_nm||
+        case when disp_ctgr4_nm is not null then '>'||disp_ctgr4_nm
+        else ''
+        end
+        FROM dp_disp_ctgr_list
+        WHERE disp_ctgr_no = x.disp_ctgr_no) AS disp_ctgr_nm
+        FROM    (
+        SELECT  disp_ctgr_no, ctgr_no_Path, max(create_dt) create_dt
+        FROM    (
+        SELECT  /*+ index_desc(a IX10_DP_GNRL_DISP)*/
+        disp_ctgr_no,
+        gnrl_ctgr1_no || '>' || gnrl_ctgr2_no || '>' || gnrl_ctgr3_no || decode(GNRL_CTGR4_NO, 0, '', '>' || GNRL_CTGR4_NO) as ctgr_no_Path,
+        create_dt
+        FROM    dp_gnrl_disp a
+        WHERE   GNRL_SEL_MNBD_NO = #{selMnbdNo}
+        <if test="omPrdYn == 'N' and svcAreaCd == '03'">
+            <![CDATA[
+				AND (GNRL_OM_PRD_YN = #{omPrdYn})
+				AND GNRL_SVC_AREA_CD = '03'
+			]]>
+        </if>
+        <if test="svcAreaCd != '03'">
+            <![CDATA[
+				AND (GNRL_SVC_AREA_CD NOT IN('03')
+				OR GNRL_SVC_AREA_CD IS NULL)
+			]]>
+        </if>
+        <![CDATA[
+		  AND   rownum < 101
+		]]>
+        )
+        GROUP BY disp_ctgr_no, ctgr_no_Path
+        ORDER BY create_dt desc
+        ) x
+        <![CDATA[
+		WHERE   rownum < 6
+		]]>
+    </select>
+
+    <!-- 상품등록시 의료기기 품목허가번호 여부 조회  -->
+    <select id="getProductMedicalPermissionYn" resultType="String" parameterType="java.lang.Long">
+        select
+        DECODE(COUNT(*), 0, 'N', 'Y') AS isMedicalYn
+        from DP_DISP_CTGR_EXPT
+        where EXPT_TYPE = '102'
+        and DISP_CTGR_NO = #{dispCtgrNo}
+        /* categoryMapper.getProductMedicalPermissionYn */
+    </select>
+
+    <update id="insertCategoryRecommendations" parameterType="PdObjTypProp">
+        INSERT INTO /* categoryMapper.xml insertCategoryRecommendations */
+        PD_OBJ_TYP_PROP (OBJ_NO, OBJ_TYP_CD, OBJ_VAL1, OBJ_VAL2, OBJ_VAL3, CREATE_DT, CREATE_NO)
+        VALUES (
+        #{objNo}
+        ,'04'
+        ,#{objVal1}
+        ,#{objVal2}
+        ,#{objVal3}
+        ,sysdate
+        ,#{createNo}
+        )
+    </update>
+
+    <!--
+    메타 카테고리 및 추가 전시 카테고리 매핑 리스트
+-->
+    <select id="getMetaDispCtgrList" parameterType="HashMap" resultType="DpDispCtgrMetaVO">
+        WITH MCTGR AS (
+        SELECT
+        ROWNUM AS ctgrOrd,
+        SUBSTR(a.ctgr_cd, 4, 3) AS ctgr_grp_cd ,
+        a.ctgr_no ,
+        a.ref_ctgr_no ,
+        (SELECT disp_ctgr_cd
+        FROM   dp_disp_ctgr
+        WHERE  disp_ctgr_no = a.ref_ctgr_no
+        AND    ROWNUM = 1) AS ref_ctgr_cd,
+        '' AS ref_ctgr_kind_cd,
+        '' AS gbl_dlv_yn,
+        a.hg_ctgr_no,
+        a.ctgr_nm,
+        a.ctgr_eng_nm as disp_ctgr_eng_nm,
+        a.ctgr_cd ,
+        level-1 as ctgr_lv,
+        a.disp_rnk ,
+        a.ctgr_kind_cd ,
+        a.ctgr_icon_cd ,
+        a.ctgr_txt_color ,
+        a.ctgr_bold_use_yn ,
+        a.ctgr_link_url ,
+        a.ctgr_link_popup_yn ,
+        a.add_info_use_yn ,
+        a.add_info_class_nm ,
+        a.add_info_link_use_yn ,
+        a.add_info_link_url ,
+        a.add_info_link_popup_yn ,
+        0 AS depth2_count ,
+        a.add_info_class_text ,
+        a.ctgr_icon_url,
+        a.ctgr_icon_slct_url
+        FROM   dp_disp_ctgr_meta a
+        WHERE  1=1
+        AND    a.use_yn = 'Y'
+        AND    a.ctgr_stat_cd IN ('03') /* 전시중 */
+        <!-- 영문노출여부 조건 추가  -->
+        <if test="engDispYn != null and engDispYn != '' and engDispYn == 'Y'">
+          AND    a.ENG_DISP_YN=#{engDispYn}
+        </if>
+        AND    LEVEL > 1 START WITH a.ctgr_no = #{ctgrNo} CONNECT BY PRIOR a.ctgr_no = a.hg_ctgr_no
+        ORDER SIBLINGS BY disp_rnk ASC
+        )
+        SELECT T.* FROM (
+        SELECT
+        <if test="levelStart != null and levelStart != '' and levelEnd != null and levelEnd != ''">
+        /*+ leading(a b) use_nl(b) index(b IX1_DP_DISP_CTGR_LIST) */
+        </if>
+        a.ctgr_grp_cd ,
+        decode(a.ref_ctgr_no,0,a.ctgr_no,b.disp_ctgr_no) as ctgr_no,
+        a.ref_ctgr_no,
+        a.ref_ctgr_cd,
+        a.ref_ctgr_kind_cd,
+        a.gbl_dlv_yn,
+        decode(b.disp_ctgr_level,2,a.ref_ctgr_no,a.hg_ctgr_no) as hg_ctgr_no,
+        <if test="getMetaCtgrNm != null and getMetaCtgrNm != ''">
+            decode(b.disp_ctgr_level, 1, a.ctgr_nm,b.disp_ctgr_nm) as ctgr_nm,
+        </if>
+        <if test="getMetaCtgrNm == null || getMetaCtgrNm == ''">
+            decode(a.ref_ctgr_no,0,a.ctgr_nm,b.disp_ctgr_nm) as ctgr_nm,
+        </if>
+        a.disp_ctgr_eng_nm,
+        a.ctgr_cd,
+        nvl(b.disp_ctgr_level,0) as ctgr_lv,
+        a.disp_rnk ,
+        a.ctgr_kind_cd ,
+        a.ctgr_icon_cd ,
+        a.ctgr_txt_color ,
+        a.ctgr_bold_use_yn ,
+        a.ctgr_link_url ,
+        a.ctgr_link_popup_yn ,
+        a.add_info_use_yn ,
+        a.add_info_class_nm ,
+        a.add_info_link_use_yn ,
+        a.add_info_link_url ,
+        a.add_info_link_popup_yn ,
+        a.depth2_count ,
+        a.add_info_class_text,
+        a.ctgr_icon_url,
+        a.ctgr_icon_slct_url,
+        b.disp_prrt_rnk
+        FROM MCTGR a, DP_DISP_CTGR_LIST b
+        WHERE a.ref_ctgr_no = b.disp_ctgr1_no(+)
+        AND NVL(b.disp_ctgr_stat_cd,'03') in ('03')
+            <if test="levelStart lte 0 and levelEnd lte 0">
+                AND b.disp_ctgr_level(+) = 1
+            </if>
+            <if test="levelStart gt 0 and levelEnd gt 0">
+                AND b.disp_ctgr_level(+) between #{levelStart} and #{levelEnd}
+            </if>
+        <if test="dispCtgrKindCd != null and !dispCtgrKindCd.equals('')">
+            AND b.disp_ctgr_kind_cd = #{dispCtgrKindCd}
+        </if>
+        <if test="engDispYn != null and !engDispYn.equals('') and engDispYn == 'Y'">
+          AND b.eng_disp_yn='Y'
+        </if>
+        ORDER BY a.ctgrOrd, nvl(b.disp_ctgr_level,0), b.disp_prrt_rnk
+        ) T
+        WHERE 1=1
+        <if test="levelStart != null">
+            AND T.ctgr_lv &gt;= #{levelStart}
+        </if>
+        <if test="levelEnd != null">
+            AND T.ctgr_lv &lt;= #{levelEnd}
+        </if>
+        <if test="metaCtgrNo != null">
+            AND T.hg_ctgr_no = #{metaCtgrNo}
+        </if>
+        <if test="endNum != null">
+            AND ROWNUM lte #{endNum}
+        </if>
+        <if test="sortByLCtgrDispRank != null and sortByLCtgrDispRank != ''">
+            ORDER BY T.CTGR_GRP_CD, T.DISP_RNK, T.CTGR_LV, T.DISP_PRRT_RNK
+        </if>
+        /* categoryMapper.getMetaDispCtgrList */
+    </select>
+
+    <select id="getCategoryRecommendations" parameterType="HashMap" resultType="CategoryRecommendationVO">
+        SELECT
+        b.disp_ctgr_no AS DISP_CTGR_NO
+        ,b.hgrnk_ctgr_no AS HGRNK_CTGR_NO
+        ,b.disp_ctgr_nm AS DISP_CTGR_NM
+        ,level
+        ,CONNECT_BY_ISLEAF AS is_leaf
+        ,b.seller_auth_yn AS SELLER_AUTH_YN
+        FROM (
+        SELECT
+        a.disp_ctgr_no
+        ,a.hgrnk_ctgr_no
+        ,a.disp_ctgr_nm
+        ,a.seller_auth_yn
+        FROM
+        DP_DISP_CTGR a
+        <if test="ctgrList != null and ctgrList.size > 0">
+            <foreach item="ctgrNo" collection="ctgrList" open="START WITH a.disp_ctgr_no in (" close=")" separator=",">
+                #{ctgrNo}
+            </foreach>
+        </if>
+        CONNECT BY PRIOR a.HGRNK_CTGR_NO = a.disp_ctgr_no
+        GROUP BY a.disp_ctgr_no, a.hgrnk_ctgr_no, a.disp_ctgr_nm, a.seller_auth_yn
+        ) b
+        START WITH b.hgrnk_ctgr_no = 0
+        CONNECT BY PRIOR b.disp_ctgr_no = b.hgrnk_ctgr_no
+        /* categoryMapper.getCategoryRecommendations */
+    </select>
+
+    <select id="getSellerAuthorizedCtgrNos" parameterType="HashMap" resultType="long">
+        SELECT
+        /*+ index(a PK_DP_DISP_CTGR_SELLER_AUTH) */
+        DISP_CTGR_NO
+        FROM
+        DP_DISP_CTGR_SELLER_AUTH
+        WHERE 1=1
+        AND MEM_NO = #{memNo}
+        <if test="ctgrList != null and ctgrList.size > 0">
+            <foreach item="ctgrNo" collection="ctgrList" open="AND DISP_CTGR_NO IN (" close=")" separator=",">
+                #{ctgrNo}
+            </foreach>
+        </if>
+        /* categoryMapper.getSellerAuthorizedCtgrNos */
+    </select>
+
+    <!-- 서비스 전시카테고리 최하위 리스트를 조회한다. -->
+    <select id="getServiceDisplayCategoryLeafList" parameterType="CategoryVO" resultType="CategoryVO">
+        SELECT
+        b.disp_ctgr_no as dispCtgrNo,
+        b.std_ctgr_no as stdCtgrNo,
+        b.hgrnk_ctgr_no as hgrnkCtgrNo,
+        b.disp_ctgr_nm as dispCtgrNm,
+        b.use_yn as useYn,
+        b.total_count as tot,
+        sf_getname_dp_disp_ctgr(b.disp_ctgr_no,4) as dispCtgrPath,
+        (SELECT  disp_ctgr1_no||'>'||disp_ctgr2_no||'>'||disp_ctgr3_no||
+        case when disp_ctgr4_no is not null then '>'||disp_ctgr4_no
+        else ''
+        end
+        FROM dp_disp_ctgr_list
+        WHERE disp_ctgr_no = b.disp_ctgr_no) AS ctgrNoPath,
+        isLeaf
+        FROM
+        (
+        SELECT
+        rownum num,
+        a.disp_ctgr_no,
+        a.std_ctgr_no,
+        a.hgrnk_ctgr_no,
+        a.disp_ctgr_nm,
+        a.use_yn,
+        count(*) over() as total_count,
+        isLeaf
+        FROM
+        (
+        SELECT a.disp_ctgr_no,
+        a.std_ctgr_no,
+        a.hgrnk_ctgr_no,
+        a.disp_ctgr_nm,
+        a.use_yn,
+        a.uniq_soho_yn,
+        a.abrd_brand_yn,
+        connect_by_isleaf as isLeaf,
+        a.ocb_zone_yn,
+        a.om_ctgr_yn,
+        a.svc_area_cd
+        FROM DP_DISP_CTGR a
+        WHERE a.use_yn = 'Y'
+        AND a.disp_ctgr_stat_cd IN ('03', '05')
+        AND a.disp_ctgr_kind_cd = '01'
+        <if test="dispCtgrNo == 0">
+            START WITH hgrnk_ctgr_no = #{dispCtgrNo}
+        </if>
+        <if test="dispCtgrNo > 0">
+            START WITH disp_ctgr_no = #{dispCtgrNo}
+        </if>
+        CONNECT BY PRIOR a.disp_ctgr_no = a.hgrnk_ctgr_no and a.use_yn = 'Y'
+        ) a
+        WHERE isLeaf = 1
+        <if test="dispCtgrNm != null">
+            and UPPER(a.disp_ctgr_nm) LIKE UPPER('%'||#{dispCtgrNm}||'%')
+        </if>
+        <if test="dispCtgrNoList != null and dispCtgrNoList.size > 0">
+            <foreach item="dispCtgrNo" collection="dispCtgrNoList" open="a.disp_ctgr_no IN (" close=")" separator=",">
+                #{dispCtgrNo}
+            </foreach>
+        </if>
+        <if test="userUniqSohoYn == 'N'">
+            <![CDATA[
+		            AND (a.uniq_soho_yn is null OR a.uniq_soho_yn <> 'Y')
+		            ]]>
+        </if>
+        <if test="userAbrdBrandYn == 'N'">
+            <![CDATA[
+		            AND (a.abrd_brand_yn is null OR a.abrd_brand_yn <> 'Y')
+		            ]]>
+        </if>
+        <if test="userAbrdBrandYn == 'Y'">
+            <![CDATA[
+		            AND (a.abrd_brand_yn is null OR a.abrd_brand_yn = 'Y')
+		            ]]>
+        </if>
+        <if test="userOcbZoneYn == 'N'">
+            <![CDATA[
+					AND (a.ocb_zone_yn IS NULL OR a.ocb_zone_yn <> 'Y')
+					]]>
+        </if>
+        <if test="omCtgrYn == 'N'">
+            <![CDATA[
+					AND (SVC_AREA_CD = #{svcAreaCd} OR SVC_AREA_CD IS NULL)
+					]]>
+            <if test="svcAreaCd != null and svcAreaCd.equals('03')">
+                 <![CDATA[
+						AND (OM_CTGR_YN = #{omCtgrYn})
+						]]>
+            </if>
+        </if>
+        <if test="omCtgrYn != 'N'">
+            <![CDATA[
+					AND (OM_CTGR_YN IS NULL OR OM_CTGR_YN = 'Y' )AND SVC_AREA_CD IS NULL
+					]]>
+        </if>
+        <if test="lev != null">
+            <if test="lev == '1' and ocbZoneYn == 'Y'">
+                and disp_ctgr_no in ( select hgrnk_ctgr_no
+                from dp_disp_ctgr
+                where disp_ctgr_no in ( select disp_ctgr_no
+                from dp_disp_ctgr_seller_auth
+                where mem_no = #{ocbZoneAppvMemNo}
+                )
+                )
+            </if>
+            <if test="lev == '2' and ocbZoneYn == 'Y'">
+                and disp_ctgr_no in ( select disp_ctgr_no
+                from dp_disp_ctgr_seller_auth
+                where mem_no = #{ocbZoneAppvMemNo}
+                )
+            </if>
+        </if>
+        ) b
+        <if test="start > 0 and limit > 0">
+        <![CDATA[
+			WHERE #{start} <= b.num AND rownum <= #{limit}
+		]]>
+        </if>
+        /* categoryMapper.getServiceDisplayCategoryLeafList */
+    </select>
+
+    <select id="getPrdInfoTypeCategoryList" resultType="InfoTypeCategoryVO">
+      SELECT /*product.getPrdInfoTypeCategoryList*/ disp_ctgr_no AS DISPCTGRNO, disp_ctgr_nm AS DISPCTGRNM
+      FROM dp_disp_ctgr
+      WHERE disp_ctgr_kind_cd = '07'
+      AND HGRNK_CTGR_NO  = 891010
+      AND use_yn = 'Y'
+      ORDER BY disp_prrt_rnk
+    </select>
+
+    <select id="getDpDispCtgrListInfo" parameterType="long" resultType="CategoryVO">
+        SELECT DISP_CTGR1_NO AS rootCtgrNo, DISP_CTGR2_NO mCtgrNo, DISP_CTGR3_NO AS sCtgrNo, DISP_CTGR4_NO AS lCtgrNo, DISP_CTGR_NO AS dispCtgrNo
+        FROM DP_DISP_CTGR_LIST
+        WHERE DISP_CTGR_NO = #{dispCtgrNo}
+        /* categoryMapper.getDpDispCtgrListInfo */
+    </select>
+
+    <select id="getCategorySearchForDispCtgrNm" parameterType="String" resultType="CategoryVO">
+      <![CDATA[
+      select /*+ index(a ix7_dp_disp_ctgr_list)*/ disp_ctgr_no,
+      trim(decode(disp_ctgr1_nm, null, '', disp_ctgr1_nm)||decode(disp_ctgr2_nm, null, '', '>'||disp_ctgr2_nm)||decode(disp_ctgr3_nm, null, '', '>'||disp_ctgr3_nm)||decode(disp_ctgr4_nm, null, '', '>'||disp_ctgr4_nm))
+      as dispCtgrPath,
+      trim(decode(disp_ctgr1_no, null, '', disp_ctgr1_no)||decode(disp_ctgr2_no, null, '', '>'||disp_ctgr2_no)||decode(disp_ctgr3_no, null, '', '>'||disp_ctgr3_no)||decode(disp_ctgr4_no, null, '', '>'||disp_ctgr4_no))
+      as ctgrNoPath,
+      leaf_yn
+      from dp_disp_ctgr_list a
+      where UPPER(disp_ctgr_nm) like '%'||#{dispCtgrNm}||'%'
+      and DISP_CTGR_KIND_CD = '01'
+      and DISP_CTGR_STAT_CD = '03'
+      order by leaf_yn desc
+      ]]>
+    </select>
+
+    <!-- 공정위 상품정보제공고시 카테고리 여부 조회  -->
+    <select id="isPrdInfoTypeCategory" resultType="string" parameterType="long">
+        SELECT DECODE(COUNT(1), 0, 'false', 'true') isExist
+        FROM dp_disp_ctgr
+        WHERE disp_ctgr_kind_cd = '07'
+        AND HGRNK_CTGR_NO  <![CDATA[ <> ]]> 0
+        AND use_yn = 'Y'
+        AND disp_ctgr_no = #{infoTypeCtgrNo}
+    </select>
+</mapper>

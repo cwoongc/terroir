@@ -1,0 +1,376 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.wms.mapper.WmsMapper">
+    <update id="updateEmployeeNo" parameterType="PdPrdWmsInfo">
+        UPDATE PD_PRD_WMS_INFO SET /* WmsMapper.xml : updateEmployeeNo : 담당MD 개별 수정  */
+        EMP_NO = #{empNo},
+        UPDATE_NO = #{updateNo},
+        UPDATE_DT = sysdate
+        WHERE
+        PRD_NO = #{prdNo}
+    </update>
+
+    <update id="insertPdPrdWmsInfoHist" parameterType="PdPrdWmsInfo">
+        INSERT INTO PD_PRD_WMS_INFO_HIST/* WmsMapper.xml : insertPdPrdWmsInfoHist*/(PRD_NO
+        ,HIST_APL_DT
+        ,SSNL_PRD_YN
+        ,FRIG_TYP_CD
+        ,INCM_ALLW_TRM_RT
+        ,EXPR_TRM_CHK_YN
+        ,EXPR_TRM_CLF_CD
+        ,EXPR_TRM_UNT
+        ,EXPR_TRM_VAL
+        ,RTN_TW_YN
+        ,SEL_UNT
+        ,EMP_NO
+        ,CREATE_NO
+        ,CREATE_DT
+        ,UPDATE_NO
+        ,UPDATE_DT
+        ,WMS_PRD_NM
+        ,REP_PTNR_MEM_NO
+        ,ONE_PACK_YN
+        ,WHIN_SFLIFE_RESID_DCNT
+        ,WHOUT_SFLIFE_RESID_DCNT
+        ,SFLIFE_WARN_DCNT
+        ,SEASON_CLF_CD
+        ,STCK_ATTR_REG_YN
+        ,DST_PRD_CLF_CD)
+        SELECT
+        PRD_NO
+        ,SYSDATE AS HIST_APL_DT
+        ,SSNL_PRD_YN
+        ,FRIG_TYP_CD
+        ,INCM_ALLW_TRM_RT
+        ,EXPR_TRM_CHK_YN
+        ,EXPR_TRM_CLF_CD
+        ,EXPR_TRM_UNT
+        ,EXPR_TRM_VAL
+        ,RTN_TW_YN
+        ,SEL_UNT
+        ,EMP_NO
+        ,CREATE_NO
+        ,CREATE_DT
+        ,UPDATE_NO
+        ,UPDATE_DT
+        ,WMS_PRD_NM
+        ,REP_PTNR_MEM_NO
+        ,ONE_PACK_YN
+        ,WHIN_SFLIFE_RESID_DCNT
+        ,WHOUT_SFLIFE_RESID_DCNT
+        ,SFLIFE_WARN_DCNT
+        ,SEASON_CLF_CD
+        ,STCK_ATTR_REG_YN
+        ,DST_PRD_CLF_CD
+        FROM    PD_PRD_WMS_INFO
+        WHERE   PRD_NO = #{prdNo}
+    </update>
+
+    <update id="insertBasisStockAttribute" parameterType="PdPrdWmsInfo">
+        INSERT /* wmsMapper.xml : insertBasisStockAttribute */ INTO PD_PRD_WMS_INFO
+        (PRD_NO,
+        EMP_NO,
+        REP_PTNR_MEM_NO,
+        CREATE_NO,
+        CREATE_DT,
+        UPDATE_NO,
+        UPDATE_DT
+        ) VALUES (
+        #{prdNo},
+        #{empNo},
+        #{repPtnrMemNo},
+        #{createNo},
+        SYSDATE,
+        #{updateNo},
+        SYSDATE
+        )
+    </update>
+
+    <select id="getMdList" resultType="EmpVO" parameterType="EmpVO">
+        SELECT *
+        FROM (SELECT COUNT(*) OVER() AS totalCount
+        ,A.DISP_CTGR1_NM
+        ,A.EMP_NM
+        ,A.EMP_NO
+        ,A.E_MAIL
+        ,A.GNRL_TLPHN_NO
+        ,ROWNUM AS RN
+        FROM (
+        SELECT /*+ LEADING(Y X) USE_HASH(X) */
+        Y.DISP_CTGR1_NM
+        ,1 ORDER_TYPE
+        ,X.EMP_NM
+        ,X.EMP_NO
+        ,X.E_MAIL
+        ,X.GNRL_TLPHN_NO
+        FROM SY_EMP X,
+        (SELECT  B.DEPT_CD,A.DISP_CTGR1_NM
+        FROM DP_DISP_CTGR_LIST A,
+        (SELECT DEPT_CD,DISP_CTGR_NO
+        FROM   SY_DEPT_CTGR
+        WHERE  SYSDATE BETWEEN BGN_DT AND END_DT
+        <if test="searchText3 != null and searchText3 != ''">
+            AND    DEPT_CD IN (
+            SELECT CD_VAL2
+            FROM SY_CO_DETAIL
+            WHERE GRP_CD = 'PD170'
+            AND CD_VAL1 = '03'
+            AND USE_YN = 'Y'
+            )
+        </if>
+        AND    USE_YN = 'Y'
+        UNION
+        SELECT CD_VAL1,TO_NUMBER(CD_VAL2) FROM SY_CO_DETAIL
+        WHERE GRP_CD = 'PD108'
+        AND USE_YN ='Y'
+        AND CD_VAL1 IS NOT NULL
+        AND CD_VAL2 IS NOT NULL
+        ) B
+        WHERE  A.DISP_CTGR_NO = B.DISP_CTGR_NO
+        AND    A.DISP_CTGR_KIND_CD = '01'
+        AND    A.DISP_CTGR_LEVEL = 2
+        AND    DEPT_CD in((select DEPT_CD
+        from   sy_dept
+        where  DEPT_CD = b.DEPT_CD
+        or     HGRNK_DEPT_CD = b.DEPT_CD))
+        <if test="searchText1 != null and searchText1 != ''">
+            AND    A.DISP_CTGR1_NO = #{searchText1}
+        </if>
+        group by  B.DEPT_CD,   A.DISP_CTGR1_NM
+        ) Y
+        WHERE X.DEPT_CD = Y.DEPT_CD
+        AND RETIRE_CLF = 'N'
+        AND X.AUTHR_GRP_CD NOT IN ('1050', '4024') /*그룹권한이 권한없으로 되어있음 조회제외*/
+        AND X.EMP_STAT_CD = '1'
+        <if test="searchText2 != null and searchText2 != ''">
+            AND INSTR(X.EMP_NM, #{searchText2} ) <![CDATA[ > ]]> 0
+        </if>
+        <if test="searchType != null and searchType != ''">
+            <if test="searchType == 'SHOCKDEAL'">
+                UNION ALL
+                /*쇼킹딜일경우 Creative MD팀 추가*/
+                SELECT '쇼킹딜' DISP_CTGR1_NM,2 ORDER_TYPE
+                ,EMP_NM,EMP_NO,E_MAIL,GNRL_TLPHN_NO
+                FROM SY_EMP
+                WHERE DEPT_CD  IN (
+                SELECT CD_VAL2
+                FROM SY_CO_DETAIL
+                WHERE GRP_CD = 'PD170'
+                AND CD_VAL1 = '01'
+                AND USE_YN = 'Y'
+                )
+                AND RETIRE_CLF = 'N'
+                AND EMP_STAT_CD = '1'
+                <if test="searchText2 != null and searchText2 != ''">
+                    AND INSTR(EMP_NM, #{searchText2} ) <![CDATA[ > ]]> 0
+                </if>
+
+                <if test="searchText2 != null and searchText2 != ''">
+                    UNION ALL
+                    /*쇼킹딜일경우 BRAND제휴팀(이름검색시) 추가*/
+                    SELECT '쇼킹딜' DISP_CTGR1_NM,3 ORDER_TYPE
+                    ,EMP_NM,EMP_NO,E_MAIL,GNRL_TLPHN_NO
+                    FROM SY_EMP
+                    WHERE DEPT_CD IN (
+                    SELECT CD_VAL2
+                    FROM SY_CO_DETAIL
+                    WHERE GRP_CD = 'PD170'
+                    AND CD_VAL1 = '02'
+                    AND USE_YN = 'Y'
+                    )
+                    AND RETIRE_CLF = 'N'
+                    AND EMP_STAT_CD = '1'
+                    AND INSTR(EMP_NM, #{searchText2} ) <![CDATA[ > ]]> 0
+                </if>
+
+                <if test="searchText3 == 'USED_DEPT'">
+                    UNION ALL
+                    /*쇼킹딜일경우 중고 추가*/
+                    SELECT '중고' DISP_CTGR1_NM,4 ORDER_TYPE
+                    ,EMP_NM,EMP_NO,E_MAIL,GNRL_TLPHN_NO
+                    FROM SY_EMP
+                    WHERE DEPT_CD IN (
+                    SELECT CD_VAL2
+                    FROM SY_CO_DETAIL
+                    WHERE GRP_CD = 'PD170'
+                    AND CD_VAL1 = '03'
+                    AND USE_YN = 'Y'
+                    )
+                    AND RETIRE_CLF = 'N'
+                    AND EMP_STAT_CD = '1'
+                    <if test="searchText2 != null and searchText2 != ''">
+                        AND INSTR(EMP_NM, #{searchText2} ) <![CDATA[ > ]]> 0
+                    </if>
+                </if>
+
+                ORDER BY ORDER_TYPE, DISP_CTGR1_NM, EMP_NM ASC
+
+            </if>
+            <if test="searchType != 'SHOCKDEAL'">
+                ORDER BY EMP_NM ASC
+            </if>
+        </if>
+        ) A
+        )
+        WHERE RN <![CDATA[ >= ]]> #{start} AND RN <![CDATA[ < ]]> #{start} + #{limit}
+        /* wmsMapper.getMdList */
+    </select>
+
+    <select id="getSellerWmWghtDlvCst" parameterType="WmWghtDlvCstVO" resultType="WmWghtDlvCstVO">
+        SELECT
+        T1.SELLER_NO
+        ,TO_CHAR(T1.BGN_DT,'YYYY/MM/DD') AS BGN_DT
+        ,TO_CHAR(T1.END_DT,'YYYY/MM/DD') AS END_DT
+        ,T1.BGN_WGHT
+        ,T1.END_WGHT
+        ,T1.DLV_CST
+        ,T1.CREATE_NO
+        ,T1.CREATE_DT
+        ,T1.UPDATE_NO
+        ,T1.UPDATE_DT
+        ,T1.CSTM_UND_DLV_CST
+        ,T1.CSTM_OVR_DLV_CST
+        FROM WM_WGHT_DLV_CST T1
+        WHERE T1.SELLER_NO = #{selMnbdNo}
+        <if test="bgnDt != null and bgnDt != ''">
+            AND TO_DATE(#{bgnDt},'YYYYMMDD') BETWEEN BGN_DT AND END_DT
+        </if>
+        <if test="bgnWght != '0.0'">
+            AND #{bgnWght} BETWEEN BGN_WGHT AND END_WGHT
+            AND ROWNUM &lt;= 1
+        </if>
+        ORDER BY T1.BGN_DT ASC, T1.BGN_WGHT ASC
+        /* wmsMapper.getSellerWmWghtDlvCst */
+    </select>
+
+    <!-- 셀러 물류보험료 계약조건 설정목록 조회 -->
+    <select id="getSellerWmInsrCst" parameterType="WmInsrCstVO" resultType="WmInsrCstVO">
+        SELECT
+        /*+ index(t1 IX1_WM_INSR_CST) */
+        T1.SELLER_NO
+        ,TO_CHAR(T1.BGN_DT,'YYYY/MM/DD') AS BGN_DT
+        ,TO_CHAR(T1.END_DT,'YYYY/MM/DD') AS END_DT
+        ,T1.BGN_PRD_PRC
+        ,T1.END_PRD_PRC
+        ,T1.INSR_CST
+        ,T1.CREATE_NO
+        ,T1.CREATE_DT
+        ,T1.UPDATE_NO
+        ,T1.UPDATE_DT
+        FROM WM_INSR_CST T1
+        WHERE T1.SELLER_NO = #{selMnbdNo}
+        <if test="bgnDt != null and bgnDt != ''">
+            AND TO_DATE(#{bgnDt},'YYYYMMDD') BETWEEN BGN_DT AND END_DT
+        </if>
+        <if test="bgnPrdPrc != '0'">
+            AND #{bgnPrdPrc} BETWEEN BGN_PRD_PRC AND END_PRD_PRC
+            AND ROWNUM &lt;= 1
+        </if>
+        ORDER BY T1.BGN_DT ASC, T1.BGN_PRD_PRC ASC
+        /* wmsMapper.getSellerWmInsrCst */
+    </select>
+
+    <!-- 관세 계산 조건 조회 -->
+    <select id="getWmCustomsCondition" parameterType="WmCustomsResultVO" resultType="WmCustomsResultVO">
+        SELECT
+        T1.HS_CODE
+        ,TO_CHAR(T1.BGN_DT,'YYYY/MM/DD') AS BGN_DT
+        ,TO_CHAR(T1.END_DT,'YYYY/MM/DD') AS END_DT
+        ,T1.BGN_PRC
+        ,T1.END_PRC
+        ,T1.WMS_CD
+        ,T1.TVAR
+        ,T1.CSTR
+        ,T1.ICTR
+        ,T1.RSTR
+        ,T1.EDTR
+        ,T1.VATR
+        ,T1.CSC_APL_YN
+        ,T1.CREATE_NO
+        ,T1.CREATE_DT
+        ,T1.UPDATE_NO
+        ,T1.UPDATE_DT
+        ,T1.DELIVERY_CD
+        ,T1.IMPORT_CHARGE
+        ,T1.REMARK
+        , trunc(((#{prdDscPrc} * decode(nvl(#{cstmCalc}, '02'), '01', 100, T1.TVAR) / 100) + #{dlvCst} + #{insrCst}), 0) AS TAXABLE_VALUE
+        FROM WM_CUSTOMS T1
+        WHERE T1.HS_CODE = #{hsCode}
+        AND TO_DATE(#{applyDt},'YYYYMMDD') BETWEEN BGN_DT AND END_DT
+        AND trunc(((#{prdDscPrc} * decode(nvl(#{cstmCalc}, '02'), '01', 100, T1.TVAR) / 100) + #{dlvCst} + #{insrCst}), 0) BETWEEN BGN_PRC AND END_PRC
+        AND T1.DELIVERY_CD = #{deliveryCd}
+        AND ROWNUM &lt;= 1
+        ORDER BY T1.HS_CODE, T1.BGN_DT ASC, T1.BGN_PRC ASC
+        /* wmsMapper.getWmCustomsCondition */
+    </select>
+
+    <!-- 물류 수수료 목록 조회 -->
+    <select id="getWmCharge" parameterType="WmChrgVO" resultType="WmChrgVO">
+        SELECT
+        T1.SELLER_NO
+        ,TO_CHAR(T1.BGN_DT,'YYYY/MM/DD') AS BGN_DT
+        ,TO_CHAR(T1.END_DT,'YYYY/MM/DD') AS END_DT
+        ,T1.HCR
+        ,T1.CSC
+        ,T1.CREATE_NO
+        ,T1.CREATE_DT
+        ,T1.UPDATE_NO
+        ,T1.UPDATE_DT
+        ,T1.CSC_ST   <!-- 통관수수료 기준금액 -->
+        ,T1.CST_ST   <!-- 관부과세 기준금액 -->
+        ,T1.WMS_ADD_DLV_CST
+        FROM WM_CHRG T1
+        WHERE T1.SELLER_NO = #{selMnbdNo}
+        <if test="bgnDt != null and bgnDt != ''">
+            AND TO_DATE(#{bgnDt},'YYYYMMDD') BETWEEN BGN_DT AND END_DT
+            AND ROWNUM &lt;= 1
+        </if>
+        ORDER BY T1.SELLER_NO, T1.BGN_DT ASC
+        /* wmsMapper.getWmCharge */
+    </select>
+
+    <!-- 물류기준 상세 정보 -->
+    <select id="getBasisStockAttribute" resultType="BasisStockVO" parameterType="long">
+        SELECT
+        W.PRD_NO as prdNo
+        , W.STCK_ATTR_REG_YN as stckAttrRegYn
+        , nvl(W.EMP_NO,0) as empNo
+        , E.EMP_NM as empNm
+        FROM
+        PD_PRD_WMS_INFO W,
+        SY_EMP E
+        WHERE
+        W.PRD_NO = #{prdNo}
+        AND
+        E.EMP_NO(+) = W.EMP_NO
+        /* wmsMapper.getBasisStockAttribute */
+    </select>
+
+
+    <select id="getHScodeDeliveryCd" resultType="int" parameterType="WmCustomsVO">
+        SELECT /* wmCustomsDAOMap.xml [ID : getHScodeDeliveryCd] */ COUNT(*)  cnt
+        FROM   (
+        SELECT *
+        FROM   WM_CUSTOMS T1
+        WHERE  trunc(SYSDATE) BETWEEN BGN_DT AND END_DT
+        <if test="hsCode != ''">
+            AND    HS_CODE = #{hsCode}
+        </if>
+        <if test="hsCode == ''">
+            AND    1 = 2
+        </if>
+        <if test="deliveryCd != ''">
+            <if test="deliveryCd == 'EU'">
+                and T1.DELIVERY_CD in ('NE', 'EU')
+            </if>
+            <if test="deliveryCd != 'EU'">
+                and T1.DELIVERY_CD = #{deliveryCd}
+            </if>
+        </if>
+        <if test="deliveryCd == ''">
+            AND    1 = 3
+        </if>
+        )
+    </select>
+</mapper>

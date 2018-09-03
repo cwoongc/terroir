@@ -1,0 +1,420 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.benefit.mapper.BenefitMapper">
+
+    <!-- 사은품 -->
+    <select id="getProductGift" parameterType="long" resultType="ProductGiftVO" >
+        SELECT /* productBenefitMapper.getProductGift */
+        GIFT_NO
+        ,PRD_NO
+        ,GIFT_NM
+        ,TO_CHAR(APL_BGN_DT,'YYYYMMDD') as aplBgnDt
+        ,TO_CHAR(APL_END_DT,'YYYYMMDD') as aplEndDt
+        ,IMG_URL_PATH
+        ,IMG_NM
+        ,GIFT_INFO
+        FROM PD_PRD_GIFT
+        WHERE PRD_NO = #{prdNo}
+    </select>
+
+    <select id="getProductGiftImage" parameterType="long" resultType="PdPrdGift">
+        SELECT /* productBenefitMapper.getProductGiftImage */
+        IMG_URL_PATH
+        ,IMG_NM
+        FROM PD_PRD_GIFT
+        WHERE PRD_NO = #{prdNo}
+    </select>
+
+    <update id="insertProductGift" parameterType="PdPrdGift">
+        INSERT INTO /* productBenefitMapper.insertProductGift */
+        PD_PRD_GIFT(GIFT_NO,PRD_NO,GIFT_NM,APL_BGN_DT,APL_END_DT,IMG_URL_PATH,IMG_NM,GIFT_INFO,CREATE_DT,CREATE_NO,UPDATE_DT,UPDATE_NO)
+        SELECT SEQ_PD_PRD_GIFT.NEXTVAL GIFT_NO
+            ,#{prdNo} PRD_NO
+            ,#{giftNm} GIFT_NM
+            ,CASE WHEN SYSDATE <![CDATA[<]]> TO_DATE(#{aplBgnDt}||'000000','YYYYMMDDHH24MISS') THEN TO_DATE(#{aplBgnDt}||'000000','YYYYMMDDHH24MISS') ELSE SYSDATE END APL_BGN_DT
+            ,CASE WHEN SYSDATE <![CDATA[<]]> TO_DATE(#{aplEndDt}||'235959','YYYYMMDDHH24MISS') AND TO_DATE(#{aplBgnDt}||'000000','YYYYMMDDHH24MISS') <![CDATA[<]]> TO_DATE(#{aplEndDt}||'235959','YYYYMMDDHH24MISS') THEN TO_DATE(#{aplEndDt}||'235959','YYYYMMDDHH24MISS')
+            ELSE CASE WHEN SYSDATE <![CDATA[<]]> TO_DATE(#{aplBgnDt}||'000000','YYYYMMDDHH24MISS') THEN TO_DATE(#{aplBgnDt}||'000000','YYYYMMDDHH24MISS') ELSE SYSDATE END
+            END APL_END_DT
+            ,#{imgUrlPath} IMG_URL_PATH
+            ,#{imgNm} IMG_NM
+            ,#{giftInfo} GIFT_INFO
+            ,SYSDATE CREATE_DT
+            ,#{createNo} CREATE_NO
+            ,SYSDATE UPDATE_DT
+            ,#{updateNo} UPDATE_NO
+        FROM DUAL
+    </update>
+
+    <update id="insertProductGiftHist" parameterType="long">
+        INSERT INTO /* productBenefitMapper.insertProductGiftHist */
+        PD_PRD_GIFT_HIST(GIFT_NO,PRD_NO,GIFT_NM,HIST_APL_BGN_DT,HIST_APL_END_DT,APL_BGN_DT,APL_END_DT,IMG_URL_PATH,IMG_NM,GIFT_INFO,CREATE_DT,CREATE_NO,UPDATE_DT,UPDATE_NO)
+        SELECT GIFT_NO
+            ,PRD_NO
+            ,SUBSTRB(GIFT_NM,0,500) GIFT_NM
+            ,APL_BGN_DT HIST_APL_BGN_DT
+            ,APL_END_DT HIST_APL_END_DT
+            ,APL_BGN_DT
+            ,APL_END_DT
+            ,IMG_URL_PATH
+            ,IMG_NM
+            ,SUBSTRB(GIFT_INFO,0,2000) GIFT_INFO
+            ,CREATE_DT
+            ,CREATE_NO
+            ,UPDATE_DT
+            ,UPDATE_NO
+        FROM PD_PRD_GIFT
+        WHERE PRD_NO = #{prdNo}
+    </update>
+
+    <update id="updateProductGiftHist" parameterType="PdPrdGift">
+        UPDATE /* productBenefitMapper.updateProductGiftHist */
+        PD_PRD_GIFT_HIST
+        SET
+        APL_BGN_DT = (SELECT CASE WHEN SYSDATE <![CDATA[>=]]> HIST_APL_BGN_DT THEN HIST_APL_BGN_DT ELSE NULL END FROM DUAL)
+        , APL_END_DT = (
+        SELECT CASE WHEN SYSDATE <![CDATA[>=]]> HIST_APL_END_DT THEN HIST_APL_END_DT
+        WHEN SYSDATE <![CDATA[>=]]> HIST_APL_BGN_DT AND SYSDATE <![CDATA[<]]> HIST_APL_END_DT THEN SYSDATE
+        ELSE NULL END FROM DUAL)
+        , UPDATE_DT = SYSDATE
+        , UPDATE_NO = #{updateNo}
+        WHERE PRD_NO = #{prdNo}
+        AND GIFT_NO = (SELECT GIFT_NO FROM PD_PRD_GIFT WHERE PRD_NO = #{prdNo})
+    </update>
+
+    <delete id="deleteProductGift" parameterType="long">
+        DELETE /* productBenefitMapper.deleteProductGift */
+        FROM PD_PRD_GIFT WHERE PRD_NO = #{prdNo}
+    </delete>
+
+    <select id="getCurrentCustomerBenefitInfo" parameterType="CustomerBenefitVO" resultType="CustomerBenefitVO">
+        SELECT
+                CUST_BNFT_NO                            AS custBnftNo
+              , PRD_NO                                  AS prdNo
+              , EVNT_NO                                 AS eventNo
+              , TO_CHAR(APL_BGN_DY,'RRRRMMDDHH24MISS')  AS aplBgnDy
+              , TO_CHAR(APL_END_DY,'RRRRMMDDHH24MISS')  AS aplEndDy
+        FROM    PD_CUST_BNFT_INFO
+        WHERE	PRD_NO = #{prdNo}
+      <choose>
+        <when test="evntNo > 0">
+        AND     evnt_no=#{evntNo}
+        </when>
+        <otherwise>
+        AND     (evnt_no = 0 or evnt_no is null)
+        </otherwise>
+      </choose>
+        AND     USE_YN='Y'
+    </select>
+
+    <select id="getSeqPdCustBnftInfoNEXTVAL" resultType="long">
+		SELECT SEQ_PD_CUST_BNFT_INFO.nextVal from dual
+    </select>
+
+    <insert id="insertPdCustBnftInfo" parameterType="PdCustBnftInfo">
+        INSERT INTO PD_CUST_BNFT_INFO
+        (
+                CUST_BNFT_NO
+              , PRD_NO
+              , EVNT_NO
+              , APL_BGN_DY
+              , APL_END_DY
+              , MALL_PNT_RT
+              , MALL_PNT
+              , SPPL_CHP_QTY
+              , CHP_SPPL_MTHD_CD
+              , DLV_CST_FR_YN
+              , CUST_BNFT_LTTR_YN
+              , CREATE_DT
+              , CREATE_NO
+              , UPDATE_DT
+              , UPDATE_NO
+              , PNT_SPPL_LMT_QTY
+              , PNT_SPPL_QTY
+              , CHP_SPPL_LMT_QTY
+              , CHP_SPPL_QTY
+              , INTFREE_MON_CLF_CD
+              , INTFREE_APL_LMT_QTY
+              , INTFREE_APL_QTY
+              , DBL_PNT_SPPL_YN
+              , SPPL_WY_CD
+              , USE_YN
+              , OCB_PNT
+              , OCB_PNT_RT
+              , OCB_SPPL_LMT_QTY
+              , OCB_SPPL_QTY
+              , OCB_WY_CD
+              , MILEAGE_PNT
+              , MILEAGE_PNT_RT
+              , MILEAGE_SPPL_LMT_QTY
+              , MILEAGE_SPPL_QTY
+              , MILEAGE_WY_CD
+              , HOPE_SHP_PNT_RT
+              , HOPE_SHP_PNT
+              , HOPE_SHP_SPPL_LMT_QTY
+              , HOPE_SHP_SPPL_QTY
+              , HOPE_SHP_WY_CD
+              , PNT_DFRM_MNBD_CLF_CD
+              , BNFT_SEL_MNBD_NO
+        )
+        VALUES (
+                #{custBnftNo}
+              , #{prdNo}
+              , #{evntNo}
+              , TO_DATE(#{aplBgnDy},'YYYYMMDDHH24MISS')
+              , TO_DATE(#{aplEndDy},'YYYYMMDDHH24MISS')
+              , #{mallPntRt}
+              , #{mallPnt}
+              , #{spplChpQty}
+              , #{chpSpplMthdCd}
+              , #{dlvCstFrYn}
+              , #{custBnftLttrYn}
+              , SYSDATE
+              , #{createNo}
+              , SYSDATE
+              , #{updateNo}
+              , #{pntSpplLmtQty}
+              , #{pntSpplQty}
+              , #{chpSpplLmtQty}
+              , #{chpSpplQty}
+              , #{intfreeMonClfCd}
+              , #{intfreeAplLmtQty}
+              , #{intfreeAplQty}
+              , #{dblPntSpplYn}
+              , #{spplWyCd}
+              , #{useYn}
+              , #{ocbPnt}
+              , #{ocbPntRt}
+              , #{ocbSpplLmtQty}
+              , #{ocbSpplQty}
+              , #{ocbWyCd}
+              , #{mileagePnt}
+              , #{mileagePntRt}
+              , #{mileageSpplLmtQty}
+              , #{mileageSpplQty}
+              , #{mileageWyCd}
+              , #{hopeShpPntRt}
+              , #{hopeShpPnt}
+              , #{hopeShpSpplLmtQty}
+              , #{hopeShpSpplQty}
+              , #{hopeShpWyCd}
+              , #{pntDfrmMnbdClfCd}
+              , #{bnftSelMnbdNo}
+        )
+    </insert>
+
+    <update id="updatePdCustBnftInfo" parameterType="PdCustBnftInfo">
+        UPDATE PD_CUST_BNFT_INFO
+        SET
+                PRD_NO                  = #{prdNo}
+              , EVNT_NO                 = #{evntNo}
+              , APL_BGN_DY              = TO_DATE(#{aplBgnDy},'YYYYMMDDHH24MISS')
+              , APL_END_DY              = TO_DATE(#{aplEndDy},'YYYYMMDDHH24MISS')
+              , MALL_PNT_RT             = #{mallPntRt}
+              , MALL_PNT                = #{mallPnt}
+              , SPPL_CHP_QTY            = #{spplChpQty}
+              , CHP_SPPL_MTHD_CD        = #{chpSpplMthdCd}
+              , DLV_CST_FR_YN           = #{dlvCstFrYn}
+              , CUST_BNFT_LTTR_YN       = #{custBnftLttrYn}
+              , UPDATE_DT               = SYSDATE
+              , UPDATE_NO               = #{updateNo}
+              , PNT_SPPL_LMT_QTY        = #{pntSpplLmtQty}
+              , PNT_SPPL_QTY            = #{pntSpplQty}
+              , CHP_SPPL_LMT_QTY        = #{chpSpplLmtQty}
+              , CHP_SPPL_QTY            = #{chpSpplQty}
+              , INTFREE_MON_CLF_CD      = #{intfreeMonClfCd}
+              , INTFREE_APL_LMT_QTY     = #{intfreeAplLmtQty}
+              , INTFREE_APL_QTY         = #{intfreeAplQty}
+              , DBL_PNT_SPPL_YN         = #{dblPntSpplYn}
+              , SPPL_WY_CD              = #{spplWyCd}
+              , USE_YN                  = #{useYn}
+              , OCB_PNT                 = #{ocbPnt}
+              , OCB_PNT_RT              = #{ocbPntRt}
+              , OCB_SPPL_LMT_QTY        = #{ocbSpplLmtQty}
+              , OCB_SPPL_QTY            = #{ocbSpplQty}
+              , OCB_WY_CD               = #{ocbWyCd}
+              , MILEAGE_PNT             = #{mileagePnt}
+              , MILEAGE_PNT_RT          = #{mileagePntRt}
+              , MILEAGE_SPPL_LMT_QTY    = #{mileageSpplLmtQty}
+              , MILEAGE_SPPL_QTY        = #{mileageSpplQty}
+              , MILEAGE_WY_CD           = #{mileageWyCd}
+              , HOPE_SHP_PNT_RT         = #{hopeShpPntRt}
+              , HOPE_SHP_PNT            = #{hopeShpPnt}
+              , HOPE_SHP_SPPL_LMT_QTY   = #{hopeShpSpplLmtQty}
+              , HOPE_SHP_SPPL_QTY       = #{hopeShpSpplQty}
+              , HOPE_SHP_WY_CD          = #{hopeShpWyCd}
+              , PNT_DFRM_MNBD_CLF_CD    = #{pntDfrmMnbdClfCd}
+              , BNFT_SEL_MNBD_NO        = #{bnftSelMnbdNo}
+        WHERE   1=1
+        AND     CUST_BNFT_NO = #{custBnftNo}
+    </update>
+
+    <update id="insertPdCustBnftInfoHist" parameterType="PdCustBnftInfo">
+        INSERT INTO PD_CUST_BNFT_INFO_HIST
+        (
+                CUST_BNFT_NO
+              , HIST_APL_BGN_DT
+              , PRD_NO
+              , EVNT_NO
+              , APL_BGN_DY
+              , APL_END_DY
+              , MALL_PNT_RT
+              , MALL_PNT
+              , PNT_SPPL_LMT_QTY
+              , PNT_SPPL_QTY
+              , SPPL_CHP_QTY
+              , CHP_SPPL_MTHD_CD
+              , CHP_SPPL_LMT_QTY
+              , CHP_SPPL_QTY
+              , INTFREE_MON_CLF_CD
+              , INTFREE_APL_LMT_QTY
+              , INTFREE_APL_QTY
+              , DLV_CST_FR_YN
+              , DBL_PNT_SPPL_YN
+              , CUST_BNFT_LTTR_YN
+              , CREATE_DT
+              , CREATE_NO
+              , UPDATE_DT
+              , UPDATE_NO
+              , SPPL_WY_CD
+              , OCB_PNT
+              , OCB_PNT_RT
+              , OCB_SPPL_LMT_QTY
+              , OCB_SPPL_QTY
+              , OCB_WY_CD
+              , MILEAGE_PNT
+              , MILEAGE_PNT_RT
+              , MILEAGE_SPPL_LMT_QTY
+              , MILEAGE_SPPL_QTY
+              , MILEAGE_WY_CD
+              , HOPE_SHP_PNT_RT
+              , HOPE_SHP_PNT
+              , HOPE_SHP_SPPL_LMT_QTY
+              , HOPE_SHP_SPPL_QTY
+              , HOPE_SHP_WY_CD
+              , PNT_DFRM_MNBD_CLF_CD
+        )
+        SELECT
+                CUST_BNFT_NO
+              , SYSDATE
+              , PRD_NO
+              , EVNT_NO
+              , APL_BGN_DY
+              , APL_END_DY
+              , MALL_PNT_RT
+              , MALL_PNT
+              , PNT_SPPL_LMT_QTY
+              , PNT_SPPL_QTY
+              , SPPL_CHP_QTY
+              , CHP_SPPL_MTHD_CD
+              , CHP_SPPL_LMT_QTY
+              , CHP_SPPL_QTY
+              , INTFREE_MON_CLF_CD
+              , INTFREE_APL_LMT_QTY
+              , INTFREE_APL_QTY
+              , DLV_CST_FR_YN
+              , CUST_BNFT_LTTR_YN
+              , DBL_PNT_SPPL_YN
+              , CREATE_DT
+              , CREATE_NO
+              , UPDATE_DT
+              , UPDATE_NO
+              , SPPL_WY_CD
+              , OCB_PNT
+              , OCB_PNT_RT
+              , OCB_SPPL_LMT_QTY
+              , OCB_SPPL_QTY
+              , OCB_WY_CD
+              , MILEAGE_PNT
+              , MILEAGE_PNT_RT
+              , MILEAGE_SPPL_LMT_QTY
+              , MILEAGE_SPPL_QTY
+              , MILEAGE_WY_CD
+              , HOPE_SHP_PNT_RT
+              , HOPE_SHP_PNT
+              , HOPE_SHP_SPPL_LMT_QTY
+              , HOPE_SHP_SPPL_QTY
+              , HOPE_SHP_WY_CD
+              , PNT_DFRM_MNBD_CLF_CD
+        FROM PD_CUST_BNFT_INFO
+        WHERE CUST_BNFT_NO = #{custBnftNo}
+    </update>
+
+    <delete id="deletePdCustBnftInfo" parameterType="PdCustBnftInfo">
+        DELETE FROM pd_cust_bnft_info
+        WHERE PRD_NO = #{prdNo}
+        AND EVNT_NO = #{evntNo}
+    </delete>
+
+    <select id="getCustomerBenefit" resultType="CustomerBenefitVO" parameterType="long">
+        SELECT
+        cust_bnft_no,
+        prd_no,
+        nvl(evnt_no,0) evnt_no,
+        to_char(apl_bgn_dy,'rrrrmmddhh24miss') apl_bgn_dy,
+        to_char(apl_end_dy,'rrrrmmddhh24miss') apl_end_dy,
+        mall_pnt_rt,
+        mall_pnt,
+        sppl_chp_qty,
+        chp_sppl_mthd_cd,
+        dlv_cst_fr_yn,
+        cust_bnft_lttr_yn,
+        to_char(create_dt,'rrrrmmddhh24miss') create_dt,
+        create_no,
+        to_char(update_dt,'rrrrmmddhh24miss') update_dt,
+        update_no,
+        pnt_sppl_lmt_qty,
+        pnt_sppl_qty,
+        chp_sppl_lmt_qty,
+        chp_sppl_qty,
+        intfree_mon_clf_cd,
+        intfree_apl_lmt_qty,
+        intfree_apl_qty,
+        dbl_pnt_sppl_yn,
+        sppl_wy_cd,
+        ocb_pnt,
+        ocb_pnt_rt,
+        ocb_sppl_lmt_qty,
+        ocb_sppl_qty,
+        ocb_wy_cd,
+        mileage_pnt,
+        mileage_pnt_rt,
+        mileage_sppl_lmt_qty,
+        mileage_sppl_qty,
+        mileage_wy_cd,
+        hope_shp_pnt_rt,
+        hope_shp_pnt,
+        hope_shp_sppl_lmt_qty,
+        hope_shp_sppl_qty,
+        hope_shp_wy_cd
+        FROM pd_cust_bnft_info
+        WHERE prd_no = #{prdNo}
+        AND ( evnt_no is null OR evnt_no = 0 )
+        AND use_yn = 'Y'
+        AND ROWNUM = 1
+        /* benefitMapper.getCustomerBenefit */
+    </select>
+
+    <!-- 복수구매할인 목록 조회 -->
+    <select id="getCustomerPrdPluDscList" resultType="CustomerBenefitVO" parameterType="long">
+        SELECT
+        /*+ INDEX(A IX1_PD_PRD_PLU_DSC) */
+        prd_no,
+        NVL(USE_YN,'N') PLU_DSC_YN, /*복구구매할인여부 2011.10.11 */
+        NVL(PLU_DSC_CD,'01') PLU_DSC_CD,
+        NVL(PLU_DSC_BASIS,'0') PLU_DSC_BASIS,
+        NVL(PLU_DSC_WY_CD,'01') PLU_DSC_WY_CD,
+        NVL(PLU_DSC_APL_YN,'N') PLU_DSC_APL_YN ,
+        to_char(PLU_APL_BGN_DY,'rrrrmmddhh24miss') PLU_APL_BGN_DY,
+        to_char(PLU_APL_END_DY,'rrrrmmddhh24miss') PLU_APL_END_DY,
+        CASE WHEN NVL(PLU_DSC_WY_CD,'01')=01 THEN  NVL(PLU_DSC_RT,0)
+        WHEN PLU_DSC_WY_CD=02 THEN NVL(PLU_DSC_AMT,0)
+        END PLUDSCAMTPERCNT
+        FROM PD_PRD_PLU_DSC A
+        WHERE prd_no = #{prdNo}
+        AND PLU_TYP_CD='01' /*복수구매*/
+        ORDER BY PLU_DSC_BASIS
+        /* benefitMapper.getCustomerPrdPluDscList */
+    </select>
+
+</mapper>

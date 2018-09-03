@@ -1,0 +1,241 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.template.mapper.TemplateMapperTest">
+
+    <!--상품정보템플릿의 시퀀스를 가져온다 -->
+    <select id="getProductInformationTemplateSeq" resultType="long">
+        SELECT /* templateDAOMap.xml 하영존 2007.08.30 6 */
+        seq_pd_prd_info_tmplt.NEXTVAL
+        FROM dual
+    </select>
+
+    <!--상품정보템플릿 정보를  입력한다 -->
+    <update id="insertProductInformationTemplate" parameterType="PdPrdInfoTmplt">
+        INSERT /* templateDAOMap.xml 하영존 2007.08.30 7 */ INTO pd_prd_info_tmplt (
+        prd_info_tmplt_no
+        , mem_no
+        , prd_info_tmplt_nm
+        , prd_info_tmplt_clf_cd
+        , use_yn
+        , create_dt
+        , create_no
+        , update_dt
+        , update_no
+        ) VALUES (
+        #{prdInfoTmpltNo}
+        , #{memNo}
+        , #{prdInfoTmpltNm}
+        , #{prdInfoTmpltClfCd}
+        , 'Y'
+        , SYSDATE
+        , #{createNo}
+        , SYSDATE
+        , #{updateNo}
+        )
+    </update>
+
+    <!--판매정보템플릿 정보를  입력한다 -->
+    <update id="insertSellInformation" parameterType="PdSelInfo">
+        INSERT /* templateMapper.xml insertSellInformation */ INTO pd_sel_info (
+        prd_info_tmplt_no
+        , dlv_cn_area_cd
+        , dlv_wy_cd
+        , dlv_cst_pay_typ_cd
+        , dlv_cst
+        , prd_fr_dlv_basi_amt
+        , rtngd_dlv_cst
+        , exch_dlv_cst
+        , bndl_dlv_cn_yn
+        , today_dlv_cn_yn
+        , appmt_dy_dlv_cn_yn
+        , snd_pln_trm
+        , rcpt_isu_cn_yn
+        , create_dt
+        , create_no
+        , update_dt
+        , update_no
+        , dlv_cst_inst_basi_cd
+        , un_dlv_cn_yn
+        , dlv_cst_info_cd
+        , visit_dlv_yn
+        , dlv_clf
+        , abrd_cn_dlv_cst
+        , abrd_in_cd
+        , prd_wght
+        , jeju_dlv_cst
+        , island_dlv_cst
+        , rtngd_dlv_cd
+        ) VALUES (
+        #{prdInfoTmpltNo}
+        , #{dlvCnAreaCd}
+        , #{dlvWyCd}
+        , #{dlvCstPayTypCd}
+        , #{dlvCst}
+        , #{frDlvBasiAmt}
+        , #{rtngdDlvCst}
+        , #{exchDlvCst}
+        , #{bndlDlvCnYn}
+        , #{todayDlvCnYn}
+        , #{appmtDyDlvCnYn}
+        , #{sndPlnTrm}
+        , #{rcptIsuCnYn}
+        , SYSDATE
+        , #{createNo}
+        , SYSDATE
+        , #{updateNo}
+        , #{dlvCstInstBasiCd}
+        , #{unDlvCnYn}
+        , #{dlvCstInfoCd}
+        , #{visitDlvYn}
+        , #{dlvClf}
+        , #{abrdCnDlvCst}
+        , #{abrdInCd}
+        , #{prdWght}
+        , #{jejuDlvCst}
+        , #{islandDlvCst}
+        , #{rtngdDlvCd}
+        )
+    </update>
+
+    <update id="insertOrdBasicDeliCost" parameterType="PdPrdLstOrdBasiDlvCst">
+        INSERT /* templateMapper.xml insertOrdBasicDeliCost */ INTO pd_prd_lst_ord_basi_dlv_cst
+        (
+        dlv_cst_inst_no,
+        prd_info_tmplt_no,
+        dlv_cst_inst_obj_clf_cd,
+        ord_bgn_qty,
+        ord_end_qty,
+        dlv_cst,
+        create_dt,
+        create_no
+        ) VALUES (
+        SEQ_PRD_LST_ORD_BASI_DLV_CST.nextVal,
+        #{prdInfoTmpltNo},
+        #{dlvCstInstObjClfCd},
+        #{ordBgnQty},
+        #{ordEndQty},
+        #{dlvCst},
+        sysdate,
+        #{createNo}
+        )
+    </update>
+
+    <update id="insertProductDesc" parameterType="pdPrdLstDesc">
+        INSERT /* templateMapper.xml insertProductDesc */ INTO pd_prd_lst_desc
+        (
+        prd_desc_no,
+        prd_desc_obj_no,
+        prd_desc_obj_clf_cd,
+        prd_desc_typ_cd,
+        prd_desc_cont_vc,
+        prd_desc_cont_clob,
+        clob_typ_yn,
+        create_dt,
+        create_no
+        ) VALUES (
+        SEQ_PD_PRD_LST_DESC.nextVal,
+        #{prdDescObjNo},
+        #{prdDescObjClfCd},
+        #{prdDescTypCd},
+        #{prdDescContVc},
+        #{prdDescContClob},
+        #{clobTypYn},
+        sysdate,
+        #{createNo}
+        )
+    </update>
+
+    <!--  물품대장 출고지/교환/반품지  정보를  입력한다 -->
+    <update id="insertInventoryProductAddress" parameterType="PdPrdLstTgowPlcExchRtngd">
+        INSERT /* templateMapper.xml insertInventoryProductAddress */ INTO pd_prd_lst_tgow_plc_exch_rtngd (
+        prd_lst_addr_no,
+        prd_addr_obj_no,
+        prd_addr_obj_clf_cd,
+        mem_no,
+        addr_seq,
+        prd_addr_clf_cd,
+        create_dt,
+        create_no,
+        update_dt,
+        update_no,
+        mb_addr_location
+        )
+        VALUES (
+        SEQ_PRDLST_TGOW_PLC_EXCH_RTNGD.nextVal,
+        #{prdAddrObjNo},
+        #{prdAddrObjClfCd},
+        #{memNo},
+        #{addrSeq},
+        #{prdAddrClfCd},
+        sysdate,
+        #{createNo},
+        sysdate,
+        #{createNo},
+        #{mbAddrLocation}
+        )
+    </update>
+
+    <!-- 물품대장 추가구성품목 저장한다. -->
+    <insert id="insertInventoryAddProductComposition" parameterType="PdPrdLstAddPrdComp">
+        INSERT /* templateMapper.xml insertInventoryAddProductComposition */ INTO pd_prd_lst_add_prd_comp
+        (
+        prd_comp_no,
+        prd_comp_obj_no,
+        prd_comp_obj_clf_cd,
+        comp_prd_no,
+        comp_prd_stck_no,
+        main_prd_yn,
+        sel_prc,
+        add_comp_prc,
+        comp_prd_qty,
+        disp_prrt_rnk,
+        prd_comp_typ_cd,
+        sel_qty,
+        use_yn,
+        create_dt,
+        create_no,
+        comp_prd_nm
+        )VALUES(
+        SEQ_PD_PRD_LST_ADD_PRD_COMP.nextval,
+        #{prdCompObjNo},
+        #{prdCompObjClfCd},
+        #{compPrdNo},
+        #{compPrdStckNo},
+        #{mainPrdYn},
+        #{selPrc},
+        #{addCompPrc},
+        #{compPrdQty},
+        #{dispPrrtRnk},
+        #{prdCompTypCd},
+        #{selQty},
+        #{useYn},
+        sysdate,
+        #{createNo},
+        #{compPrdNm}
+        )
+    </insert>
+
+    <delete id="deleteProductInformationTemplate" parameterType="long">
+        delete from pd_prd_info_tmplt where PRD_INFO_TMPLT_NO = #{templtNo}
+    </delete>
+
+    <delete id="deletePrdSelInfo" parameterType="long">
+        delete from pd_sel_info where PRD_INFO_TMPLT_NO = #{templtNo}
+    </delete>
+
+    <delete id="deleteBasiDlvCst" parameterType="long">
+        delete from pd_prd_lst_ord_basi_dlv_cst where PRD_INFO_TMPLT_NO = #{templtNo}
+    </delete>
+
+    <delete id="deleteLstDesc" parameterType="long">
+        delete from pd_prd_lst_desc where PRD_DESC_OBJ_NO = #{templtNo} and create_no = 1004
+    </delete>
+
+    <delete id="deleteExchRtngd" parameterType="long">
+        delete from pd_prd_lst_tgow_plc_exch_rtngd where PRD_ADDR_OBJ_NO = #{templtNo} and create_no = 1004
+    </delete>
+    <delete id="deletePrdComp" parameterType="long">
+        delete from pd_prd_lst_add_prd_comp where prd_comp_obj_no = #{templtNo}
+    </delete>
+</mapper>

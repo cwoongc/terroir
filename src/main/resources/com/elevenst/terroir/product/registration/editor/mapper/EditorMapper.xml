@@ -1,0 +1,93 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.elevenst.terroir.product.registration.editor.mapper.EditorMapper">
+
+    <select id="selectFid" resultType="long">
+        SELECT 	SEQ_DP_CPEDITOR_FILE.nextval FROM dual
+    </select>
+
+    <insert id="insertUploadedEditorImageFileInfo" parameterType="DpCpeditorFile">
+        INSERT INTO 	/* EditorMapper.insertUploadedEditorImageFileInfo */
+        DP_CPEDITOR_FILE
+        (
+        FID,
+        FILE_NM,
+        FILE_TYPE,
+        FILE_SIZE,
+        FILE_PATH,
+        FILE_URL,
+        USE_YN,
+        CREATE_DT,
+        CREATE_NO,
+        DEL_DT
+        )
+        values
+        (
+        #{fid},
+        #{fileNm},
+        #{fileType},
+        #{fileSize},
+        #{filePath},
+        #{fileUrl},
+        'N',
+        SYSDATE,
+        #{createNo},
+        null
+        )
+    </insert>
+
+
+    <select id="selectRecommandEditorTemplates" resultType="PdRecmEdtrTmplt">
+        SELECT /* EditorMapper.selectRecommandEditorTemplates */
+          RECM_EDTR_TMPLT_NO,
+          RECM_EDTR_TMPLT_NM,
+          RECM_EDTR_TMPLT_CONT,
+          THUM_IMG_URL,
+          USE_YN,
+          CREATE_DT,
+          CREATE_NO,
+          UPDATE_DT,
+          UPDATE_NO
+        FROM PD_RECM_EDTR_TMPLT
+        ORDER BY RECM_EDTR_TMPLT_NO
+    </select>
+
+    <select id="selectRecommandEditorTemplate" parameterType="long" resultType="PdRecmEdtrTmplt">
+        SELECT /* EditorMapper.selectRecommandEditorTemplate */
+        RECM_EDTR_TMPLT_NO,
+        RECM_EDTR_TMPLT_NM,
+        RECM_EDTR_TMPLT_CONT,
+        THUM_IMG_URL,
+        USE_YN,
+        CREATE_DT,
+        CREATE_NO,
+        UPDATE_DT,
+        UPDATE_NO
+        FROM PD_RECM_EDTR_TMPLT
+        WHERE RECM_EDTR_TMPLT_NO = #{recommandEditorTemplateNo}
+    </select>
+
+
+    <insert id="insertRecommandEditorTemplate" parameterType="PdRecmEdtrTmplt">
+        INSERT INTO /* EditorMapper.insertRecommandEditorTemplate */ PD_RECM_EDTR_TMPLT (RECM_EDTR_TMPLT_NO, RECM_EDTR_TMPLT_NM, RECM_EDTR_TMPLT_CONT, THUM_IMG_URL, USE_YN, CREATE_DT, CREATE_NO, UPDATE_DT, UPDATE_NO)
+        VALUES (
+          #{recmEdtrTmpltNo},
+          #{recmEdtrTmpltNm},
+          #{recmEdtrTmpltCont},
+          #{thumImgUrl},
+          #{useYn},
+          sysdate,
+          #{createNo},
+          sysdate,
+          #{updateNo}
+        )
+    </insert>
+
+    <select id="createRecommandEditorTemplateNo" resultType="long">
+        SELECT /* createRecommandEditorTemplateNo */
+        SEQ_PD_RECM_EDTR_TMPLT.nextval FROM DUAL
+    </select>
+
+
+</mapper>
